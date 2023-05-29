@@ -1,4 +1,4 @@
-﻿#include <string>
+#include <string>
 #include <Windows.h>
 #include <locale>
 #include <codecvt>
@@ -191,15 +191,28 @@ private:
         _updatedFlags |= FLAG_UTF8;
     }
 
+    void initArrays()
+    {
+        _ascii = nullptr;
+        _latin1 = nullptr;
+        _latin2 = nullptr;
+        _latin3 = nullptr;
+        _latin4 = nullptr;
+        _shiftJis = nullptr;
+    }
+
 public:
     MorphText(const std::string& utf8)
     {
+        initArrays();
         _utf8 = utf8;
         _updatedFlags |= FLAG_UTF8;
     }
 
     MorphText(const std::wstring& utf16, bool bigEndian = false)
     {
+        initArrays();
+
         if (bigEndian)
         {
             _utf16BE = utf16;
@@ -214,6 +227,8 @@ public:
 
     MorphText(const std::u32string& utf32, bool bigEndian = false)
     {
+        initArrays();
+
         if (bigEndian)
         {
             _utf32BE = utf32;
@@ -228,6 +243,9 @@ public:
 
     MorphText(const char* charStr, int strType = 0)
     {
+
+        initArrays();
+
         int length = strlen(charStr);
         switch (strType)
         {
@@ -255,6 +273,7 @@ public:
 
     MorphText(const wchar_t* charStr, bool bigEndian = false)
     {
+        initArrays();
         *this = MorphText(std::wstring(charStr), bigEndian);
     }
 
@@ -265,7 +284,18 @@ public:
 
     MorphText(const char32_t* charStr, bool bigEndian = false)
     {
+        initArrays();
         *this = MorphText(std::u32string(charStr), bigEndian);
+    }
+
+    ~MorphText()
+    {
+        delete[] _ascii;
+        delete[] _latin1;
+        delete[] _latin2;
+        delete[] _latin3;
+        delete[] _latin4;
+        delete[] _shiftJis;
     }
 
     void operator = (const MorphText& other)
@@ -716,7 +746,7 @@ public:
         std::string temp;
         char* result;
 
-        switch (type)
+        switch (format)
         {
         case SHIFTJIS: {
             temp = ShiftJis_To_Utf8(input);
