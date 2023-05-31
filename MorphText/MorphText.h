@@ -1,4 +1,4 @@
-﻿#include <string>
+#include <string>
 #include <Windows.h>
 #include <locale>
 #include <codecvt>
@@ -1779,28 +1779,30 @@ public:
 
     void operator = (const MorphText& other)
     {
+        this->~MorphText();
+        initArrays();
         _utf8 = other._utf8;
         _utf16LE = other._utf16LE;
         _utf16BE = other._utf16BE;
         _utf32LE = other._utf32LE;
         _utf32BE = other._utf32BE;
-        strcpy(_ascii, other._ascii);
-        strcpy(_iso_8859_1, other._iso_8859_1);
-        strcpy(_iso_8859_2, other._iso_8859_2);
-        strcpy(_iso_8859_3, other._iso_8859_3);
-        strcpy(_iso_8859_4, other._iso_8859_4);
-        strcpy(_iso_8859_5, other._iso_8859_5);
-        strcpy(_iso_8859_6, other._iso_8859_6);
-        strcpy(_iso_8859_7, other._iso_8859_7);
-        strcpy(_iso_8859_8, other._iso_8859_8);
-        strcpy(_iso_8859_9, other._iso_8859_9);
-        strcpy(_iso_8859_10, other._iso_8859_10);
-        strcpy(_iso_8859_11, other._iso_8859_11);
-        strcpy(_iso_8859_13, other._iso_8859_13);
-        strcpy(_iso_8859_14, other._iso_8859_14);
-        strcpy(_iso_8859_15, other._iso_8859_15);
-        strcpy(_iso_8859_16, other._iso_8859_16);
-        strcpy(_shiftJis, other._shiftJis);
+        if(other._ascii) strcpy(_ascii, other._ascii);
+        if (other._iso_8859_1) strcpy(_iso_8859_1, other._iso_8859_1);
+        if (other._iso_8859_2) strcpy(_iso_8859_2, other._iso_8859_2);
+        if (other._iso_8859_3) strcpy(_iso_8859_3, other._iso_8859_3);
+        if (other._iso_8859_4) strcpy(_iso_8859_4, other._iso_8859_4);
+        if (other._iso_8859_5) strcpy(_iso_8859_5, other._iso_8859_5);
+        if (other._iso_8859_6) strcpy(_iso_8859_6, other._iso_8859_6);
+        if (other._iso_8859_7) strcpy(_iso_8859_7, other._iso_8859_7);
+        if (other._iso_8859_8) strcpy(_iso_8859_8, other._iso_8859_8);
+        if (other._iso_8859_9) strcpy(_iso_8859_9, other._iso_8859_9);
+        if (other._iso_8859_10) strcpy(_iso_8859_10, other._iso_8859_10);
+        if (other._iso_8859_11) strcpy(_iso_8859_11, other._iso_8859_11);
+        if (other._iso_8859_13) strcpy(_iso_8859_13, other._iso_8859_13);
+        if (other._iso_8859_14) strcpy(_iso_8859_14, other._iso_8859_14);
+        if (other._iso_8859_15) strcpy(_iso_8859_15, other._iso_8859_15);
+        if (other._iso_8859_16) strcpy(_iso_8859_16, other._iso_8859_16);
+        if (other._shiftJis) strcpy(_shiftJis, other._shiftJis);
         _updatedFlags = other._updatedFlags;
     }
 
