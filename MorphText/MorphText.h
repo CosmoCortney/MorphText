@@ -17,18 +17,15 @@ public:
         UTF32LE,
         UTF32BE,
         ASCII,
-        LATIN1,
-        LATIN2,
-        LATIN3,
-        LATIN4,
-        //LATIN5,
-        //LATIN6,
-        //LATIN7,
-        //LATIN8,
-        //LATIN9,
-        //LATIN10,
-        //LATIN11,
+        ISO_8859_1,
+        ISO_8859_2,
+        ISO_8859_3,
+        ISO_8859_4,
         SHIFTJIS,
+        LATIN1 = ISO_8859_1,
+        LATIN2 = ISO_8859_2,
+        LATIN3 = ISO_8859_3,
+        LATIN4 = ISO_8859_4,
     };
 
 private:
@@ -38,46 +35,37 @@ private:
     std::u32string _utf32LE;
     std::u32string _utf32BE;
     char* _ascii;
-    char* _latin1;
-    char* _latin2;
-    char* _latin3;
-    char* _latin4;
+    char* _iso_8859_1;
+    char* _iso_8859_2;
+    char* _iso_8859_3;
+    char* _iso_8859_4;
     char* _shiftJis;
     int _updatedFlags = 0;
-    bool _BE = false;
-    static constexpr wchar_t _latin2Lookup[] = {
-    0x00A0, 0x0104, 0x02D8, 0x0141, 0x00A4, 0x013D, 0x015A, 0x00A7, 0x00A8, 0x0160,
-    0x015E, 0x0164, 0x0179, 0x00AD, 0x017D, 0x017B, 0x00B0, 0x0105, 0x02DB, 0x0142,
-    0x00B4, 0x013E, 0x015B, 0x02C7, 0x00B8, 0x0161, 0x015F, 0x0165, 0x017A, 0x02DD,
-    0x017E, 0x017C, 0x0154, 0x00C1, 0x00C2, 0x0102, 0x00C4, 0x0139, 0x0106, 0x00C7,
-    0x010C, 0x00C9, 0x0118, 0x00CB, 0x011A, 0x00CD, 0x00CE, 0x010E, 0x0110, 0x0143,
-    0x0147, 0x00D3, 0x00D4, 0x0150, 0x00D6, 0x00D7, 0x0158, 0x016E, 0x00DA, 0x0170,
-    0x00DC, 0x00DD, 0x0162, 0x00DF, 0x0155, 0x00E1, 0x00E2, 0x0103, 0x00E4, 0x013A,
-    0x0107, 0x00E7, 0x010D, 0x00E9, 0x0119, 0x00EB, 0x011B, 0x00ED, 0x00EE, 0x010F,
-    0x0111, 0x0144, 0x0148, 0x00F3, 0x00F4, 0x0151, 0x00F6, 0x00F7, 0x0159, 0x016F,
-    0x00FA, 0x0171, 0x00FC, 0x00FD, 0x0163, 0x02D9 };
-    static constexpr wchar_t _latin3Lookup[] = {
-    0x00A0, 0x0126, 0x02D8, 0x00A3, 0x00A4, 0x00A5, 0x0124, 0x00A7, 0x00A8, 0x0130,
-    0x015E, 0x011E, 0x0134, 0x00AD, 0x017B, 0x00AF, 0x00B0, 0x0127, 0x00B2, 0x00B3,
-    0x00B4, 0x00B5, 0x0125, 0x00B7, 0x00B8, 0x0131, 0x015F, 0x011F, 0x0135, 0x00BD,
-    0x017C, 0x00BF, 0x00C0, 0x00C1, 0x00C2, 0x0102, 0x00C4, 0x0106, 0x00C6, 0x00C7,
-    0x010C, 0x00C9, 0x0118, 0x00CB, 0x011A, 0x00CD, 0x00CE, 0x010E, 0x0110, 0x0143,
-    0x0147, 0x00D3, 0x00D4, 0x0150, 0x00D6, 0x00D7, 0x0158, 0x016E, 0x00DA, 0x0170,
-    0x00DC, 0x00DD, 0x0162, 0x00DF, 0x0154, 0x00E1, 0x00E2, 0x0103, 0x00E4, 0x0107,
-    0x00E6, 0x00E7, 0x010D, 0x00E9, 0x0119, 0x00EB, 0x011B, 0x00ED, 0x00EE, 0x010F,
-    0x0111, 0x0144, 0x0148, 0x00F3, 0x00F4, 0x0151, 0x00F6, 0x00F7, 0x0159, 0x016F,
-    0x00FA, 0x0171, 0x00FC, 0x00FD, 0x0163, 0x02D9 };
-    static constexpr wchar_t _latin4Lookup[] = {
-    0x00A0, 0x0104, 0x0138, 0x0156, 0x00A4, 0x0128, 0x013B, 0x00A7, 0x00A8, 0x0160,
-    0x0112, 0x0122, 0x0166, 0x00AD, 0x017D, 0x00AF, 0x00B0, 0x0105, 0x02DB, 0x0157,
-    0x00B4, 0x0129, 0x013C, 0x02C7, 0x00B8, 0x0161, 0x0113, 0x0123, 0x0167, 0x014A,
-    0x017E, 0x014B, 0x0100, 0x00C1, 0x00C2, 0x00C3, 0x00C4, 0x00C5, 0x00C6, 0x012E,
-    0x010C, 0x00C9, 0x0118, 0x00CB, 0x0116, 0x00CD, 0x00CE, 0x012A, 0x0110, 0x0145,
-    0x014C, 0x00D3, 0x00D4, 0x00D5, 0x00D6, 0x00D7, 0x00D8, 0x0172, 0x00DA, 0x00DB,
-    0x00DC, 0x0168, 0x016A, 0x00DF, 0x0101, 0x00E1, 0x00E2, 0x00E3, 0x00E4, 0x00E5,
-    0x00E6, 0x012F, 0x010D, 0x00E9, 0x0119, 0x00EB, 0x0117, 0x00ED, 0x00EE, 0x012B,
-    0x0111, 0x0146, 0x014D, 0x00F3, 0x00F4, 0x00F5, 0x00F6, 0x00F7, 0x00F8, 0x0173,
-    0x00FA, 0x00FB, 0x00FC, 0x0169, 0x016B, 0x02D9};
+
+    static constexpr wchar_t _iso8859_2_map[] = { //Latin-2
+        0x00A0, 0x0104, 0x02D8, 0x0141, 0x00A4, 0x013D, 0x015A, 0x00A7, 0x00A8, 0x0160, 0x015E, 0x0164, 0x0179, 0x00AD, 0x017D, 0x017B,
+        0x00B0, 0x0105, 0x02DB, 0x0142, 0x00B4, 0x013E, 0x015B, 0x02C7, 0x00B8, 0x0161, 0x015F, 0x0165, 0x017A, 0x02DD, 0x017E, 0x017C,
+        0x0154, 0x00C1, 0x00C2, 0x0102, 0x00C4, 0x0139, 0x0106, 0x00C7, 0x010C, 0x00C9, 0x0118, 0x00CB, 0x011A, 0x00CD, 0x00CE, 0x010E,
+        0x0110, 0x0143, 0x0147, 0x00D3, 0x00D4, 0x0150, 0x00D6, 0x00D7, 0x0158, 0x016E, 0x00DA, 0x0170, 0x00DC, 0x00DD, 0x0162, 0x00DF,
+        0x0155, 0x00E1, 0x00E2, 0x0103, 0x00E4, 0x013A, 0x0107, 0x00E7, 0x010D, 0x00E9, 0x0119, 0x00EB, 0x011B, 0x00ED, 0x00EE, 0x010F,
+        0x0111, 0x0144, 0x0148, 0x00F3, 0x00F4, 0x0151, 0x00F6, 0x00F7, 0x0159, 0x016F, 0x00FA, 0x0171, 0x00FC, 0x00FD, 0x0163, 0x02D9
+    };
+    static constexpr wchar_t _iso8859_3_map[] = { //Latin-3
+        0x00A0, 0x0126, 0x02D8, 0x00A3, 0x00A4, 0x00A5, 0x0124, 0x00A7, 0x00A8, 0x0130, 0x015E, 0x011E, 0x0134, 0x00AD, 0xFFFF, 0x017B,
+        0x00B0, 0x0127, 0x00B2, 0x00B3, 0x00B4, 0x00B5, 0x0125, 0x00B7, 0x00B8, 0x0131, 0x015F, 0x011F, 0x0135, 0x00BD, 0xFFFF, 0x017C,
+        0x00C0, 0x00C1, 0x00C2, 0xFFFF, 0x00C4, 0x010A, 0x0108, 0x00C7, 0x00C8, 0x00C9, 0x00CA, 0x00CB, 0x00CC, 0x00CD, 0x00CE, 0x00CF,
+        0xFFFF, 0x00D1, 0x00D2, 0x00D3, 0x00D4, 0x0120, 0x00D6, 0x00D7, 0x011C, 0x00D9, 0x00DA, 0x00DB, 0x00DC, 0x016C, 0x015C, 0x00DF,
+        0x00E0, 0x00E1, 0x00E2, 0xFFFF, 0x00E4, 0x010B, 0x0109, 0x00E7, 0x00E8, 0x00E9, 0x00EA, 0x00EB, 0x00EC, 0x00ED, 0x00EE, 0x00EF,
+        0xFFFF, 0x00F1, 0x00F2, 0x00F3, 0x00F4, 0x0121, 0x00F6, 0x00F7, 0x011D, 0x00F9, 0x00FA, 0x00FB, 0x00FC, 0x016D, 0x015D, 0x02D9
+    };
+    static constexpr wchar_t _iso8859_4_map[] = { //Latin-4
+        0x00A0, 0x0104, 0x0138, 0x0156, 0x00A4, 0x0128, 0x013B, 0x00A7, 0x00A8, 0x0160, 0x0112, 0x0122, 0x0166, 0x00AD, 0x017D, 0x00AF,
+        0x00B0, 0x0105, 0x02DB, 0x0157, 0x00B4, 0x0129, 0x013C, 0x02C7, 0x00B8, 0x0161, 0x0113, 0x0123, 0x0167, 0x014A, 0x017E, 0x014B,
+        0x0100, 0x00C1, 0x00C2, 0x00C3, 0x00C4, 0x00C5, 0x00C6, 0x012E, 0x010C, 0x00C9, 0x0118, 0x00CB, 0x0116, 0x00CD, 0x00CE, 0x012A,
+        0x0110, 0x0145, 0x014C, 0x0136, 0x00D4, 0x00D5, 0x00D6, 0x00D7, 0x00D8, 0x0172, 0x00DA, 0x00DB, 0x00DC, 0x0168, 0x016A, 0x00DF,
+        0x0101, 0x00E1, 0x00E2, 0x00E3, 0x00E4, 0x00E5, 0x00E6, 0x012F, 0x010D, 0x00E9, 0x0119, 0x00EB, 0x0117, 0x00ED, 0x00EE, 0x012B,
+        0x0111, 0x0146, 0x014D, 0x0137, 0x00F4, 0x00F5, 0x00F6, 0x00F7, 0x00F8, 0x0173, 0x00FA, 0x00FB, 0x00FC, 0x0169, 0x016B, 0x02D9
+    };
 
     enum Flags
     {
@@ -87,10 +75,10 @@ private:
         FLAG_UTF32LE = 1 << Formats::UTF32LE,
         FLAG_UTF32BE = 1 << Formats::UTF32BE,
         FLAG_ASCII = 1 << Formats::ASCII,
-        FLAG_LATIN1 = 1 << Formats::LATIN1,
-        FLAG_LATIN2 = 1 << Formats::LATIN2,
-        FLAG_LATIN3 = 1 << Formats::LATIN3,
-        FLAG_LATIN4 = 1 << Formats::LATIN4,
+        FLAG_ISO_8859_1 = 1 << Formats::ISO_8859_1,
+        FLAG_ISO_8859_2 = 1 << Formats::ISO_8859_2,
+        FLAG_ISO_8859_3 = 1 << Formats::ISO_8859_3,
+        FLAG_ISO_8859_4 = 1 << Formats::ISO_8859_4,
         FLAG_SHIFTJIS = 1 << Formats::SHIFTJIS,
     };
 
@@ -194,10 +182,10 @@ private:
     void initArrays()
     {
         _ascii = nullptr;
-        _latin1 = nullptr;
-        _latin2 = nullptr;
-        _latin3 = nullptr;
-        _latin4 = nullptr;
+        _iso_8859_1 = nullptr;
+        _iso_8859_2 = nullptr;
+        _iso_8859_3 = nullptr;
+        _iso_8859_4 = nullptr;
         _shiftJis = nullptr;
     }
 
@@ -291,10 +279,10 @@ public:
     ~MorphText()
     {
         delete[] _ascii;
-        delete[] _latin1;
-        delete[] _latin2;
-        delete[] _latin3;
-        delete[] _latin4;
+        delete[] _iso_8859_1;
+        delete[] _iso_8859_2;
+        delete[] _iso_8859_3;
+        delete[] _iso_8859_4;
         delete[] _shiftJis;
     }
 
@@ -509,7 +497,7 @@ public:
         return output;
     }
 
-    static std::string ISO8859X_To_Utf8(const char* input, int format = LATIN1) //Converts the ISO8859X input to UTF-8
+    static std::string ISO8859X_To_Utf8(const char* input, int format = ISO_8859_1) //Converts the ISO8859X input to UTF-8
     {
         int length = strlen(input);
         wchar_t* temp = new wchar_t[length+1];
@@ -517,19 +505,18 @@ public:
 
         switch (format)
         {
-        case LATIN2:
-            lookup = (wchar_t*)_latin2Lookup;
+        case ISO_8859_2:
+            lookup = (wchar_t*)_iso8859_2_map;
             break;
-        case LATIN3:
-            lookup = (wchar_t*)_latin3Lookup;
+        case ISO_8859_3:
+            lookup = (wchar_t*)_iso8859_3_map;
             break;
-        case LATIN4:
-            lookup = (wchar_t*)_latin4Lookup;
+        case ISO_8859_4:
+            lookup = (wchar_t*)_iso8859_4_map;
             break;
-        default: //latin1
+        default: //ISO 8859-1
             return std::string(input);
         }
-
 
         for (int index = 0; index < length-1; ++index)
         {
@@ -545,7 +532,7 @@ public:
         return output;
     }
 
-    static char* Utf8_To_ISO8859X(const std::string& input, int format = LATIN1) //Converts the UTF-8 input to ISO8859X
+    static char* Utf8_To_ISO8859X(const std::string& input, const int format = ISO_8859_1) //Converts the UTF-8 input to ISO8859X
     {
         std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
         std::wstring utf16 = converter.from_bytes(input);
@@ -553,8 +540,15 @@ public:
 
         switch (format)
         {
-        case LATIN2:
-            lookup = (wchar_t*)_latin2Lookup;
+        case ISO_8859_2:
+            lookup = (wchar_t*)_iso8859_2_map;
+            break;
+        case ISO_8859_3:
+            lookup = (wchar_t*)_iso8859_3_map;
+            break;
+        case ISO_8859_4:
+            lookup = (wchar_t*)_iso8859_4_map;
+            break;
             break;
         case LATIN3:
             lookup = (wchar_t*)_latin3Lookup;
@@ -562,7 +556,7 @@ public:
         case LATIN4:
             lookup = (wchar_t*)_latin4Lookup;
             break;
-        default: //latin1
+        default: //ISO_8859_1
         {
             char* output = new char[input.size() + 1];
             strcpy(output, input.c_str());
@@ -581,7 +575,7 @@ public:
             {
                 for (uint8_t lookupIndex = 0; lookupIndex < 0x60; ++lookupIndex)
                 {
-                    if (_latin2Lookup[lookupIndex] == ch)
+                    if (_iso8859_2_map[lookupIndex] == ch)
                     {
                         output[index] = lookupIndex + 0xA0;
                         break;
@@ -1009,10 +1003,10 @@ public:
         std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
 
         std::cout << "ASCII: " << _ascii << " --- updated: " << (bool)(_updatedFlags & FLAG_ASCII) << "\n";
-        std::cout << "LATIN1: " << _latin1 << " --- updated: " << (bool)(_updatedFlags & FLAG_LATIN1) << "\n";
-        std::cout << "LATIN2: " << _latin2 << " --- updated: " << (bool)(_updatedFlags & FLAG_LATIN2) << "\n";
-        std::cout << "LATIN3: " << _latin3 << " --- updated: " << (bool)(_updatedFlags & FLAG_LATIN3) << "\n";
-        std::cout << "LATIN4: " << _latin4 << " --- updated: " << (bool)(_updatedFlags & FLAG_LATIN4) << "\n";
+        std::cout << "LATIN1: " << _iso_8859_1 << " --- updated: " << (bool)(_updatedFlags & FLAG_ISO_8859_1) << "\n";
+        std::cout << "LATIN2: " << _iso_8859_2 << " --- updated: " << (bool)(_updatedFlags & FLAG_ISO_8859_2) << "\n";
+        std::cout << "LATIN3: " << _iso_8859_3 << " --- updated: " << (bool)(_updatedFlags & FLAG_ISO_8859_3) << "\n";
+        std::cout << "LATIN4: " << _iso_8859_4 << " --- updated: " << (bool)(_updatedFlags & FLAG_ISO_8859_4) << "\n";
         std::cout << "UTF-8: " << _utf8 << " --- updated: " << (bool)(_updatedFlags & FLAG_UTF8) << "\n";
         std::wcout << L"UTF-16LE: " << _utf16LE << " --- updated: " << (bool)(_updatedFlags & FLAG_UTF16LE) << "\n";
         std::wcout << L"UTF-16BE: " << _utf16BE << " --- updated: " << (bool)(_updatedFlags & FLAG_UTF16BE) << "\n";
