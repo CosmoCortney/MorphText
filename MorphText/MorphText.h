@@ -324,6 +324,17 @@ private:
         _iso_8859_2 = nullptr;
         _iso_8859_3 = nullptr;
         _iso_8859_4 = nullptr;
+        _iso_8859_5 = nullptr;
+        _iso_8859_6 = nullptr;
+        _iso_8859_7 = nullptr;
+        _iso_8859_8 = nullptr;
+        _iso_8859_9 = nullptr;
+        _iso_8859_10 = nullptr;
+        _iso_8859_11 = nullptr;
+        _iso_8859_13 = nullptr;
+        _iso_8859_14 = nullptr;
+        _iso_8859_15 = nullptr;
+        _iso_8859_16 = nullptr;
         _shiftJis = nullptr;
     }
 
@@ -369,29 +380,115 @@ public:
 
     MorphText(const char* charStr, int strType = 0)
     {
-
         initArrays();
-
         int length = strlen(charStr);
+
         switch (strType)
         {
         case Formats::UTF8: {
             *this = MorphText(std::string(charStr));
         } break;
-        case LATIN1: {
-
+        case ISO_8859_1: {
+            _iso_8859_1 = new char[length + 1];
+            strcpy(_iso_8859_1, charStr);
+            _iso_8859_1[length] = '/0';
+            _updatedFlags |= FLAG_ISO_8859_1;
+        } break;
+        case ISO_8859_2: {
+            _iso_8859_2 = new char[length + 1];
+            strcpy(_iso_8859_2, charStr);
+            _iso_8859_2[length] = '/0';
+            _updatedFlags |= FLAG_ISO_8859_2;
+        } break;
+        case ISO_8859_3: {
+            _iso_8859_3 = new char[length + 1];
+            strcpy(_iso_8859_3, charStr);
+            _iso_8859_3[length] = '/0';
+            _updatedFlags |= FLAG_ISO_8859_3;
+        } break;
+        case ISO_8859_4: {
+            _iso_8859_4 = new char[length + 1];
+            strcpy(_iso_8859_4, charStr);
+            _iso_8859_4[length] = '/0';
+            _updatedFlags |= FLAG_ISO_8859_4;
+        } break;
+        case ISO_8859_5: {
+            _iso_8859_5 = new char[length + 1];
+            strcpy(_iso_8859_5, charStr);
+            _iso_8859_5[length] = '/0';
+            _updatedFlags |= FLAG_ISO_8859_5;
+        } break;
+        case ISO_8859_6: {
+            _iso_8859_6 = new char[length + 1];
+            strcpy(_iso_8859_6, charStr);
+            _iso_8859_6[length] = '/0';
+            _updatedFlags |= FLAG_ISO_8859_6;
+        } break;
+        case ISO_8859_7: {
+            _iso_8859_7 = new char[length + 1];
+            strcpy(_iso_8859_7, charStr);
+            _iso_8859_7[length] = '/0';
+            _updatedFlags |= FLAG_ISO_8859_7;
+        } break;
+        case ISO_8859_8: {
+            _iso_8859_8 = new char[length + 1];
+            strcpy(_iso_8859_8, charStr);
+            _iso_8859_8[length] = '/0';
+            _updatedFlags |= FLAG_ISO_8859_8;
+        } break;
+        case ISO_8859_9: {
+            _iso_8859_9 = new char[length + 1];
+            strcpy(_iso_8859_9, charStr);
+            _iso_8859_9[length] = '/0';
+            _updatedFlags |= FLAG_ISO_8859_9;
+        } break;
+        case ISO_8859_10: {
+            _iso_8859_10 = new char[length + 1];
+            strcpy(_iso_8859_10, charStr);
+            _iso_8859_10[length] = '/0';
+            _updatedFlags |= FLAG_ISO_8859_10;
+        } break;
+        case ISO_8859_11: {
+            _iso_8859_11 = new char[length + 1];
+            strcpy(_iso_8859_11, charStr);
+            _iso_8859_11[length] = '/0';
+            _updatedFlags |= FLAG_ISO_8859_11;
+        } break;
+        case ISO_8859_13: {
+            _iso_8859_13 = new char[length + 1];
+            strcpy(_iso_8859_13, charStr);
+            _iso_8859_13[length] = '/0';
+            _updatedFlags |= FLAG_ISO_8859_13;
+        } break;
+        case ISO_8859_14: {
+            _iso_8859_14 = new char[length + 1];
+            strcpy(_iso_8859_14, charStr);
+            _iso_8859_14[length] = '/0';
+            _updatedFlags |= FLAG_ISO_8859_14;
+        } break;
+        case ISO_8859_15: {
+            _iso_8859_15 = new char[length + 1];
+            strcpy(_iso_8859_15, charStr);
+            _iso_8859_15[length] = '/0';
+            _updatedFlags |= FLAG_ISO_8859_15;
+        } break;
+        case ISO_8859_16: {
+            _iso_8859_16 = new char[length + 1];
+            strcpy(_iso_8859_16, charStr);
+            _iso_8859_16[length] = '/0';
+            _updatedFlags |= FLAG_ISO_8859_16;
         } break;
         case Formats::SHIFTJIS: {
             _shiftJis = new char[length + 1];
-            _shiftJis[length] = '/0';
             strcpy(_shiftJis, charStr);
+            _shiftJis[length] = '/0';
             _updatedFlags |= FLAG_SHIFTJIS;
         } break;
         default: // ASCII
         {
             _ascii = new char[length + 1];
-            _ascii[length] = '/0';
             strcpy(_ascii, charStr);
+            _ascii[length] = '/0';
             _updatedFlags |= FLAG_ASCII;
         }
         }
@@ -421,6 +518,17 @@ public:
         delete[] _iso_8859_2;
         delete[] _iso_8859_3;
         delete[] _iso_8859_4;
+        delete[] _iso_8859_5;
+        delete[] _iso_8859_6;
+        delete[] _iso_8859_7;
+        delete[] _iso_8859_8;
+        delete[] _iso_8859_9;
+        delete[] _iso_8859_10;
+        delete[] _iso_8859_11;
+        delete[] _iso_8859_13;
+        delete[] _iso_8859_14;
+        delete[] _iso_8859_15;
+        delete[] _iso_8859_16;
         delete[] _shiftJis;
     }
 
