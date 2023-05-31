@@ -225,14 +225,36 @@ private:
         if (_updatedFlags & FLAG_UTF8)
             return;
 
-        if (_updatedFlags & FLAG_LATIN1)
-            ;
-        else if (_updatedFlags & FLAG_LATIN2)
-            ;
-        else if (_updatedFlags & FLAG_LATIN3)
-            ;
-        else if (_updatedFlags & FLAG_LATIN4)
-            ;
+        if (_updatedFlags & FLAG_ISO_8859_1)
+            iso8859xToUtf8(FLAG_ISO_8859_1);
+        else if (_updatedFlags & FLAG_ISO_8859_2)
+            iso8859xToUtf8(FLAG_ISO_8859_2);
+        else if (_updatedFlags & FLAG_ISO_8859_3)
+            iso8859xToUtf8(FLAG_ISO_8859_3);
+        else if (_updatedFlags & FLAG_ISO_8859_4)
+            iso8859xToUtf8(FLAG_ISO_8859_4);
+        else if (_updatedFlags & FLAG_ISO_8859_5)
+            iso8859xToUtf8(FLAG_ISO_8859_5);
+        else if (_updatedFlags & FLAG_ISO_8859_6)
+            iso8859xToUtf8(FLAG_ISO_8859_6);
+        else if (_updatedFlags & FLAG_ISO_8859_7)
+            iso8859xToUtf8(FLAG_ISO_8859_7);
+        else if (_updatedFlags & FLAG_ISO_8859_8)
+            iso8859xToUtf8(FLAG_ISO_8859_8);
+        else if (_updatedFlags & FLAG_ISO_8859_9)
+            iso8859xToUtf8(FLAG_ISO_8859_9);
+        else if (_updatedFlags & FLAG_ISO_8859_10)
+            iso8859xToUtf8(FLAG_ISO_8859_10);
+        else if (_updatedFlags & FLAG_ISO_8859_11)
+            iso8859xToUtf8(FLAG_ISO_8859_11);
+        else if (_updatedFlags & FLAG_ISO_8859_13)
+            iso8859xToUtf8(FLAG_ISO_8859_13);
+        else if (_updatedFlags & FLAG_ISO_8859_14)
+            iso8859xToUtf8(FLAG_ISO_8859_14);
+        else if (_updatedFlags & FLAG_ISO_8859_15)
+            iso8859xToUtf8(FLAG_ISO_8859_15);
+        else if (_updatedFlags & FLAG_ISO_8859_16)
+            iso8859xToUtf8(FLAG_ISO_8859_16);
         else if (_updatedFlags & FLAG_UTF16LE)
             utf16LeToUtf8();
         else if (_updatedFlags & FLAG_UTF16BE)
@@ -295,14 +317,124 @@ private:
 
     void asciiToUtf8()
     {
-        _utf8 = std::string(_ascii);
+        _utf8 = ASCII_To_Utf8(_ascii);
         _updatedFlags |= FLAG_UTF8;
     }
 
     void utf8ToAscii()
     {
-        strcpy(_ascii, _utf8.c_str());
+        _ascii = Utf8_To_ASCII(_utf8);
         _updatedFlags |= FLAG_ASCII;
+    }
+
+    void iso8859xToUtf8(int format)
+    {
+        char* txt;
+
+        switch (format)
+        {
+        case ISO_8859_2:
+            txt = _iso_8859_2;
+            break;
+        case ISO_8859_3:
+            txt = _iso_8859_3;
+            break;
+        case ISO_8859_4:
+            txt = _iso_8859_4;
+            break;
+        case ISO_8859_5:
+            txt = _iso_8859_5;
+            break;
+        case ISO_8859_6:
+            txt = _iso_8859_6;
+            break;
+        case ISO_8859_7:
+            txt = _iso_8859_7;
+            break;
+        case ISO_8859_8:
+            txt = _iso_8859_8;
+            break;
+        case ISO_8859_9:
+            txt = _iso_8859_9;
+            break;
+        case ISO_8859_10:
+            txt = _iso_8859_10;
+            break;
+        case ISO_8859_11:
+            txt = _iso_8859_11;
+            break;
+        case ISO_8859_13:
+            txt = _iso_8859_13;
+            break;
+        case ISO_8859_14:
+            txt = _iso_8859_14;
+            break;
+        case ISO_8859_15:
+            txt = _iso_8859_15;
+            break;
+        case ISO_8859_16:
+            txt = _iso_8859_16;
+            break;
+        default: //ISO_8859_1
+            txt = _iso_8859_1;
+        }
+
+        _utf8 = ISO8859X_To_Utf8(txt, format);
+        _updatedFlags |= FLAG_UTF8;
+    }
+
+    void utf8ToIso8859x(int format)
+    {
+        switch (format)
+        {
+        case ISO_8859_2:
+            _iso_8859_2 = Utf8_To_ISO8859X(_utf8, format);
+            break;
+        case ISO_8859_3:
+            _iso_8859_3 = Utf8_To_ISO8859X(_utf8, format);
+            break;
+        case ISO_8859_4:
+            _iso_8859_4 = Utf8_To_ISO8859X(_utf8, format);
+            break;
+        case ISO_8859_5:
+            _iso_8859_5 = Utf8_To_ISO8859X(_utf8, format);
+            break;
+        case ISO_8859_6:
+            _iso_8859_6 = Utf8_To_ISO8859X(_utf8, format);
+            break;
+        case ISO_8859_7:
+            _iso_8859_7 = Utf8_To_ISO8859X(_utf8, format);
+            break;
+        case ISO_8859_8:
+            _iso_8859_8 = Utf8_To_ISO8859X(_utf8, format);
+            break;
+        case ISO_8859_9:
+            _iso_8859_9 = Utf8_To_ISO8859X(_utf8, format);
+            break;
+        case ISO_8859_10:
+            _iso_8859_10 = Utf8_To_ISO8859X(_utf8, format);
+            break;
+        case ISO_8859_11:
+            _iso_8859_11 = Utf8_To_ISO8859X(_utf8, format);
+            break;
+        case ISO_8859_13:
+            _iso_8859_13 = Utf8_To_ISO8859X(_utf8, format);
+            break;
+        case ISO_8859_14:
+            _iso_8859_14 = Utf8_To_ISO8859X(_utf8, format);
+            break;
+        case ISO_8859_15:
+            _iso_8859_15 = Utf8_To_ISO8859X(_utf8, format);
+            break;
+        case ISO_8859_16:
+            _iso_8859_16 = Utf8_To_ISO8859X(_utf8, format);
+            break;
+        default:// ISO 8859-1
+            _iso_8859_1 = Utf8_To_ISO8859X(_utf8, format);
+            break;
+        }
+        
+        _updatedFlags |= (format >= ISO_8859_1 && format <= ISO_8859_16) ? (1 << format) : ISO_8859_1;
     }
 
     void utf8ToShiftJis()
@@ -760,6 +892,39 @@ public:
         case ISO_8859_4:
             lookup = (wchar_t*)_iso8859_4_map;
             break;
+        case ISO_8859_5:
+            lookup = (wchar_t*)_iso8859_5_map;
+            break;
+        case ISO_8859_6:
+            lookup = (wchar_t*)_iso8859_6_map;
+            break;
+        case ISO_8859_7:
+            lookup = (wchar_t*)_iso8859_7_map;
+            break;
+        case ISO_8859_8:
+            lookup = (wchar_t*)_iso8859_8_map;
+            break;
+        case ISO_8859_9:
+            lookup = (wchar_t*)_iso8859_9_map;
+            break;
+        case ISO_8859_10:
+            lookup = (wchar_t*)_iso8859_10_map;
+            break;
+        case ISO_8859_11:
+            lookup = (wchar_t*)_iso8859_11_map;
+            break;
+        case ISO_8859_13:
+            lookup = (wchar_t*)_iso8859_13_map;
+            break;
+        case ISO_8859_14:
+            lookup = (wchar_t*)_iso8859_14_map;
+            break;
+        case ISO_8859_15:
+            lookup = (wchar_t*)_iso8859_15_map;
+            break;
+        case ISO_8859_16:
+            lookup = (wchar_t*)_iso8859_16_map;
+            break;
         default: //ISO 8859-1
             return std::string(input);
         }
@@ -795,12 +960,38 @@ public:
         case ISO_8859_4:
             lookup = (wchar_t*)_iso8859_4_map;
             break;
+        case ISO_8859_5:
+            lookup = (wchar_t*)_iso8859_5_map;
             break;
-        case LATIN3:
-            lookup = (wchar_t*)_latin3Lookup;
+        case ISO_8859_6:
+            lookup = (wchar_t*)_iso8859_6_map;
             break;
-        case LATIN4:
-            lookup = (wchar_t*)_latin4Lookup;
+        case ISO_8859_7:
+            lookup = (wchar_t*)_iso8859_7_map;
+            break;
+        case ISO_8859_8:
+            lookup = (wchar_t*)_iso8859_8_map;
+            break;
+        case ISO_8859_9:
+            lookup = (wchar_t*)_iso8859_9_map;
+            break;
+        case ISO_8859_10:
+            lookup = (wchar_t*)_iso8859_10_map;
+            break;
+        case ISO_8859_11:
+            lookup = (wchar_t*)_iso8859_11_map;
+            break;
+        case ISO_8859_13:
+            lookup = (wchar_t*)_iso8859_13_map;
+            break;
+        case ISO_8859_14:
+            lookup = (wchar_t*)_iso8859_14_map;
+            break;
+        case ISO_8859_15:
+            lookup = (wchar_t*)_iso8859_15_map;
+            break;
+        case ISO_8859_16:
+            lookup = (wchar_t*)_iso8859_16_map;
             break;
         default: //ISO_8859_1
         {
@@ -988,15 +1179,20 @@ public:
 
         switch (format)
         {
+        case ASCII: {
+            temp = ShiftJis_To_Utf8(input);
+            temp = ToLower(temp);
+            result = Utf8_To_ShiftJis(temp);
+        }break;
         case SHIFTJIS: {
             temp = ShiftJis_To_Utf8(input);
             temp = ToLower(temp);
             result = Utf8_To_ShiftJis(temp);
         }break;
-        default: { //ASCII
-            temp = ASCII_To_Utf8(input);
+        default: { //ISO 8859-X
+            temp = ISO8859X_To_Utf8(input, format);
             temp = ToLower(temp);
-            result = Utf8_To_ASCII(temp);
+            result = Utf8_To_ISO8859X(temp);
         }
         }
 
@@ -1010,15 +1206,20 @@ public:
 
         switch (format)
         {
+        case ASCII: {
+            temp = ShiftJis_To_Utf8(input);
+            temp = ToUpper(temp);
+            result = Utf8_To_ShiftJis(temp);
+        }break;
         case SHIFTJIS: {
             temp = ShiftJis_To_Utf8(input);
             temp = ToUpper(temp);
             result = Utf8_To_ShiftJis(temp);
         }break;
-        default: { //ASCII
-            temp = ASCII_To_Utf8(input);
+        default: { //ISO 8859-X
+            temp = ISO8859X_To_Utf8(input, format);
             temp = ToUpper(temp);
-            result = Utf8_To_ASCII(temp);
+            result = Utf8_To_ISO8859X(temp);
         }
         }
 
@@ -1032,15 +1233,20 @@ public:
 
         switch (format)
         {
+        case ASCII: {
+            temp = ShiftJis_To_Utf8(input);
+            temp = ToSarcasm(temp);
+            result = Utf8_To_ShiftJis(temp);
+        }break;
         case SHIFTJIS: {
             temp = ShiftJis_To_Utf8(input);
             temp = ToSarcasm(temp);
             result = Utf8_To_ShiftJis(temp);
         }break;
-        default: { //ASCII
-            temp = ASCII_To_Utf8(input);
+        default: { //ISO 8859-X
+            temp = ISO8859X_To_Utf8(input, format);
             temp = ToSarcasm(temp);
-            result = Utf8_To_ASCII(temp);
+            result = Utf8_To_ISO8859X(temp);
         }
         }
 
@@ -1081,12 +1287,16 @@ public:
         {
             switch (format)
             {
+            case ASCII: {
+                utf8ToAscii();
+                return ToLower(_ascii, ASCII);
+            }
                 case SHIFTJIS: {
                     utf8ToShiftJis();
                     return ToLower(_shiftJis, SHIFTJIS);
                 }
-                default: { //ASCII
-                    utf8ToAscii();
+            default: { //ISO 8859-X
+                utf8ToIso8859x();
                     return ToLower(_ascii, ASCII);
                 }
             }
