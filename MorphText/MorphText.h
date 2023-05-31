@@ -971,18 +971,16 @@ public:
         return output;
     }
 
-    static bool Compare(const std::string& lhs, const std::string& rhs, const bool caseSensitive = true, const bool subString = false)
+
+    static bool Compare(const std::string& lhs, const std::string& rhs, const bool caseSensitive = true)
     {
         std::string lhsOperand = caseSensitive ? lhs : ToLower(lhs);
         std::string rhsOperand = caseSensitive ? rhs : ToLower(rhs);
 
-        if (subString)
-            return lhsOperand.find(rhsOperand) != (size_t)-1;
-        else
             return lhsOperand.compare(rhsOperand) == 0;
     }
 
-    static bool Compare(const std::wstring& lhs, const std::wstring& rhs, const bool caseSensitive = true, const bool subString = false, bool isBigEndian = false)
+    static bool Compare(const std::wstring& lhs, const std::wstring& rhs, const bool caseSensitive = true, bool isBigEndian = false)
     {
         std::string lhsOperand;
         std::string rhsOperand;
@@ -998,13 +996,10 @@ public:
             rhsOperand = caseSensitive ? Utf16LE_To_Utf8(rhs) : ToLower(Utf16LE_To_Utf8(rhs));
         }
 
-        if (subString)
-            return lhsOperand.find(rhsOperand) != (size_t)-1;
-        else
             return lhsOperand.compare(rhsOperand) == 0;
     }
 
-    static bool Compare(const std::u32string& lhs, const std::u32string& rhs, const bool caseSensitive = true, const bool subString = false, bool isBigEndian = false)
+    static bool Compare(const std::u32string& lhs, const std::u32string& rhs, const bool caseSensitive = true, bool isBigEndian = false)
     {
         std::string lhsOperand;
         std::string rhsOperand;
@@ -1020,33 +1015,22 @@ public:
             rhsOperand = caseSensitive ? Utf32LE_To_Utf8(rhs) : ToLower(Utf32LE_To_Utf8(rhs));
         }
 
-        if (subString)
-            return lhsOperand.find(rhsOperand) != (size_t)-1;
-        else
             return lhsOperand.compare(rhsOperand) == 0;
     }
 
-    static bool Compare(const char* lhs, const char* rhs, const bool caseSensitive = true, const bool subString = false, const int format = 0)
+    static bool Compare(const char* lhs, const char* rhs, const bool caseSensitive = true, const int format = 0)
     {
-        std::string lhsOperand;
-        std::string rhsOperand;
-
         switch (format)
         {
-        case SHIFTJIS: {
-            lhsOperand = caseSensitive ? ShiftJis_To_Utf8(lhs) : ToLower(ShiftJis_To_Utf8(lhs));
-            rhsOperand = caseSensitive ? ShiftJis_To_Utf8(rhs) : ToLower(ShiftJis_To_Utf8(rhs));
-        }break;
-        default: { //ASCII
-            lhsOperand = caseSensitive ? ASCII_To_Utf8(lhs) : ToLower(ASCII_To_Utf8(lhs));
-            rhsOperand = caseSensitive ? ASCII_To_Utf8(rhs) : ToLower(ASCII_To_Utf8(rhs));
+        case ASCII:
+            return Compare(ASCII_To_Utf8(lhs), ASCII_To_Utf8(rhs), caseSensitive);
+        break;
+        case SHIFTJIS: 
+            return Compare(ShiftJis_To_Utf8(lhs), ShiftJis_To_Utf8(rhs), caseSensitive);
+        break;
+        default: //ISO 8859-X
+            return Compare(ISO8859X_To_Utf8(lhs, format), ISO8859X_To_Utf8(rhs, format), caseSensitive);
         }
-        }
-
-        if (subString)
-            return lhsOperand.find(rhsOperand) != (size_t)-1;
-        else
-            return lhsOperand.compare(rhsOperand) == 0;
     }
 
     static std::string ToLower(const std::string& input)
@@ -1338,6 +1322,67 @@ public:
         }
     }
 
+    bool Compare(const std::string& rhs, const bool caseSensitive = true)
+    {
+        return Compare(_utf8, rhs, caseSensitive);
+    }
+
+    bool Compare(const std::wstring& rhs, const bool caseSensitive = true, const bool bigEndian = false)
+    {
+        if(bigEndian)
+            return Compare(_utf16BE, rhs, caseSensitive, true);
+
+        return Compare(_utf16LE, rhs, caseSensitive, false);
+    }
+
+    bool Compare(const std::u32string& rhs, const bool caseSensitive = true, const bool bigEndian = false)
+    {
+        if (bigEndian)
+            return Compare(_utf32BE, rhs, caseSensitive, true);
+
+        return Compare(_utf32LE, rhs, caseSensitive, false);
+    }
+
+    bool Compare(const char* rhs, const bool caseSensitive = true, const int format = ASCII)
+    {
+        switch (format)
+        {
+        case SHIFTJIS:
+            return Compare(_shiftJis, rhs, caseSensitive);
+        case ISO_8859_1:
+            return Compare(_iso_8859_1, rhs, caseSensitive, format);
+        case ISO_8859_2:
+            return Compare(_iso_8859_2, rhs, caseSensitive, format);
+        case ISO_8859_3:
+            return Compare(_iso_8859_3, rhs, caseSensitive, format);
+        case ISO_8859_4:
+            return Compare(_iso_8859_4, rhs, caseSensitive, format);
+        case ISO_8859_5:
+            return Compare(_iso_8859_5, rhs, caseSensitive, format);
+        case ISO_8859_6:
+            return Compare(_iso_8859_6, rhs, caseSensitive, format);
+        case ISO_8859_7:
+            return Compare(_iso_8859_7, rhs, caseSensitive, format);
+        case ISO_8859_8:
+            return Compare(_iso_8859_8, rhs, caseSensitive, format);
+        case ISO_8859_9:
+            return Compare(_iso_8859_9, rhs, caseSensitive, format);
+        case ISO_8859_10:
+            return Compare(_iso_8859_10, rhs, caseSensitive, format);
+        case ISO_8859_11:
+            return Compare(_iso_8859_11, rhs, caseSensitive, format);
+        case ISO_8859_13:
+            return Compare(_iso_8859_13, rhs, caseSensitive, format);
+        case ISO_8859_14:
+            return Compare(_iso_8859_14, rhs, caseSensitive, format);
+        case ISO_8859_15:
+            return Compare(_iso_8859_15, rhs, caseSensitive, format);
+        case ISO_8859_16:
+            return Compare(_iso_8859_16, rhs, caseSensitive, format);
+        default: //ASCII
+            return Compare(_ascii, rhs, caseSensitive);
+        }
+    }
     std::string GetUTF8()
     {
         convertToUtf8();
