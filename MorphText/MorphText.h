@@ -1,4 +1,4 @@
-#include <string>
+﻿#include <string>
 #include <Windows.h>
 #include <locale>
 #include <codecvt>
@@ -971,13 +971,66 @@ public:
         return output;
     }
 
+    static int Find(const std::string& superset, const std::string& subset, bool caseSensitive = true)
+    {
+        std::string sups = caseSensitive ? superset : ToLower(superset);
+        std::string subs = caseSensitive ? subset : ToLower(subset);
+        return sups.find(subs);
+    }
+
+    static int Find(const std::wstring& superset, const std::wstring& subset, const bool caseSensitive = true, const bool bigEndian = false)
+    {
+        if (bigEndian)
+        {
+            if (caseSensitive)
+                return Utf16BE_To_Utf8(superset).find(Utf16BE_To_Utf8(subset));
+
+            return ToLower(Utf16BE_To_Utf8(superset)).find(ToLower(Utf16BE_To_Utf8(subset)));
+        }
+        
+        if (caseSensitive)
+            return Utf16LE_To_Utf8(superset).find(Utf16LE_To_Utf8(subset));
+
+        return ToLower(Utf16LE_To_Utf8(superset)).find(ToLower(Utf16LE_To_Utf8(subset)));
+    }
+
+    static int Find(const std::u32string& superset, const std::u32string& subset, const bool caseSensitive = true, const bool bigEndian = false)
+    {
+        if (bigEndian)
+        {
+            if (caseSensitive)
+                return Utf32BE_To_Utf8(superset).find(Utf32BE_To_Utf8(subset));
+
+            return ToLower(Utf32BE_To_Utf8(superset)).find(ToLower(Utf32BE_To_Utf8(subset)));
+        }
+
+        if (caseSensitive)
+            return Utf32LE_To_Utf8(superset).find(Utf32LE_To_Utf8(subset));
+
+        return ToLower(Utf32LE_To_Utf8(superset)).find(ToLower(Utf32LE_To_Utf8(subset)));
+    }
+
+    static int Find(const char* superset, const char* subset, const int format, const bool caseSensitive = true)
+    {
+        switch (format)
+        {
+        case ASCII:
+            return Find(ASCII_To_Utf8(superset), ASCII_To_Utf8(subset), caseSensitive);
+            break;
+        case SHIFTJIS:
+            return Find(ShiftJis_To_Utf8(superset), ShiftJis_To_Utf8(subset), caseSensitive);
+            break;
+        default: //ISO 8859-X
+            return Find(ISO8859X_To_Utf8(superset, format), ISO8859X_To_Utf8(subset, format), caseSensitive);
+        }
+    }
 
     static bool Compare(const std::string& lhs, const std::string& rhs, const bool caseSensitive = true)
     {
         std::string lhsOperand = caseSensitive ? lhs : ToLower(lhs);
         std::string rhsOperand = caseSensitive ? rhs : ToLower(rhs);
 
-            return lhsOperand.compare(rhsOperand) == 0;
+        return lhsOperand.compare(rhsOperand) == 0;
     }
 
     static bool Compare(const std::wstring& lhs, const std::wstring& rhs, const bool caseSensitive = true, bool isBigEndian = false)
@@ -996,7 +1049,7 @@ public:
             rhsOperand = caseSensitive ? Utf16LE_To_Utf8(rhs) : ToLower(Utf16LE_To_Utf8(rhs));
         }
 
-            return lhsOperand.compare(rhsOperand) == 0;
+        return lhsOperand.compare(rhsOperand) == 0;
     }
 
     static bool Compare(const std::u32string& lhs, const std::u32string& rhs, const bool caseSensitive = true, bool isBigEndian = false)
@@ -1015,7 +1068,7 @@ public:
             rhsOperand = caseSensitive ? Utf32LE_To_Utf8(rhs) : ToLower(Utf32LE_To_Utf8(rhs));
         }
 
-            return lhsOperand.compare(rhsOperand) == 0;
+        return lhsOperand.compare(rhsOperand) == 0;
     }
 
     static bool Compare(const char* lhs, const char* rhs, const bool caseSensitive = true, const int format = 0)
@@ -1218,14 +1271,14 @@ public:
                 utf8ToAscii();
                 return ToLower(_ascii, ASCII);
             }
-                case SHIFTJIS: {
-                    utf8ToShiftJis();
-                    return ToLower(_shiftJis, SHIFTJIS);
-                }
+            case SHIFTJIS: {
+                utf8ToShiftJis();
+                return ToLower(_shiftJis, SHIFTJIS);
+            }
             default: { //ISO 8859-X
                 utf8ToIso8859x();
-                    return ToLower(_ascii, ASCII);
-                }
+                return ToLower(_ascii, ASCII);
+            }
             }
         }
     }
@@ -1383,6 +1436,69 @@ public:
             return Compare(_ascii, rhs, caseSensitive);
         }
     }
+
+    int Find(const std::string& subset, const bool caseSensitive = true)
+    {
+        return Find(_utf8, subset, caseSensitive);
+    }
+
+    int Find(const std::wstring& subset, const bool caseSensitive = true, const bool bigEndian = false)
+    {
+        if(caseSensitive)
+            return Find(_utf16BE, subset, caseSensitive, true);
+
+        return Find(_utf16LE, subset, caseSensitive, false);
+    }
+
+    int Find(const std::u32string& subset, const bool caseSensitive = true, const bool bigEndian = false)
+    {
+        if (caseSensitive)
+            return Find(_utf32BE, subset, caseSensitive, true);
+
+        return Find(_utf32LE, subset, caseSensitive, false);
+    }
+
+    int Find(const char* subset, const int format, const bool caseSensitive = true)
+    {
+        switch (format)
+        {
+        case ISO_8859_1:
+            return Find(ISO8859X_To_Utf8(_iso_8859_1, format), ISO8859X_To_Utf8(subset, format), caseSensitive);
+        case ISO_8859_2:
+            return Find(ISO8859X_To_Utf8(_iso_8859_2, format), ISO8859X_To_Utf8(subset, format), caseSensitive);
+        case ISO_8859_3:
+            return Find(ISO8859X_To_Utf8(_iso_8859_3, format), ISO8859X_To_Utf8(subset, format), caseSensitive);
+        case ISO_8859_4:
+            return Find(ISO8859X_To_Utf8(_iso_8859_4, format), ISO8859X_To_Utf8(subset, format), caseSensitive);
+        case ISO_8859_5:
+            return Find(ISO8859X_To_Utf8(_iso_8859_5, format), ISO8859X_To_Utf8(subset, format), caseSensitive);
+        case ISO_8859_6:
+            return Find(ISO8859X_To_Utf8(_iso_8859_6, format), ISO8859X_To_Utf8(subset, format), caseSensitive);
+        case ISO_8859_7:
+            return Find(ISO8859X_To_Utf8(_iso_8859_7, format), ISO8859X_To_Utf8(subset, format), caseSensitive);
+        case ISO_8859_8:
+            return Find(ISO8859X_To_Utf8(_iso_8859_8, format), ISO8859X_To_Utf8(subset, format), caseSensitive);
+        case ISO_8859_9:
+            return Find(ISO8859X_To_Utf8(_iso_8859_9, format), ISO8859X_To_Utf8(subset, format), caseSensitive);
+        case ISO_8859_10:
+            return Find(ISO8859X_To_Utf8(_iso_8859_10, format), ISO8859X_To_Utf8(subset, format), caseSensitive);
+        case ISO_8859_11:
+            return Find(ISO8859X_To_Utf8(_iso_8859_11, format), ISO8859X_To_Utf8(subset, format), caseSensitive);
+        case ISO_8859_13:
+            return Find(ISO8859X_To_Utf8(_iso_8859_13, format), ISO8859X_To_Utf8(subset, format), caseSensitive);
+        case ISO_8859_14:
+            return Find(ISO8859X_To_Utf8(_iso_8859_14, format), ISO8859X_To_Utf8(subset, format), caseSensitive);
+        case ISO_8859_15:
+            return Find(ISO8859X_To_Utf8(_iso_8859_15, format), ISO8859X_To_Utf8(subset, format), caseSensitive);
+        case ISO_8859_16:
+            return Find(ISO8859X_To_Utf8(_iso_8859_16, format), ISO8859X_To_Utf8(subset, format), caseSensitive);
+        case SHIFTJIS:
+            return Find(ShiftJis_To_Utf8(_shiftJis), ShiftJis_To_Utf8(subset), caseSensitive);
+        default: //ASCII
+            return Find(ASCII_To_Utf8(_ascii), ASCII_To_Utf8(subset), caseSensitive);
+        }
+    }
+
     std::string GetUTF8()
     {
         convertToUtf8();
