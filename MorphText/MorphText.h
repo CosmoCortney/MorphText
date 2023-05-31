@@ -664,63 +664,6 @@ public:
         delete[] _shiftJis;
     }
 
-    void operator = (const MorphText& other)
-    {
-        _utf8 = other._utf8;
-        _utf16LE = other._utf16LE;
-        _utf16BE = other._utf16BE;
-        _utf32LE = other._utf32LE;
-        _utf32BE = other._utf32BE;
-        strcpy(_ascii, other._ascii);
-        strcpy(_latin1, other._latin1);
-        strcpy(_latin2, other._latin2);
-        strcpy(_latin3, other._latin3);
-        strcpy(_latin4, other._latin4);
-        strcpy(_shiftJis, other._shiftJis);
-        _updatedFlags = other._updatedFlags;
-    }
-
-    void operator = (const std::string& str)
-    {
-        _utf8 = str;
-        _updatedFlags = Flags::FLAG_UTF8;
-    }
-
-    void operator = (const std::wstring& str)
-    {
-        if (_BE)
-        {
-            _utf16BE = str;
-            _updatedFlags = Flags::FLAG_UTF16BE;
-        }
-        else
-        {
-            _utf16LE = str;
-            _updatedFlags = Flags::FLAG_UTF16LE;
-        }
-    }
-
-    void operator = (const std::u32string& str)
-    {
-        if (_BE)
-        {
-            _utf32LE = str;
-            _updatedFlags = Flags::FLAG_UTF32BE;
-        }
-        else
-        {
-            _utf32LE = str;
-            _updatedFlags = Flags::FLAG_UTF32LE;
-        }
-    }
-
-    void operator = (const wchar_t* str)
-    {
-        *this = std::wstring(str);
-    }
-
-    //u32char
-
     static std::string ShiftJis_To_Utf8(const char* input) {
         int length = MultiByteToWideChar(932, 0, input, -1, NULL, 0);
 
@@ -1449,9 +1392,255 @@ public:
         return _shiftJis;
     }
 
-    void SetBigEndian(const bool shall_I)
+    std::string GetISO8859X(int format)
     {
-        _BE = shall_I;
+        switch (format)
+        {
+        case ISO_8859_2:
+            if(_updatedFlags & FLAG_ISO_8859_2)
+                utf8ToIso8859x(format);
+            return _iso_8859_2;
+        case ISO_8859_3:
+            if (_updatedFlags & FLAG_ISO_8859_3)
+                utf8ToIso8859x(format);
+            return _iso_8859_3;
+        case ISO_8859_4:
+            if (_updatedFlags & FLAG_ISO_8859_4)
+                utf8ToIso8859x(format);
+            return _iso_8859_4;
+        case ISO_8859_5:
+            if (_updatedFlags & FLAG_ISO_8859_5)
+                utf8ToIso8859x(format);
+            return _iso_8859_5;
+        case ISO_8859_6:
+            if (_updatedFlags & FLAG_ISO_8859_6)
+                utf8ToIso8859x(format);
+            return _iso_8859_6;
+        case ISO_8859_7:
+            if (_updatedFlags & FLAG_ISO_8859_7)
+                utf8ToIso8859x(format);
+            return _iso_8859_7;
+        case ISO_8859_8:
+            if (_updatedFlags & FLAG_ISO_8859_8)
+                utf8ToIso8859x(format);
+            return _iso_8859_8;
+        case ISO_8859_9:
+            if (_updatedFlags & FLAG_ISO_8859_9)
+                utf8ToIso8859x(format);
+            return _iso_8859_9;
+        case ISO_8859_10:
+            if (_updatedFlags & FLAG_ISO_8859_10)
+                utf8ToIso8859x(format);
+            return _iso_8859_10;
+        case ISO_8859_11:
+            if (_updatedFlags & FLAG_ISO_8859_11)
+                utf8ToIso8859x(format);
+            return _iso_8859_11;
+        case ISO_8859_13:
+            if (_updatedFlags & FLAG_ISO_8859_13)
+                utf8ToIso8859x(format);
+            return _iso_8859_13;
+        case ISO_8859_14:
+            if (_updatedFlags & FLAG_ISO_8859_14)
+                utf8ToIso8859x(format);
+            return _iso_8859_14;
+        case ISO_8859_15:
+            if (_updatedFlags & FLAG_ISO_8859_15)
+                utf8ToIso8859x(format);
+            return _iso_8859_15;
+        case ISO_8859_16:
+            if (_updatedFlags & FLAG_ISO_8859_16)
+                utf8ToIso8859x(format);
+            return _iso_8859_16;
+        default:
+            if (_updatedFlags & FLAG_ISO_8859_1)
+                utf8ToIso8859x(format);
+            return _iso_8859_1;
+        }
+    }
+
+    void SetASCII(char* input)
+    {
+        if (_updatedFlags & Flags::FLAG_ASCII)
+            delete[] _ascii;
+        strcpy(_ascii, input);
+        _updatedFlags = Flags::FLAG_ASCII;
+    }
+
+    void SetShiftJis(char* input)
+    {
+        if (_updatedFlags & Flags::FLAG_SHIFTJIS)
+            delete[] _shiftJis;
+        strcpy(_shiftJis, input);
+        _updatedFlags = Flags::FLAG_SHIFTJIS;
+    }
+
+    void SetISO8859X(char* input, int format)
+    {
+        switch (format)
+        {
+        case ISO_8859_2:
+            if (_updatedFlags & Flags::FLAG_ISO_8859_2)
+                delete[] _iso_8859_2;
+            strcpy(_iso_8859_2, input);
+            _updatedFlags = Flags::FLAG_ISO_8859_2;
+            break;
+        case ISO_8859_3:
+            if (_updatedFlags & Flags::FLAG_ISO_8859_3)
+                delete[] _iso_8859_3;
+            strcpy(_iso_8859_3, input);
+            _updatedFlags = Flags::FLAG_ISO_8859_3;
+            break;
+        case ISO_8859_4:
+            if (_updatedFlags & Flags::FLAG_ISO_8859_4)
+                delete[] _iso_8859_4;
+            strcpy(_iso_8859_4, input);
+            _updatedFlags = Flags::FLAG_ISO_8859_4;
+            break;
+        case ISO_8859_5:
+            if (_updatedFlags & Flags::FLAG_ISO_8859_5)
+                delete[] _iso_8859_5;
+            strcpy(_iso_8859_5, input);
+            _updatedFlags = Flags::FLAG_ISO_8859_5;
+            break;
+        case ISO_8859_6:
+            if (_updatedFlags & Flags::FLAG_ISO_8859_6)
+                delete[] _iso_8859_6;
+            strcpy(_iso_8859_6, input);
+            _updatedFlags = Flags::FLAG_ISO_8859_6;
+            break;
+        case ISO_8859_7:
+            if (_updatedFlags & Flags::FLAG_ISO_8859_7)
+                delete[] _iso_8859_7;
+            strcpy(_iso_8859_7, input);
+            _updatedFlags = Flags::FLAG_ISO_8859_7;
+            break;
+        case ISO_8859_8:
+            if (_updatedFlags & Flags::FLAG_ISO_8859_8)
+                delete[] _iso_8859_8;
+            strcpy(_iso_8859_8, input);
+            _updatedFlags = Flags::FLAG_ISO_8859_8;
+            break;
+        case ISO_8859_9:
+            if (_updatedFlags & Flags::FLAG_ISO_8859_9)
+                delete[] _iso_8859_9;
+            strcpy(_iso_8859_9, input);
+            _updatedFlags = Flags::FLAG_ISO_8859_9;
+            break;
+        case ISO_8859_10:
+            if (_updatedFlags & Flags::FLAG_ISO_8859_10)
+                delete[] _iso_8859_10;
+            strcpy(_iso_8859_10, input);
+            _updatedFlags = Flags::FLAG_ISO_8859_10;
+            break;
+        case ISO_8859_11:
+            if (_updatedFlags & Flags::FLAG_ISO_8859_11)
+                delete[] _iso_8859_11;
+            strcpy(_iso_8859_11, input);
+            _updatedFlags = Flags::FLAG_ISO_8859_11;
+            break;
+        case ISO_8859_13:
+            if (_updatedFlags & Flags::FLAG_ISO_8859_13)
+                delete[] _iso_8859_13;
+            strcpy(_iso_8859_13, input);
+            _updatedFlags = Flags::FLAG_ISO_8859_13;
+            break;
+        case ISO_8859_14:
+            if (_updatedFlags & Flags::FLAG_ISO_8859_14)
+                delete[] _iso_8859_14;
+            strcpy(_iso_8859_14, input);
+            _updatedFlags = Flags::FLAG_ISO_8859_14;
+            break;
+        case ISO_8859_15:
+            if (_updatedFlags & Flags::FLAG_ISO_8859_15)
+                delete[] _iso_8859_15;
+            strcpy(_iso_8859_15, input);
+            _updatedFlags = Flags::FLAG_ISO_8859_15;
+            break;
+        case ISO_8859_16:
+            if (_updatedFlags & Flags::FLAG_ISO_8859_16)
+                delete[] _iso_8859_16;
+            strcpy(_iso_8859_16, input);
+            _updatedFlags = Flags::FLAG_ISO_8859_16;
+            break;
+        default:// ISO 8859-1
+            if (_updatedFlags & Flags::FLAG_ISO_8859_1)
+                delete[] _iso_8859_1;
+            strcpy(_iso_8859_1, input);
+            _updatedFlags = Flags::FLAG_ISO_8859_1;
+            break;
+        }
+    }
+
+    void SetUTF8(const std::string& str)
+    {
+        _utf8 = str;
+        _updatedFlags = Flags::FLAG_UTF8;
+    }
+
+    void SetUTF16(const std::wstring& input, bool isBigEndian = false)
+    {
+        if (isBigEndian)
+        {
+            _utf16BE = input;
+            _updatedFlags = Flags::FLAG_UTF16BE;
+        }
+        else
+        {
+            _utf16LE = input;
+            _updatedFlags = Flags::FLAG_UTF16LE;
+        }
+    }
+
+    void SetUTF16(const wchar_t* input, bool isBigEndian = false)
+    {
+        SetUTF16(std::wstring(input));
+    }
+
+    void SetUTF32(const std::u32string& input, bool isBigEndian = false)
+    {
+        if (isBigEndian)
+        {
+            _utf32LE = input;
+            _updatedFlags = Flags::FLAG_UTF32BE;
+        }
+        else
+        {
+            _utf32LE = input;
+            _updatedFlags = Flags::FLAG_UTF32LE;
+        }
+    }
+
+    void SetUTF32(const char32_t* input, bool isBigEndian = false)
+    {
+        SetUTF32(std::u32string(input));
+    }
+
+    void operator = (const MorphText& other)
+    {
+        _utf8 = other._utf8;
+        _utf16LE = other._utf16LE;
+        _utf16BE = other._utf16BE;
+        _utf32LE = other._utf32LE;
+        _utf32BE = other._utf32BE;
+        strcpy(_ascii, other._ascii);
+        strcpy(_iso_8859_1, other._iso_8859_1);
+        strcpy(_iso_8859_2, other._iso_8859_2);
+        strcpy(_iso_8859_3, other._iso_8859_3);
+        strcpy(_iso_8859_4, other._iso_8859_4);
+        strcpy(_iso_8859_5, other._iso_8859_5);
+        strcpy(_iso_8859_6, other._iso_8859_6);
+        strcpy(_iso_8859_7, other._iso_8859_7);
+        strcpy(_iso_8859_8, other._iso_8859_8);
+        strcpy(_iso_8859_9, other._iso_8859_9);
+        strcpy(_iso_8859_10, other._iso_8859_10);
+        strcpy(_iso_8859_11, other._iso_8859_11);
+        strcpy(_iso_8859_13, other._iso_8859_13);
+        strcpy(_iso_8859_14, other._iso_8859_14);
+        strcpy(_iso_8859_15, other._iso_8859_15);
+        strcpy(_iso_8859_16, other._iso_8859_16);
+        strcpy(_shiftJis, other._shiftJis);
+        _updatedFlags = other._updatedFlags;
     }
 
     void Test()
