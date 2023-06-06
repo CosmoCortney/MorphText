@@ -856,12 +856,15 @@ public:
     /// Converts the passed ASCII char&ast; string to a UTF-8 std::string&amp;.
     /// <param><c>char&ast; input: string to be processed.</param>
     /// </summary>
-    static std::string ASCII_To_Utf8(const char* input) //Converts the ASCII input to UTF-8
+    static std::string ASCII_To_Utf8(const char* input, uint32_t maxLength = -1) //Converts the ASCII input to UTF-8
     {
         std::string output(input);
 
-        for (int i = 0; i < output.size(); ++i)
+        for (int i = 0; i < output.size() && i < maxLength; ++i)
             output[i] = input[i] < 0 ? '?' : input[i];
+
+        if (strlen(input) < maxLength)
+            output[maxLength] = '\0';
 
         return output;
     }
