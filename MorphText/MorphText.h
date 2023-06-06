@@ -1376,19 +1376,44 @@ public:
     static char* ToUpper(const char* input, const int format)
     {
         std::string temp;
-        char* result;
+        int length = strlen(input) + 1;
+        char* result = new char[length];
+        strcpy(result, input);
 
         switch (format)
         {
         case ASCII: {
-            temp = ShiftJis_To_Utf8(input);
-            temp = ToUpper(temp);
-            result = Utf8_To_ShiftJis(temp);
+            for (char* i = result; *i != '\0'; ++i)
+                *i = std::toupper(*i);
         }break;
         case SHIFTJIS: {
-            temp = ShiftJis_To_Utf8(input);
-            temp = ToUpper(temp);
-            result = Utf8_To_ShiftJis(temp);
+            for (size_t i = 0; i < length;)
+            {
+                if (static_cast<unsigned char>(result[i]) < 0x80)
+                {
+                    if (i > 0 && static_cast<unsigned char>(result[i - 1]) < 0x80)
+                        result[i] = static_cast<char>(std::toupper(static_cast<unsigned char>(result[i])));
+                    else
+                        result[i] = static_cast<char>(std::toupper(static_cast<unsigned char>(result[i])));
+                    ++i;
+                }
+                else
+                {
+                    uint16_t current = static_cast<unsigned char>(result[i]) << 8;
+                    current |= static_cast<unsigned char>(result[i + 1]);
+                    if ((current > 0x83BE && current < 0x83D7) ||
+                        (current > 0x846F && current < 0x8492))
+                    {
+                        current -= 0x20;
+                    }
+                    else if ((current > 0x8280 && current < 0x829B))
+                        current -= 0x21;
+
+                    result[i] = static_cast<char>(current >> 8);
+                    result[i + 1] = static_cast<char>(current & 0xFF);
+                    i += 2;
+                }
+            }
         }break;
         default: { //ISO 8859-X
             temp = ISO8859X_To_Utf8(input, format);
