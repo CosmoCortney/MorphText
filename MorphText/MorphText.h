@@ -1193,12 +1193,34 @@ public:
     {
         switch (format)
         {
-        case ASCII:
-            return Compare(ASCII_To_Utf8(lhs), ASCII_To_Utf8(rhs), caseSensitive);
-        break;
-        case SHIFTJIS: 
-            return Compare(ShiftJis_To_Utf8(lhs), ShiftJis_To_Utf8(rhs), caseSensitive);
-        break;
+        case ASCII: {
+            if (!caseSensitive)
+            {
+                char* lowerLhs = new char[strlen(lhs) + 1];
+                char* lowerRhs = new char[strlen(rhs) + 1];
+                lowerLhs = ToLower(lhs, format);
+                lowerRhs = ToLower(rhs, format);
+                int result = strcmp(lowerLhs, lowerRhs);
+                delete[] lowerLhs;
+                delete[] lowerRhs;
+                return result == 0;
+            }
+            return strcmp(lhs, rhs) == 0;
+        } break;
+        case SHIFTJIS: {
+            if (!caseSensitive)
+            {
+                char* lowerLhs = new char[strlen(lhs) + 1];
+                char* lowerRhs = new char[strlen(rhs) + 1];
+                lowerLhs = ToLower(lhs, format);
+                lowerRhs = ToLower(rhs, format);
+                int result = strcmp(lowerLhs, lowerRhs);
+                delete[] lowerLhs;
+                delete[] lowerRhs;
+                return result == 0;
+            }
+            return strcmp(lhs, rhs) == 0;
+        } break;
         default: //ISO 8859-X
             return Compare(ISO8859X_To_Utf8(lhs, format), ISO8859X_To_Utf8(rhs, format), caseSensitive);
         }
