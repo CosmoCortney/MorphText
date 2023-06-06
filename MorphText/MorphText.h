@@ -80,6 +80,7 @@ private:
     char* _iso_8859_16;
     char* _shiftJis;
     int _updatedFlags = 0;
+    uint32_t _maxLength = -1;
 
     static constexpr wchar_t _iso8859_2_map[] = { //Latin-2
         0x00A0, 0x0104, 0x02D8, 0x0141, 0x00A4, 0x013D, 0x015A, 0x00A7, 0x00A8, 0x0160, 0x015E, 0x0164, 0x0179, 0x00AD, 0x017D, 0x017B,
@@ -2123,6 +2124,11 @@ public:
     void SetUTF32(const char32_t* input, const bool isBigEndian = false)
     {
         SetUTF32(std::u32string(input));
+    }
+
+    void SetMaxLength(const uint32_t length)
+    {
+        _maxLength = length;
     }
 
     /// <summary>
