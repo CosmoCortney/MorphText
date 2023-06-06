@@ -2216,23 +2216,91 @@ public:
         _utf16BE = other._utf16BE;
         _utf32LE = other._utf32LE;
         _utf32BE = other._utf32BE;
-        if(other._ascii) strcpy(_ascii, other._ascii);
-        if (other._iso_8859_1) strcpy(_iso_8859_1, other._iso_8859_1);
-        if (other._iso_8859_2) strcpy(_iso_8859_2, other._iso_8859_2);
-        if (other._iso_8859_3) strcpy(_iso_8859_3, other._iso_8859_3);
-        if (other._iso_8859_4) strcpy(_iso_8859_4, other._iso_8859_4);
-        if (other._iso_8859_5) strcpy(_iso_8859_5, other._iso_8859_5);
-        if (other._iso_8859_6) strcpy(_iso_8859_6, other._iso_8859_6);
-        if (other._iso_8859_7) strcpy(_iso_8859_7, other._iso_8859_7);
-        if (other._iso_8859_8) strcpy(_iso_8859_8, other._iso_8859_8);
-        if (other._iso_8859_9) strcpy(_iso_8859_9, other._iso_8859_9);
-        if (other._iso_8859_10) strcpy(_iso_8859_10, other._iso_8859_10);
-        if (other._iso_8859_11) strcpy(_iso_8859_11, other._iso_8859_11);
-        if (other._iso_8859_13) strcpy(_iso_8859_13, other._iso_8859_13);
-        if (other._iso_8859_14) strcpy(_iso_8859_14, other._iso_8859_14);
-        if (other._iso_8859_15) strcpy(_iso_8859_15, other._iso_8859_15);
-        if (other._iso_8859_16) strcpy(_iso_8859_16, other._iso_8859_16);
-        if (other._shiftJis) strcpy(_shiftJis, other._shiftJis);
+        if (other._ascii)
+        {
+            _ascii = new char[strlen(other._ascii)+1];
+            strcpy(_ascii, other._ascii);
+        }
+        if (other._iso_8859_1)
+        {
+            _iso_8859_1 = new char[strlen(other._iso_8859_1) + 1];
+            strcpy(_iso_8859_1, other._iso_8859_1);
+        }
+        if (other._iso_8859_2)
+        {
+            _iso_8859_2 = new char[strlen(other._iso_8859_2) + 1];
+            strcpy(_iso_8859_2, other._iso_8859_2);
+        }
+        if (other._iso_8859_3)
+        {
+            _iso_8859_3 = new char[strlen(other._iso_8859_3) + 1];
+            strcpy(_iso_8859_3, other._iso_8859_3);
+        }
+        if (other._iso_8859_4)
+        {
+            _iso_8859_4 = new char[strlen(other._iso_8859_4) + 1];
+            strcpy(_iso_8859_4, other._iso_8859_4);
+        }
+        if (other._iso_8859_5)
+        {
+            _iso_8859_5 = new char[strlen(other._iso_8859_5) + 1];
+            strcpy(_iso_8859_5, other._iso_8859_5);
+        }
+        if (other._iso_8859_6)
+        {
+            _iso_8859_6 = new char[strlen(other._iso_8859_6) + 1];
+            strcpy(_iso_8859_6, other._iso_8859_6);
+        }
+        if (other._iso_8859_7)
+        {
+            _iso_8859_7 = new char[strlen(other._iso_8859_7) + 1];
+            strcpy(_iso_8859_7, other._iso_8859_7);
+        }
+        if (other._iso_8859_8)
+        {
+            _iso_8859_8 = new char[strlen(other._iso_8859_8) + 1];
+            strcpy(_iso_8859_8, other._iso_8859_8);
+        }
+        if (other._iso_8859_9)
+        {
+            _iso_8859_9 = new char[strlen(other._iso_8859_9) + 1];
+            strcpy(_iso_8859_9, other._iso_8859_9);
+        }
+        if (other._iso_8859_10)
+        {
+            _iso_8859_10 = new char[strlen(other._iso_8859_10) + 1];
+            strcpy(_iso_8859_10, other._iso_8859_10);
+        }
+        if (other._iso_8859_11)
+        {
+            _iso_8859_11 = new char[strlen(other._iso_8859_11) + 1];
+            strcpy(_iso_8859_11, other._iso_8859_11);
+        }
+        if (other._iso_8859_13)
+        {
+            _iso_8859_13 = new char[strlen(other._iso_8859_13) + 1];
+            strcpy(_iso_8859_13, other._iso_8859_13);
+        }
+        if (other._iso_8859_14)
+        {
+            _iso_8859_14 = new char[strlen(other._iso_8859_14) + 1];
+            strcpy(_iso_8859_14, other._iso_8859_14);
+        }
+        if (other._iso_8859_15)
+        {
+            _iso_8859_15 = new char[strlen(other._iso_8859_15) + 1];
+            strcpy(_iso_8859_15, other._iso_8859_15);
+        }
+        if (other._iso_8859_16)
+        {
+            _iso_8859_16 = new char[strlen(other._iso_8859_16) + 1];
+            strcpy(_iso_8859_16, other._iso_8859_16);
+        }
+        if (other._shiftJis)
+        {
+            _shiftJis = new char[strlen(other._shiftJis) + 1];
+            strcpy(_shiftJis, other._shiftJis);
+        }
         _updatedFlags = other._updatedFlags;
         _primaryFormat = other._primaryFormat;
     }
