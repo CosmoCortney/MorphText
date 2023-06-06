@@ -1,4 +1,4 @@
-﻿#include <string>
+#include <string>
 #include <Windows.h>
 #include <locale>
 #include <codecvt>
@@ -471,6 +471,11 @@ private:
     }
 
 public:
+    MorphText()
+    {
+        initArrays();
+    }
+
     MorphText(const std::string& utf8)
     {
         initArrays();
