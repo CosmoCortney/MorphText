@@ -639,6 +639,7 @@ public:
 
     MorphText(const MorphText& other)
     {
+        initArrays();
         *this = other;
     }
 
