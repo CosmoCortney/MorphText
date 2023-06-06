@@ -1,4 +1,4 @@
-#include <string>
+﻿#include <string>
 #include <Windows.h>
 #include <locale>
 #include <codecvt>
@@ -1419,7 +1419,7 @@ public:
         case ASCII: {
             for (char* i = result; *i != '\0'; ++i)
                 *i = std::toupper(*i);
-        }break;
+            }break;
         case SHIFTJIS: {
             for (size_t i = 0; i < length;)
             {
