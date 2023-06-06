@@ -1869,9 +1869,9 @@ public:
     /// <summary>
     /// Returns the instance's <b>ASCII</b> value.
     /// </summary>
-    std::string GetASCII()
+    char* GetASCII()
     {
-        if (_updatedFlags & FLAG_ASCII)
+        if (!(_updatedFlags & FLAG_ASCII))
             utf8ToAscii();
 
         return _ascii;
@@ -1880,9 +1880,9 @@ public:
     /// <summary>
     /// Returns the instance's <b>Shift-Jis</b> value as char*.
     /// </summary>
-    std::string GetShiftJis()
+    char* GetShiftJis()
     {
-        if (_updatedFlags & FLAG_SHIFTJIS)
+        if (!(_updatedFlags & FLAG_SHIFTJIS))
             utf8ToShiftJis();
 
         return _shiftJis;
@@ -1892,68 +1892,68 @@ public:
     /// Returns the instance's <b>ISO-8859-X</b> value as char*.
     /// <param><c>int format</c>: ISO-8859-X format to return.</param>
     /// </summary>
-    std::string GetISO8859X(const int format)
+    char* GetISO8859X(const int format)
     {
         switch (format)
         {
         case ISO_8859_2:
-            if(_updatedFlags & FLAG_ISO_8859_2)
+            if(!(_updatedFlags & FLAG_ISO_8859_2))
                 utf8ToIso8859x(format);
             return _iso_8859_2;
         case ISO_8859_3:
-            if (_updatedFlags & FLAG_ISO_8859_3)
+            if (!(_updatedFlags & FLAG_ISO_8859_3))
                 utf8ToIso8859x(format);
             return _iso_8859_3;
         case ISO_8859_4:
-            if (_updatedFlags & FLAG_ISO_8859_4)
+            if (!(_updatedFlags & FLAG_ISO_8859_4))
                 utf8ToIso8859x(format);
             return _iso_8859_4;
         case ISO_8859_5:
-            if (_updatedFlags & FLAG_ISO_8859_5)
+            if (!(_updatedFlags & FLAG_ISO_8859_5))
                 utf8ToIso8859x(format);
             return _iso_8859_5;
         case ISO_8859_6:
-            if (_updatedFlags & FLAG_ISO_8859_6)
+            if (!(_updatedFlags & FLAG_ISO_8859_6))
                 utf8ToIso8859x(format);
             return _iso_8859_6;
         case ISO_8859_7:
-            if (_updatedFlags & FLAG_ISO_8859_7)
+            if (!(_updatedFlags & FLAG_ISO_8859_7))
                 utf8ToIso8859x(format);
             return _iso_8859_7;
         case ISO_8859_8:
-            if (_updatedFlags & FLAG_ISO_8859_8)
+            if (!(_updatedFlags & FLAG_ISO_8859_8))
                 utf8ToIso8859x(format);
             return _iso_8859_8;
         case ISO_8859_9:
-            if (_updatedFlags & FLAG_ISO_8859_9)
+            if (!(_updatedFlags & FLAG_ISO_8859_9))
                 utf8ToIso8859x(format);
             return _iso_8859_9;
         case ISO_8859_10:
-            if (_updatedFlags & FLAG_ISO_8859_10)
+            if (!(_updatedFlags & FLAG_ISO_8859_10))
                 utf8ToIso8859x(format);
             return _iso_8859_10;
         case ISO_8859_11:
-            if (_updatedFlags & FLAG_ISO_8859_11)
+            if (!(_updatedFlags & FLAG_ISO_8859_11))
                 utf8ToIso8859x(format);
             return _iso_8859_11;
         case ISO_8859_13:
-            if (_updatedFlags & FLAG_ISO_8859_13)
+            if (!(_updatedFlags & FLAG_ISO_8859_13))
                 utf8ToIso8859x(format);
             return _iso_8859_13;
         case ISO_8859_14:
-            if (_updatedFlags & FLAG_ISO_8859_14)
+            if (!(_updatedFlags & FLAG_ISO_8859_14))
                 utf8ToIso8859x(format);
             return _iso_8859_14;
         case ISO_8859_15:
-            if (_updatedFlags & FLAG_ISO_8859_15)
+            if (!(_updatedFlags & FLAG_ISO_8859_15))
                 utf8ToIso8859x(format);
             return _iso_8859_15;
         case ISO_8859_16:
-            if (_updatedFlags & FLAG_ISO_8859_16)
+            if (!(_updatedFlags & FLAG_ISO_8859_16))
                 utf8ToIso8859x(format);
             return _iso_8859_16;
         default:
-            if (_updatedFlags & FLAG_ISO_8859_1)
+            if (!(_updatedFlags & FLAG_ISO_8859_1))
                 utf8ToIso8859x(format);
             return _iso_8859_1;
         }
