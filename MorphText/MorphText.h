@@ -80,6 +80,7 @@ private:
     char* _iso_8859_16;
     char* _shiftJis;
     int _updatedFlags = 0;
+    int _primaryFormat;
     uint32_t _maxLength = -1;
 
     static constexpr wchar_t _iso8859_2_map[] = { //Latin-2
@@ -482,6 +483,7 @@ public:
         initArrays();
         _utf8 = utf8;
         _updatedFlags |= FLAG_UTF8;
+        _primaryFormat = UTF8;
     }
 
     MorphText(const std::wstring& utf16, const bool bigEndian = false)
@@ -492,11 +494,13 @@ public:
         {
             _utf16BE = utf16;
             _updatedFlags |= FLAG_UTF16BE;
+            _primaryFormat = UTF16BE;
         }
         else
         {
             _utf16LE = utf16;
             _updatedFlags |= FLAG_UTF16LE;
+            _primaryFormat = UTF16LE;
         }
     }
 
@@ -508,11 +512,13 @@ public:
         {
             _utf32BE = utf32;
             _updatedFlags |= FLAG_UTF32BE;
+            _primaryFormat = UTF32BE;
         }
         else
         {
             _utf32LE = utf32;
             _updatedFlags |= FLAG_UTF32LE;
+            _primaryFormat = UTF32LE;
         }
     }
 
@@ -521,7 +527,7 @@ public:
         initArrays();
         int length = strlen(charStr);
 
-        switch (strType)
+        switch (format)
         {
         case Formats::UTF8: {
             *this = MorphText(std::string(charStr));
@@ -630,6 +636,8 @@ public:
             _updatedFlags |= FLAG_ASCII;
         }
         }
+
+        _primaryFormat = format;
     }
 
     MorphText(const wchar_t* charStr, const bool bigEndian = false)
@@ -1952,6 +1960,49 @@ public:
     }
 
     /// <summary>
+    /// Returns the primary format. This is useful if other parts of your code don't which format to output.
+    /// </summary>
+    int GetPrimaryFormat()
+    {
+        return _primaryFormat;
+    }
+
+    /// <summary>
+    /// Sets the primary format. This is useful if other parts of your code don't which format to output.
+    /// <param><c>int format</c>: ISO-8859 Format.</param>
+    /// </summary>
+    void SetPrimaryFormat(const int format)
+    {
+        convertToUtf8();
+
+        switch (format)
+        {
+        case ASCII:
+            utf8ToAscii();
+            break;
+        case SHIFTJIS:
+            utf8ToShiftJis();
+            break;
+        case UTF16LE:
+            utf8ToUtf16Le();
+            break;
+        case UTF16BE:
+            utf8ToUtf16Be();
+            break;
+        case UTF32LE:
+            utf8ToUtf32Le();
+            break;
+        case UTF32BE:
+            utf8ToUtf32Be();
+            break;
+        default: //ISO-8859-X
+            utf8ToIso8859x(format);
+        }
+
+        _primaryFormat = format;
+    }
+
+    /// <summary>
     /// Sets the instance's <b>ASCII</b> value.
     /// <param><c>char&ast; input</c>: ASCII char* string to be set.</param>
     /// <example> instance.SetASCII(text);</example>
@@ -2183,6 +2234,7 @@ public:
         if (other._iso_8859_16) strcpy(_iso_8859_16, other._iso_8859_16);
         if (other._shiftJis) strcpy(_shiftJis, other._shiftJis);
         _updatedFlags = other._updatedFlags;
+        _primaryFormat = other._primaryFormat;
     }
 
     void Test()
@@ -2199,6 +2251,7 @@ public:
         std::wcout << L"UTF-16BE: " << _utf16BE << " --- updated: " << (bool)(_updatedFlags & FLAG_UTF16BE) << "\n";
         std::cout << "UTF-32LE: " << converter.to_bytes(_utf32LE) << " --- updated: " << (bool)(_updatedFlags & FLAG_UTF32LE) << "\n";
         std::cout << "UTF-32BE: " << converter.to_bytes(_utf32BE) << " --- updated: " << (bool)(_updatedFlags & FLAG_UTF32BE) << "\n";
+        std::cout << "Primary Format: " << _primaryFormat << "\n";
         std::cout << "\n\n\n\n";
     }
 };
