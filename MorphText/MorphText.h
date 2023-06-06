@@ -1433,16 +1433,17 @@ public:
     static char* ToSarcasm(const char* input, const int format)
     {
         std::string temp;
-        char* result;
+        int length = strlen(input) + 1;
+        char* result = new char[length];
+        strcpy(result, input);
 
         switch (format)
         {
         case ASCII: {
-            temp = ShiftJis_To_Utf8(input);
-            temp = ToSarcasm(temp);
-            result = Utf8_To_ShiftJis(temp);
+            for (char* i = result; *i != '\0'; ++i)
+                *i = reinterpret_cast<uint64_t>(i) & 1 ? std::tolower(*i) : std::toupper(*i);
         }break;
-        case SHIFTJIS: {
+        case SHIFTJIS: { //guess it's okay doing it this way here since this function won't be used in performance-critical situations
             temp = ShiftJis_To_Utf8(input);
             temp = ToSarcasm(temp);
             result = Utf8_To_ShiftJis(temp);
