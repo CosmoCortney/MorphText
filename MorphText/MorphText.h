@@ -651,23 +651,23 @@ public:
 
     ~MorphText()
     {
-        delete[] _ascii;
-        delete[] _iso_8859_1;
-        delete[] _iso_8859_2;
-        delete[] _iso_8859_3;
-        delete[] _iso_8859_4;
-        delete[] _iso_8859_5;
-        delete[] _iso_8859_6;
-        delete[] _iso_8859_7;
-        delete[] _iso_8859_8;
-        delete[] _iso_8859_9;
-        delete[] _iso_8859_10;
-        delete[] _iso_8859_11;
-        delete[] _iso_8859_13;
-        delete[] _iso_8859_14;
-        delete[] _iso_8859_15;
-        delete[] _iso_8859_16;
-        delete[] _shiftJis;
+        if(_ascii) delete[] _ascii;
+        if (_iso_8859_1) delete[] _iso_8859_1;
+        if (_iso_8859_2) delete[] _iso_8859_2;
+        if (_iso_8859_3) delete[] _iso_8859_3;
+        if (_iso_8859_4) delete[] _iso_8859_4;
+        if (_iso_8859_5) delete[] _iso_8859_5;
+        if (_iso_8859_6) delete[] _iso_8859_6;
+        if (_iso_8859_7) delete[] _iso_8859_7;
+        if (_iso_8859_8) delete[] _iso_8859_8;
+        if (_iso_8859_9) delete[] _iso_8859_9;
+        if (_iso_8859_10) delete[] _iso_8859_10;
+        if (_iso_8859_11) delete[] _iso_8859_11;
+        if (_iso_8859_13) delete[] _iso_8859_13;
+        if (_iso_8859_14) delete[] _iso_8859_14;
+        if (_iso_8859_15) delete[] _iso_8859_15;
+        if (_iso_8859_16) delete[] _iso_8859_16;
+        if (_shiftJis) delete[] _shiftJis;
     }
 
     /// <summary>
