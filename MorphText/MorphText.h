@@ -1698,8 +1698,10 @@ public:
     {
         switch (format)
         {
+        case UTF8:
+            return Compare(_utf8.c_str(), rhs, caseSensitive, format);
         case SHIFTJIS:
-            return Compare(_shiftJis, rhs, caseSensitive);
+            return Compare(_shiftJis, rhs, caseSensitive, format);
         case ISO_8859_1:
             return Compare(_iso_8859_1, rhs, caseSensitive, format);
         case ISO_8859_2:
@@ -1731,7 +1733,7 @@ public:
         case ISO_8859_16:
             return Compare(_iso_8859_16, rhs, caseSensitive, format);
         default: //ASCII
-            return Compare(_ascii, rhs, caseSensitive);
+            return Compare(_ascii, rhs, caseSensitive, format);
         }
     }
 
