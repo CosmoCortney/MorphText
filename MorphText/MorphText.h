@@ -483,7 +483,7 @@ public:
         _updatedFlags |= FLAG_UTF8;
     }
 
-    MorphText(const std::wstring& utf16, bool bigEndian = false)
+    MorphText(const std::wstring& utf16, const bool bigEndian = false)
     {
         initArrays();
 
@@ -499,7 +499,7 @@ public:
         }
     }
 
-    MorphText(const std::u32string& utf32, bool bigEndian = false)
+    MorphText(const std::u32string& utf32, const bool bigEndian = false)
     {
         initArrays();
 
@@ -515,7 +515,7 @@ public:
         }
     }
 
-    MorphText(const char* charStr, int strType = 0)
+    MorphText(const char* charStr, const int format = 0)
     {
         initArrays();
         int length = strlen(charStr);
@@ -631,7 +631,7 @@ public:
         }
     }
 
-    MorphText(const wchar_t* charStr, bool bigEndian = false)
+    MorphText(const wchar_t* charStr, const bool bigEndian = false)
     {
         initArrays();
         *this = MorphText(std::wstring(charStr), bigEndian);
@@ -642,7 +642,7 @@ public:
         *this = other;
     }
 
-    MorphText(const char32_t* charStr, bool bigEndian = false)
+    MorphText(const char32_t* charStr, const bool bigEndian = false)
     {
         initArrays();
         *this = MorphText(std::u32string(charStr), bigEndian);
@@ -876,7 +876,7 @@ public:
     /// <param><c>char&ast; input: string to be processed.
     /// <c>int format: ISO-8859 format of the passed string.</param>
     /// </summary>
-    static std::string ISO8859X_To_Utf8(const char* input, int format = ISO_8859_1)
+    static std::string ISO8859X_To_Utf8(const char* input, const int format = ISO_8859_1)
     {
         int length = strlen(input);
         wchar_t* temp = new wchar_t[length+1];
@@ -1040,7 +1040,7 @@ public:
     /// <c>std::u32string&amp; rhs</c>: std::u32string&amp; to be found. 
     /// <c>bool caseSensitive</c> (optional): Consider case sensitivity (true = case sensitive (default), false = case insensitive.</param>
     /// </summary>
-    static int Find(const std::string& superset, const std::string& subset, bool caseSensitive = true)
+    static int Find(const std::string& superset, const std::string& subset, const bool caseSensitive = true)
     {
         std::string sups = caseSensitive ? superset : ToLower(superset);
         std::string subs = caseSensitive ? subset : ToLower(subset);
@@ -1054,7 +1054,7 @@ public:
     /// <c>bool caseSensitive</c> (optional): Consider case sensitivity (true = case sensitive (default), false = case insensitive.
     /// <c>bool isBigEndian</c>: true to return the big endian value, false to return the little endian value.</param>
     /// </summary>
-    static int Find(const std::wstring& superset, const std::wstring& subset, const bool caseSensitive = true, const bool bigEndian = false)
+    static int Find(const std::wstring& superset, const std::wstring& subset, const const bool caseSensitive = true, const bool bigEndian = false)
     {
         if (bigEndian)
         {
@@ -1136,7 +1136,7 @@ public:
     /// <c>bool caseSensitive</c> (optional): Consider case sensitivity (true = case sensitive (default), false = case insensitive.
     /// <c>bool isBigEndian</c>: true to return the big endian value, false to return the little endian value.</param>
     /// </summary>
-    static bool Compare(const std::wstring& lhs, const std::wstring& rhs, const bool caseSensitive = true, bool isBigEndian = false)
+    static bool Compare(const std::wstring& lhs, const std::wstring& rhs, const bool caseSensitive = true, const bool isBigEndian = false)
     {
         std::string lhsOperand;
         std::string rhsOperand;
@@ -1162,7 +1162,7 @@ public:
     /// <c>bool caseSensitive</c> (optional): Consider case sensitivity (true = case sensitive (default), false = case insensitive.
     /// <c>bool isBigEndian</c>: true to return the big endian value, false to return the little endian value.</param>
     /// </summary>
-    static bool Compare(const std::u32string& lhs, const std::u32string& rhs, const bool caseSensitive = true, bool isBigEndian = false)
+    static bool Compare(const std::u32string& lhs, const std::u32string& rhs, const bool caseSensitive = true, const bool isBigEndian = false)
     {
         std::string lhsOperand;
         std::string rhsOperand;
@@ -1243,7 +1243,7 @@ public:
     /// <param><c>std::u32string&amp; input: string to be processed.
     /// <c>bool isBigEndian</c>: set true if the passed string is big endian.</param>
     /// </summary>
-    static std::wstring ToLower(const std::wstring& input, bool isBigEndian = false)
+    static std::wstring ToLower(const std::wstring& input, const bool isBigEndian = false)
     {
         std::string temp = isBigEndian ? Utf16BE_To_Utf8(input) : Utf16LE_To_Utf8(input);
         temp = ToLower(temp);
@@ -1255,7 +1255,7 @@ public:
     /// <param><c>std::wstring&amp; input: string to be processed.
     /// <c>bool isBigEndian</c>: set true if the passed string is big endian.</param>
     /// </summary>
-    static std::wstring ToUpper(const std::wstring& input, bool isBigEndian = false)
+    static std::wstring ToUpper(const std::wstring& input, const bool isBigEndian = false)
     {
         std::string temp = isBigEndian ? Utf16BE_To_Utf8(input) : Utf16LE_To_Utf8(input);
         temp = ToUpper(temp);
