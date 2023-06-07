@@ -5,6 +5,7 @@
 #include<iostream>
 #include<algorithm>
 #include <cstdint>
+#include<cwctype>
 
 class MorphText
 {
@@ -221,6 +222,14 @@ private:
         FLAG_ISO_8859_16 = 1 << Formats::ISO_8859_16,
         FLAG_SHIFTJIS = 1 << Formats::SHIFTJIS,
     };
+
+    static void swapBytes(wchar_t* src)
+    {
+        char* ref = (char*)src;
+        *ref ^= *(ref + 1);
+        *(ref + 1) ^= *ref;
+        *ref ^= *(ref + 1);
+    }
 
     void convertToUtf8()
     {
@@ -1204,7 +1213,7 @@ public:
     {
         switch (format)
         {
-        case ASCII: {
+        case ASCII: case SHIFTJIS: case UTF8: {
             if (!caseSensitive)
             {
                 char* lowerLhs = new char[strlen(lhs) + 1];
@@ -1217,38 +1226,26 @@ public:
                 return result == 0;
             }
             return strcmp(lhs, rhs) == 0;
-        } break;
-        case SHIFTJIS: {
-            if (!caseSensitive)
-            {
-                char* lowerLhs = new char[strlen(lhs) + 1];
-                char* lowerRhs = new char[strlen(rhs) + 1];
-                lowerLhs = ToLower(lhs, format);
-                lowerRhs = ToLower(rhs, format);
-                int result = strcmp(lowerLhs, lowerRhs);
-                delete[] lowerLhs;
-                delete[] lowerRhs;
-                return result == 0;
-            }
-            return strcmp(lhs, rhs) == 0;
-        } break;
-        case UTF8: {
-            if (!caseSensitive)
-            {
-                char* lowerLhs = new char[strlen(lhs) + 1];
-                char* lowerRhs = new char[strlen(rhs) + 1];
-                lowerLhs = ToLower(lhs, format);
-                lowerRhs = ToLower(rhs, format);
-                int result = strcmp(lowerLhs, lowerRhs);
-                delete[] lowerLhs;
-                delete[] lowerRhs;
-                return result == 0;
-            }
-            return strcmp(lhs, rhs) == 0;
-        } break;
+        }
         default: //ISO 8859-X
             return Compare(ISO8859X_To_Utf8(lhs, format), ISO8859X_To_Utf8(rhs, format), caseSensitive);
         }
+    }
+
+    static bool Compare(const wchar_t* lhs, const wchar_t* rhs, const bool caseSensitive = true, const bool isBigEndian = false)
+    {
+        if (!caseSensitive)
+        {
+            wchar_t* lowerLhs = new wchar_t[wcslen(lhs) + 1];
+            wchar_t* lowerRhs = new wchar_t[wcslen(rhs) + 1];
+            lowerLhs = ToLower(lhs, isBigEndian);
+            lowerRhs = ToLower(rhs, isBigEndian);
+            int result = wcscmp(lowerLhs, lowerRhs);
+            delete[] lowerLhs;
+            delete[] lowerRhs;
+            return result == 0;
+        }
+        return wcscmp(lhs, rhs) == 0;
     }
 
     /// <summary>
@@ -1413,6 +1410,70 @@ public:
         }
         }
 
+        return result;
+    }
+
+    static wchar_t* ToLower(const wchar_t* input, bool isBigEndian = true)
+    {
+        int length = wcslen(input) + 1;
+        wchar_t* result = new wchar_t[length];
+        wcscpy(result, input);
+
+        if (isBigEndian)
+        {
+            for (wchar_t* i = result; i < result+length; ++i)
+            {
+                swapBytes(i);
+
+                if (*i != '\0')
+                    break;
+
+                *i = std::towlower(*i);
+                swapBytes(i);
+            }
+        }
+        else
+        {
+            for (wchar_t* i = result; *i != '\0'; ++i)
+                *i = std::towlower(*i);
+        }
+
+        return result;
+    }
+
+    static wchar_t* ToUpper(const wchar_t* input, bool isBigEndian = true)
+    {
+        int length = wcslen(input) + 1;
+        wchar_t* result = new wchar_t[length];
+        wcscpy(result, input);
+
+        if (isBigEndian)
+        {
+            for (wchar_t* i = result; i < result + length; ++i)
+            {
+                swapBytes(i);
+
+                if (*i != '\0')
+                    break;
+
+                *i = std::towupper(*i);
+                swapBytes(i);
+            }
+        }
+        else
+        {
+            for (wchar_t* i = result; *i != '\0'; ++i)
+                *i = std::towupper(*i);
+        }
+
+        return result;
+    }
+
+    static wchar_t* ToSarcasm(const wchar_t* input, bool isBigEndian = true)
+    {
+        int length = wcslen(input) + 1;
+        wchar_t* result = new wchar_t[length];
+        wcscpy(result, ToSarcasm(std::wstring(input), isBigEndian).c_str());
         return result;
     }
 
@@ -1751,6 +1812,11 @@ public:
         }
     }
 
+    bool Compare(const wchar_t* rhs, const bool caseSensitive = true, const bool isBigEndian = false)
+    {
+        return Compare(isBigEndian ? _utf16BE.c_str() : _utf16LE.c_str(), rhs, caseSensitive, isBigEndian);
+    }
+
     /// <summary>
     /// Checks if the std::string&amp; string parameter appears within the instance's std::string. Returns the position of appearance, otherwise -1.
     /// <param><c>std::string&amp; subset</c>: std::string&amp; to be found. 
@@ -1853,13 +1919,13 @@ public:
     {
         if (isBigEndian)
         {
-            if (_updatedFlags & FLAG_UTF16BE)
+            if (!(_updatedFlags & FLAG_UTF16BE))
                 utf8ToUtf16Be();
 
             return _utf16BE;
         }
 
-        if (_updatedFlags & FLAG_UTF16LE)
+        if (!(_updatedFlags & FLAG_UTF16LE))
             utf8ToUtf16Le();
 
         return _utf16LE;
@@ -1873,13 +1939,13 @@ public:
     {
         if (isBigEndian)
         {
-            if (_updatedFlags & FLAG_UTF32BE)
+            if (!(_updatedFlags & FLAG_UTF32BE))
                 utf8ToUtf32Be();
 
             return _utf32BE;
         }
 
-        if (_updatedFlags & FLAG_UTF32LE)
+        if (!(_updatedFlags & FLAG_UTF32LE))
             utf8ToUtf32Le();
 
         return _utf32LE;
