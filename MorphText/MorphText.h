@@ -231,6 +231,18 @@ private:
         *ref ^= *(ref + 1);
     }
 
+    static void swapBytes(char32_t* src)
+    {
+        char* ref = (char*)src;
+        *ref ^= *(ref + 3);
+        *(ref + 3) ^= *ref;
+        *ref ^= *(ref + 3);
+
+        *(ref + 1) ^= *(ref + 2);
+        *(ref + 2) ^= *(ref + 1);
+        *(ref + 1) ^= *(ref + 2);
+    }
+
     void convertToUtf8()
     {
         if (_updatedFlags & FLAG_UTF8)
@@ -1248,6 +1260,25 @@ public:
         return wcscmp(lhs, rhs) == 0;
     }
 
+    static bool Compare(const char32_t* lhs, const char32_t* rhs, const bool caseSensitive = true, const bool isBigEndian = false)
+    {
+        int lhsLength = std::char_traits<char32_t>::length(lhs) + 1;
+        int lhrLength = std::char_traits<char32_t>::length(rhs) + 1;
+
+        if (!caseSensitive)
+        {
+            char32_t* lowerLhs = new char32_t[lhsLength];
+            char32_t* lowerRhs = new char32_t[lhrLength];
+            lowerLhs = ToLower(lhs, isBigEndian);
+            lowerRhs = ToLower(rhs, isBigEndian);
+            int result = std::char_traits<char32_t>::compare(lowerLhs, lowerRhs, lhsLength);
+            delete[] lowerLhs;
+            delete[] lowerRhs;
+            return result == 0;
+        }
+        return std::char_traits<char32_t>::compare(lhs, rhs, lhsLength) == 0;
+    }
+
     /// <summary>
     /// Returns the passed std::string&amp; in <b>uppercase</b>.
     /// <param><c>std::string&amp; input: string to be processed.</param>
@@ -1474,6 +1505,70 @@ public:
         int length = wcslen(input) + 1;
         wchar_t* result = new wchar_t[length];
         wcscpy(result, ToSarcasm(std::wstring(input), isBigEndian).c_str());
+        return result;
+    }
+
+    static char32_t* ToLower(const char32_t* input, bool isBigEndian = true)
+    {
+        int length = std::char_traits<char32_t>::length(input) + 1;
+        char32_t* result = new char32_t[length];
+        std::char_traits<char32_t>::copy(result, input, length);
+
+        if (isBigEndian)
+        {
+            for (char32_t* i = result; i < result + length; ++i)
+            {
+                swapBytes(i);
+
+                if (*i != '\0')
+                    break;
+
+                *i = std::towlower(*i);
+                swapBytes(i);
+            }
+        }
+        else
+        {
+            for (char32_t* i = result; *i != '\0'; ++i)
+                *i = std::towlower(*i);
+        }
+
+        return result;
+    }
+
+    static char32_t* ToUpper(const char32_t* input, bool isBigEndian = true)
+    {
+        int length = std::char_traits<char32_t>::length(input) + 1;
+        char32_t* result = new char32_t[length];
+        std::char_traits<char32_t>::copy(result, input, length);
+
+        if (isBigEndian)
+        {
+            for (char32_t* i = result; i < result + length; ++i)
+            {
+                swapBytes(i);
+
+                if (*i != '\0')
+                    break;
+
+                *i = std::towupper(*i);
+                swapBytes(i);
+            }
+        }
+        else
+        {
+            for (char32_t* i = result; *i != '\0'; ++i)
+                *i = std::towupper(*i);
+        }
+
+        return result;
+    }
+
+    static char32_t* ToSarcasm(const char32_t* input, bool isBigEndian = true)
+    {
+        int length = std::char_traits<char32_t>::length(input) + 1;
+        char32_t* result = new char32_t[length];
+        std::char_traits<char32_t>::copy(result, ToSarcasm(std::u32string(input), isBigEndian).c_str(), length);
         return result;
     }
 
@@ -1815,6 +1910,11 @@ public:
     bool Compare(const wchar_t* rhs, const bool caseSensitive = true, const bool isBigEndian = false)
     {
         return Compare(isBigEndian ? _utf16BE.c_str() : _utf16LE.c_str(), rhs, caseSensitive, isBigEndian);
+    }
+
+    bool Compare(const char32_t* rhs, const bool caseSensitive = true, const bool isBigEndian = false)
+    {
+        return Compare(isBigEndian ? _utf32BE.c_str() : _utf32LE.c_str(), rhs, caseSensitive, isBigEndian);
     }
 
     /// <summary>
