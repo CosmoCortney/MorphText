@@ -1,4 +1,4 @@
-﻿#include <string>
+#include <string>
 #include <Windows.h>
 #include <locale>
 #include <codecvt>
@@ -1232,6 +1232,20 @@ public:
             }
             return strcmp(lhs, rhs) == 0;
         } break;
+        case UTF8: {
+            if (!caseSensitive)
+            {
+                char* lowerLhs = new char[strlen(lhs) + 1];
+                char* lowerRhs = new char[strlen(rhs) + 1];
+                lowerLhs = ToLower(lhs, format);
+                lowerRhs = ToLower(rhs, format);
+                int result = strcmp(lowerLhs, lowerRhs);
+                delete[] lowerLhs;
+                delete[] lowerRhs;
+                return result == 0;
+            }
+            return strcmp(lhs, rhs) == 0;
+        } break;
         default: //ISO 8859-X
             return Compare(ISO8859X_To_Utf8(lhs, format), ISO8859X_To_Utf8(rhs, format), caseSensitive);
         }
@@ -1359,7 +1373,7 @@ public:
 
         switch (format)
         {
-        case ASCII: {
+        case ASCII: case UTF8: {
             for (char* i = result; *i != '\0'; ++i)
                 *i = std::tolower(*i);
         }break;
@@ -1416,7 +1430,7 @@ public:
 
         switch (format)
         {
-        case ASCII: {
+        case ASCII: case UTF8: {
             for (char* i = result; *i != '\0'; ++i)
                 *i = std::toupper(*i);
             }break;
@@ -1473,7 +1487,7 @@ public:
 
         switch (format)
         {
-        case ASCII: {
+        case ASCII: case UTF8: {
             for (char* i = result; *i != '\0'; ++i)
                 *i = reinterpret_cast<uint64_t>(i) & 1 ? std::tolower(*i) : std::toupper(*i);
         }break;
