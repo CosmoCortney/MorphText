@@ -1,4 +1,4 @@
-#include <string>
+﻿#include <string>
 #include <Windows.h>
 #include <locale>
 #include <codecvt>
@@ -83,6 +83,15 @@ private:
     int _updatedFlags = 0;
     int _primaryFormat;
     uint32_t _maxLength = -1;
+
+    static constexpr wchar_t _iso8859_1_map[] = { //Latin-1
+        0x00A0, 0x00A1, 0x00A2, 0x00A3, 0x00A4, 0x00A5, 0x00A6, 0x00A7, 0x00A8, 0x00A9, 0x00AA, 0x00AB, 0x00AC, 0x00AD, 0x00AE, 0x00AF,
+        0x00B0, 0x00B1, 0x00B2, 0x00B3, 0x00B4, 0x00B5, 0x00B6, 0x00B7, 0x00B8, 0x00B9, 0x00BA, 0x00BB, 0x00BC, 0x00BD, 0x00BE, 0x00BF,
+        0x00C0, 0x00C1, 0x00C2, 0x00C3, 0x00C4, 0x00C5, 0x00C6, 0x00C7, 0x00C8, 0x00C9, 0x00CA, 0x00CB, 0x00CC, 0x00CD, 0x00CE, 0x00CF,
+        0x00D0, 0x00D1, 0x00D2, 0x00D3, 0x00D4, 0x00D5, 0x00D6, 0x00D7, 0x00D8, 0x00D9, 0x00DA, 0x00DB, 0x00DC, 0x00DD, 0x00DE, 0x00DF,
+        0x00E0, 0x00E1, 0x00E2, 0x00E3, 0x00E4, 0x00E5, 0x00E6, 0x00E7, 0x00E8, 0x00E9, 0x00EA, 0x00EB, 0x00EC, 0x00ED, 0x00EE, 0x00EF,
+        0x00F0, 0x00F1, 0x00F2, 0x00F3, 0x00F4, 0x00F5, 0x00F6, 0x00F7, 0x00F8, 0x00F9, 0x00FA, 0x00FB, 0x00FC, 0x00FD, 0x00FE, 0x00FF
+    };
 
     static constexpr wchar_t _iso8859_2_map[] = { //Latin-2
         0x00A0, 0x0104, 0x02D8, 0x0141, 0x00A4, 0x013D, 0x015A, 0x00A7, 0x00A8, 0x0160, 0x015E, 0x0164, 0x0179, 0x00AD, 0x017D, 0x017B,
@@ -961,16 +970,17 @@ public:
             lookup = (wchar_t*)_iso8859_16_map;
             break;
         default: //ISO 8859-1
-            return std::string(input);
+            lookup = (wchar_t*)_iso8859_1_map;
         }
 
-        for (int index = 0; index < length-1; ++index)
+        for (int index = 0; index < length; ++index)
         {
             wchar_t ch = (uint8_t)input[index];
             temp[index] = (ch > 0xA0) ? lookup[ch - 0xA0] : ch;
+            if (ch == '\0') break;
         }
 
-        temp[length-1] = 0;
+        temp[length] = 0;
         std::wstring utf16(temp);
         delete[] temp;
         std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
@@ -1035,9 +1045,7 @@ public:
             break;
         default: //ISO_8859_1
         {
-            char* output = new char[input.size() + 1];
-            strcpy(output, input.c_str());
-            return output;
+            lookup = (wchar_t*)_iso8859_1_map;
         }
         }
 
@@ -1052,7 +1060,7 @@ public:
             {
                 for (uint8_t lookupIndex = 0; lookupIndex < 0x60; ++lookupIndex)
                 {
-                    if (_iso8859_2_map[lookupIndex] == ch)
+                    if (lookup[lookupIndex] == ch)
                     {
                         output[index] = lookupIndex + 0xA0;
                         break;
@@ -1223,25 +1231,18 @@ public:
     /// </summary>
     static bool Compare(const char* lhs, const char* rhs, const bool caseSensitive = true, const int format = 0)
     {
-        switch (format)
+        if (!caseSensitive)
         {
-        case ASCII: case SHIFTJIS: case UTF8: {
-            if (!caseSensitive)
-            {
-                char* lowerLhs = new char[strlen(lhs) + 1];
-                char* lowerRhs = new char[strlen(rhs) + 1];
-                lowerLhs = ToLower(lhs, format);
-                lowerRhs = ToLower(rhs, format);
-                int result = strcmp(lowerLhs, lowerRhs);
-                delete[] lowerLhs;
-                delete[] lowerRhs;
-                return result == 0;
-            }
-            return strcmp(lhs, rhs) == 0;
+            char* lowerLhs = new char[strlen(lhs) + 1];
+            char* lowerRhs = new char[strlen(rhs) + 1];
+            lowerLhs = ToLower(lhs, format);
+            lowerRhs = ToLower(rhs, format);
+            int result = strcmp(lowerLhs, lowerRhs);
+            delete[] lowerLhs;
+            delete[] lowerRhs;
+            return result == 0;
         }
-        default: //ISO 8859-X
-            return Compare(ISO8859X_To_Utf8(lhs, format), ISO8859X_To_Utf8(rhs, format), caseSensitive);
-        }
+        return strcmp(lhs, rhs) == 0;
     }
 
     static bool Compare(const wchar_t* lhs, const wchar_t* rhs, const bool caseSensitive = true, const bool isBigEndian = false)
