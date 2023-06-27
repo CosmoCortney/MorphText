@@ -232,7 +232,7 @@ private:
         FLAG_SHIFTJIS = 1 << Formats::SHIFTJIS,
     };
 
-    static void swapBytes(wchar_t* src)
+    static void swapBytes(const wchar_t* src)
     {
         char* ref = (char*)src;
         *ref ^= *(ref + 1);
@@ -240,7 +240,7 @@ private:
         *ref ^= *(ref + 1);
     }
 
-    static void swapBytes(char32_t* src)
+    static void swapBytes(const char32_t* src)
     {
         char* ref = (char*)src;
         *ref ^= *(ref + 3);
@@ -359,7 +359,7 @@ private:
         _updatedFlags |= FLAG_ASCII;
     }
 
-    void iso8859xToUtf8(int format)
+    void iso8859xToUtf8(const int format)
     {
         char* txt;
 
@@ -415,7 +415,7 @@ private:
         _updatedFlags |= FLAG_UTF8;
     }
 
-    void utf8ToIso8859x(int format)
+    void utf8ToIso8859x(const int format)
     {
         switch (format)
         {
@@ -1445,7 +1445,7 @@ public:
         return result;
     }
 
-    static wchar_t* ToLower(const wchar_t* input, bool isBigEndian = true)
+    static wchar_t* ToLower(const wchar_t* input, const bool isBigEndian = true)
     {
         int length = wcslen(input) + 1;
         wchar_t* result = new wchar_t[length];
@@ -1473,7 +1473,7 @@ public:
         return result;
     }
 
-    static wchar_t* ToUpper(const wchar_t* input, bool isBigEndian = true)
+    static wchar_t* ToUpper(const wchar_t* input, const bool isBigEndian = true)
     {
         int length = wcslen(input) + 1;
         wchar_t* result = new wchar_t[length];
@@ -1501,7 +1501,7 @@ public:
         return result;
     }
 
-    static wchar_t* ToSarcasm(const wchar_t* input, bool isBigEndian = true)
+    static wchar_t* ToSarcasm(const wchar_t* input, const bool isBigEndian = true)
     {
         int length = wcslen(input) + 1;
         wchar_t* result = new wchar_t[length];
@@ -1509,7 +1509,7 @@ public:
         return result;
     }
 
-    static char32_t* ToLower(const char32_t* input, bool isBigEndian = true)
+    static char32_t* ToLower(const char32_t* input, const bool isBigEndian = true)
     {
         int length = std::char_traits<char32_t>::length(input) + 1;
         char32_t* result = new char32_t[length];
@@ -1537,7 +1537,7 @@ public:
         return result;
     }
 
-    static char32_t* ToUpper(const char32_t* input, bool isBigEndian = true)
+    static char32_t* ToUpper(const char32_t* input, const bool isBigEndian = true)
     {
         int length = std::char_traits<char32_t>::length(input) + 1;
         char32_t* result = new char32_t[length];
@@ -1565,7 +1565,7 @@ public:
         return result;
     }
 
-    static char32_t* ToSarcasm(const char32_t* input, bool isBigEndian = true)
+    static char32_t* ToSarcasm(const char32_t* input, const bool isBigEndian = true)
     {
         int length = std::char_traits<char32_t>::length(input) + 1;
         char32_t* result = new char32_t[length];
