@@ -555,7 +555,7 @@ public:
     MorphText(const char* charStr, const int format = 0)
     {
         initArrays();
-        int length = strlen(charStr);
+        const int length = strlen(charStr);
 
         switch (format)
         {
@@ -565,104 +565,104 @@ public:
         case ISO_8859_1: {
             _iso_8859_1 = new char[length + 1];
             strcpy(_iso_8859_1, charStr);
-            _iso_8859_1[length] = '/0';
+            _iso_8859_1[length] = '\0';
             _updatedFlags |= FLAG_ISO_8859_1;
         } break;
         case ISO_8859_2: {
             _iso_8859_2 = new char[length + 1];
             strcpy(_iso_8859_2, charStr);
-            _iso_8859_2[length] = '/0';
+            _iso_8859_2[length] = '\0';
             _updatedFlags |= FLAG_ISO_8859_2;
         } break;
         case ISO_8859_3: {
             _iso_8859_3 = new char[length + 1];
             strcpy(_iso_8859_3, charStr);
-            _iso_8859_3[length] = '/0';
+            _iso_8859_3[length] = '\0';
             _updatedFlags |= FLAG_ISO_8859_3;
         } break;
         case ISO_8859_4: {
             _iso_8859_4 = new char[length + 1];
             strcpy(_iso_8859_4, charStr);
-            _iso_8859_4[length] = '/0';
+            _iso_8859_4[length] = '\0';
             _updatedFlags |= FLAG_ISO_8859_4;
         } break;
         case ISO_8859_5: {
             _iso_8859_5 = new char[length + 1];
             strcpy(_iso_8859_5, charStr);
-            _iso_8859_5[length] = '/0';
+            _iso_8859_5[length] = '\0';
             _updatedFlags |= FLAG_ISO_8859_5;
         } break;
         case ISO_8859_6: {
             _iso_8859_6 = new char[length + 1];
             strcpy(_iso_8859_6, charStr);
-            _iso_8859_6[length] = '/0';
+            _iso_8859_6[length] = '\0';
             _updatedFlags |= FLAG_ISO_8859_6;
         } break;
         case ISO_8859_7: {
             _iso_8859_7 = new char[length + 1];
             strcpy(_iso_8859_7, charStr);
-            _iso_8859_7[length] = '/0';
+            _iso_8859_7[length] = '\0';
             _updatedFlags |= FLAG_ISO_8859_7;
         } break;
         case ISO_8859_8: {
             _iso_8859_8 = new char[length + 1];
             strcpy(_iso_8859_8, charStr);
-            _iso_8859_8[length] = '/0';
+            _iso_8859_8[length] = '\0';
             _updatedFlags |= FLAG_ISO_8859_8;
         } break;
         case ISO_8859_9: {
             _iso_8859_9 = new char[length + 1];
             strcpy(_iso_8859_9, charStr);
-            _iso_8859_9[length] = '/0';
+            _iso_8859_9[length] = '\0';
             _updatedFlags |= FLAG_ISO_8859_9;
         } break;
         case ISO_8859_10: {
             _iso_8859_10 = new char[length + 1];
             strcpy(_iso_8859_10, charStr);
-            _iso_8859_10[length] = '/0';
+            _iso_8859_10[length] = '\0';
             _updatedFlags |= FLAG_ISO_8859_10;
         } break;
         case ISO_8859_11: {
             _iso_8859_11 = new char[length + 1];
             strcpy(_iso_8859_11, charStr);
-            _iso_8859_11[length] = '/0';
+            _iso_8859_11[length] = '\0';
             _updatedFlags |= FLAG_ISO_8859_11;
         } break;
         case ISO_8859_13: {
             _iso_8859_13 = new char[length + 1];
             strcpy(_iso_8859_13, charStr);
-            _iso_8859_13[length] = '/0';
+            _iso_8859_13[length] = '\0';
             _updatedFlags |= FLAG_ISO_8859_13;
         } break;
         case ISO_8859_14: {
             _iso_8859_14 = new char[length + 1];
             strcpy(_iso_8859_14, charStr);
-            _iso_8859_14[length] = '/0';
+            _iso_8859_14[length] = '\0';
             _updatedFlags |= FLAG_ISO_8859_14;
         } break;
         case ISO_8859_15: {
             _iso_8859_15 = new char[length + 1];
             strcpy(_iso_8859_15, charStr);
-            _iso_8859_15[length] = '/0';
+            _iso_8859_15[length] = '\0';
             _updatedFlags |= FLAG_ISO_8859_15;
         } break;
         case ISO_8859_16: {
             _iso_8859_16 = new char[length + 1];
             strcpy(_iso_8859_16, charStr);
-            _iso_8859_16[length] = '/0';
+            _iso_8859_16[length] = '\0';
             _updatedFlags |= FLAG_ISO_8859_16;
         } break;
         case Formats::SHIFTJIS: {
             _shiftJis = new char[length + 1];
             strcpy(_shiftJis, charStr);
-            _shiftJis[length] = '/0';
+            _shiftJis[length] = '\0';
             _updatedFlags |= FLAG_SHIFTJIS;
         } break;
         default: // ASCII
         {
             _ascii = new char[length + 1];
             strcpy(_ascii, charStr);
-            _ascii[length] = '/0';
+            _ascii[length] = '\0';
             _updatedFlags |= FLAG_ASCII;
         }
         }
@@ -690,23 +690,6 @@ public:
 
     ~MorphText()
     {
-        if(_ascii) delete[] _ascii;
-        if (_iso_8859_1) delete[] _iso_8859_1;
-        if (_iso_8859_2) delete[] _iso_8859_2;
-        if (_iso_8859_3) delete[] _iso_8859_3;
-        if (_iso_8859_4) delete[] _iso_8859_4;
-        if (_iso_8859_5) delete[] _iso_8859_5;
-        if (_iso_8859_6) delete[] _iso_8859_6;
-        if (_iso_8859_7) delete[] _iso_8859_7;
-        if (_iso_8859_8) delete[] _iso_8859_8;
-        if (_iso_8859_9) delete[] _iso_8859_9;
-        if (_iso_8859_10) delete[] _iso_8859_10;
-        if (_iso_8859_11) delete[] _iso_8859_11;
-        if (_iso_8859_13) delete[] _iso_8859_13;
-        if (_iso_8859_14) delete[] _iso_8859_14;
-        if (_iso_8859_15) delete[] _iso_8859_15;
-        if (_iso_8859_16) delete[] _iso_8859_16;
-        if (_shiftJis) delete[] _shiftJis;
     }
 
     /// <summary>
@@ -714,7 +697,7 @@ public:
     /// <param><c>char&ast; input: string to be processed.</param>
     /// </summary>
     static std::string ShiftJis_To_Utf8(const char* input) {
-        int length = MultiByteToWideChar(932, 0, input, -1, NULL, 0);
+        int length = MultiByteToWideChar(932, 0, input, -1, nullptr, 0);
 
         if (!length)
             return "";
@@ -726,7 +709,7 @@ public:
             return "";
         }
 
-        int mbLength = WideCharToMultiByte(CP_UTF8, 0, wideStr, -1, NULL, 0, NULL, NULL);
+        int mbLength = WideCharToMultiByte(CP_UTF8, 0, wideStr, -1, nullptr, 0, nullptr, nullptr);
         if (!mbLength)
         {
             delete[] wideStr;
@@ -734,7 +717,7 @@ public:
         }
 
         char* mbStr = new char[mbLength];
-        if (WideCharToMultiByte(CP_UTF8, 0, wideStr, -1, mbStr, mbLength, NULL, NULL) == 0)
+        if (WideCharToMultiByte(CP_UTF8, 0, wideStr, -1, mbStr, mbLength, nullptr, nullptr) == 0)
         {
             delete[] wideStr;
             delete[] mbStr;
@@ -755,7 +738,7 @@ public:
     /// </summary>
     static char* Utf8_To_ShiftJis(const std::string& input)
     {
-        int wideLength = MultiByteToWideChar(CP_UTF8, 0, input.c_str(), -1, NULL, 0);
+        const int wideLength = MultiByteToWideChar(CP_UTF8, 0, input.c_str(), -1, nullptr, 0);
 
         if (!wideLength)
             return nullptr;
@@ -768,7 +751,7 @@ public:
             return nullptr;
         }
 
-        int sjisLength = WideCharToMultiByte(932, 0, wideStr, -1, NULL, 0, NULL, NULL);
+        int sjisLength = WideCharToMultiByte(932, 0, wideStr, -1, nullptr, 0, nullptr, nullptr);
 
         if (!sjisLength)
         {
@@ -778,7 +761,7 @@ public:
 
         char* sjisStr = new char[sjisLength];
 
-        if (WideCharToMultiByte(932, 0, wideStr, -1, sjisStr, sjisLength, NULL, NULL) == 0)
+        if (WideCharToMultiByte(932, 0, wideStr, -1, sjisStr, sjisLength, nullptr, nullptr) == 0)
         {
             delete[] wideStr;
             delete[] sjisStr;
@@ -981,7 +964,7 @@ public:
         }
 
         temp[length] = 0;
-        std::wstring utf16(temp);
+        const std::wstring utf16(temp);
         delete[] temp;
         std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
         std::string output = converter.to_bytes(utf16);
@@ -996,7 +979,7 @@ public:
     static char* Utf8_To_ISO8859X(const std::string& input, const int format = ISO_8859_1)
     {
         std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-        std::wstring utf16 = converter.from_bytes(input);
+        const std::wstring utf16 = converter.from_bytes(input);
         wchar_t* lookup;
 
         switch (format)
@@ -1049,7 +1032,7 @@ public:
         }
         }
 
-        int length = utf16.size();
+        const int length = utf16.size();
         char* output = new char[length + 1];
 
         for (int index = 0; index < length; ++index)
@@ -1084,8 +1067,8 @@ public:
     /// </summary>
     static int Find(const std::string& superset, const std::string& subset, const bool caseSensitive = true)
     {
-        std::string sups = caseSensitive ? superset : ToLower(superset);
-        std::string subs = caseSensitive ? subset : ToLower(subset);
+        const std::string sups = caseSensitive ? superset : ToLower(superset);
+        const std::string subs = caseSensitive ? subset : ToLower(subset);
         return sups.find(subs);
     }
 
@@ -1096,7 +1079,7 @@ public:
     /// <c>bool caseSensitive</c> (optional): Consider case sensitivity (true = case sensitive (default), false = case insensitive.
     /// <c>bool isBigEndian</c>: true to return the big endian value, false to return the little endian value.</param>
     /// </summary>
-    static int Find(const std::wstring& superset, const std::wstring& subset, const const bool caseSensitive = true, const bool bigEndian = false)
+    static int Find(const std::wstring& superset, const std::wstring& subset, const bool caseSensitive = true, const bool bigEndian = false)
     {
         if (bigEndian)
         {
@@ -1233,11 +1216,11 @@ public:
     {
         if (!caseSensitive)
         {
-            char* lowerLhs = new char[strlen(lhs) + 1];
-            char* lowerRhs = new char[strlen(rhs) + 1];
+            const char* lowerLhs = new char[strlen(lhs) + 1];
+            const char* lowerRhs = new char[strlen(rhs) + 1];
             lowerLhs = ToLower(lhs, format);
             lowerRhs = ToLower(rhs, format);
-            int result = strcmp(lowerLhs, lowerRhs);
+            const int result = strcmp(lowerLhs, lowerRhs);
             delete[] lowerLhs;
             delete[] lowerRhs;
             return result == 0;
@@ -1249,11 +1232,11 @@ public:
     {
         if (!caseSensitive)
         {
-            wchar_t* lowerLhs = new wchar_t[wcslen(lhs) + 1];
-            wchar_t* lowerRhs = new wchar_t[wcslen(rhs) + 1];
+            const wchar_t* lowerLhs = new wchar_t[wcslen(lhs) + 1];
+            const wchar_t* lowerRhs = new wchar_t[wcslen(rhs) + 1];
             lowerLhs = ToLower(lhs, isBigEndian);
             lowerRhs = ToLower(rhs, isBigEndian);
-            int result = wcscmp(lowerLhs, lowerRhs);
+            const int result = wcscmp(lowerLhs, lowerRhs);
             delete[] lowerLhs;
             delete[] lowerRhs;
             return result == 0;
@@ -1263,16 +1246,16 @@ public:
 
     static bool Compare(const char32_t* lhs, const char32_t* rhs, const bool caseSensitive = true, const bool isBigEndian = false)
     {
-        int lhsLength = std::char_traits<char32_t>::length(lhs) + 1;
-        int lhrLength = std::char_traits<char32_t>::length(rhs) + 1;
+        const int lhsLength = std::char_traits<char32_t>::length(lhs) + 1;
+        const int lhrLength = std::char_traits<char32_t>::length(rhs) + 1;
 
         if (!caseSensitive)
         {
-            char32_t* lowerLhs = new char32_t[lhsLength];
-            char32_t* lowerRhs = new char32_t[lhrLength];
+            const char32_t* lowerLhs = new char32_t[lhsLength];
+            const char32_t* lowerRhs = new char32_t[lhrLength];
             lowerLhs = ToLower(lhs, isBigEndian);
             lowerRhs = ToLower(rhs, isBigEndian);
-            int result = std::char_traits<char32_t>::compare(lowerLhs, lowerRhs, lhsLength);
+            const int result = std::char_traits<char32_t>::compare(lowerLhs, lowerRhs, lhsLength);
             delete[] lowerLhs;
             delete[] lowerRhs;
             return result == 0;
@@ -1395,10 +1378,9 @@ public:
     /// </summary>
     static char* ToLower(const char* input, const int format)
     {
-        std::string temp;
-        int length = strlen(input) + 1;
+        const int length = strlen(input) + 1;
         char* result = new char[length];
-        strcpy(result, input);
+        strcpy_s(result, length, input);
 
         switch (format)
         {
@@ -1436,7 +1418,7 @@ public:
             }
         }break;
         default: { //ISO 8859-X
-            temp = ISO8859X_To_Utf8(input, format);
+            std::string temp = ISO8859X_To_Utf8(input, format);
             temp = ToLower(temp);
             result = Utf8_To_ISO8859X(temp);
         }
@@ -1447,9 +1429,9 @@ public:
 
     static wchar_t* ToLower(const wchar_t* input, const bool isBigEndian = true)
     {
-        int length = wcslen(input) + 1;
+        const int length = wcslen(input) + 1;
         wchar_t* result = new wchar_t[length];
-        wcscpy(result, input);
+        wcscpy_s(result, length, input);
 
         if (isBigEndian)
         {
@@ -1475,9 +1457,9 @@ public:
 
     static wchar_t* ToUpper(const wchar_t* input, const bool isBigEndian = true)
     {
-        int length = wcslen(input) + 1;
+        const int length = wcslen(input) + 1;
         wchar_t* result = new wchar_t[length];
-        wcscpy(result, input);
+        wcscpy_s(result, length, input);
 
         if (isBigEndian)
         {
@@ -1503,15 +1485,15 @@ public:
 
     static wchar_t* ToSarcasm(const wchar_t* input, const bool isBigEndian = true)
     {
-        int length = wcslen(input) + 1;
+        const int length = wcslen(input) + 1;
         wchar_t* result = new wchar_t[length];
-        wcscpy(result, ToSarcasm(std::wstring(input), isBigEndian).c_str());
+        wcscpy_s(result, length, ToSarcasm(std::wstring(input), isBigEndian).c_str());
         return result;
     }
 
     static char32_t* ToLower(const char32_t* input, const bool isBigEndian = true)
     {
-        int length = std::char_traits<char32_t>::length(input) + 1;
+        const int length = std::char_traits<char32_t>::length(input) + 1;
         char32_t* result = new char32_t[length];
         std::char_traits<char32_t>::copy(result, input, length);
 
@@ -1567,7 +1549,7 @@ public:
 
     static char32_t* ToSarcasm(const char32_t* input, const bool isBigEndian = true)
     {
-        int length = std::char_traits<char32_t>::length(input) + 1;
+        const int length = std::char_traits<char32_t>::length(input) + 1;
         char32_t* result = new char32_t[length];
         std::char_traits<char32_t>::copy(result, ToSarcasm(std::u32string(input), isBigEndian).c_str(), length);
         return result;
@@ -1580,10 +1562,9 @@ public:
     /// </summary>
     static char* ToUpper(const char* input, const int format)
     {
-        std::string temp;
-        int length = strlen(input) + 1;
+        const int length = strlen(input) + 1;
         char* result = new char[length];
-        strcpy(result, input);
+        strcpy_s(result, length, input);
 
         switch (format)
         {
@@ -1621,7 +1602,7 @@ public:
             }
         }break;
         default: { //ISO 8859-X
-            temp = ISO8859X_To_Utf8(input, format);
+            std::string temp = ISO8859X_To_Utf8(input, format);
             temp = ToUpper(temp);
             result = Utf8_To_ISO8859X(temp);
         }
@@ -1638,9 +1619,9 @@ public:
     static char* ToSarcasm(const char* input, const int format)
     {
         std::string temp;
-        int length = strlen(input) + 1;
+        const int length = strlen(input) + 1;
         char* result = new char[length];
-        strcpy(result, input);
+        strcpy_s(result, length, input);
 
         switch (format)
         {
@@ -1823,7 +1804,7 @@ public:
     /// <c>std::string&amp; rhs</c>: right-hand std::string&amp; to be compared against. 
     /// <c>bool caseSensitive</c> (optional): Consider case sensitivity (true = case sensitive (default), false = case insensitive.</param>
     /// </summary>
-    bool Compare(const std::string& rhs, const bool caseSensitive = true)
+    bool Compare(const std::string& rhs, const bool caseSensitive = true) const
     {
         return Compare(_utf8, rhs, caseSensitive);
     }
@@ -1835,7 +1816,7 @@ public:
     /// <c>bool caseSensitive</c> (optional): Consider case sensitivity (true = case sensitive (default), false = case insensitive.
     /// <c>bool isBigEndian</c>: true to return the big endian value, false to return the little endian value.</param>
     /// </summary>
-    bool Compare(const std::wstring& rhs, const bool caseSensitive = true, const bool bigEndian = false)
+    bool Compare(const std::wstring& rhs, const bool caseSensitive = true, const bool bigEndian = false) const
     {
         if(bigEndian)
             return Compare(_utf16BE, rhs, caseSensitive, true);
@@ -1850,7 +1831,7 @@ public:
     /// <c>bool caseSensitive</c> (optional): Consider case sensitivity (true = case sensitive (default), false = case insensitive.
     /// <c>bool isBigEndian</c>: true to return the big endian value, false to return the little endian value.</param>
     /// </summary>
-    bool Compare(const std::u32string& rhs, const bool caseSensitive = true, const bool bigEndian = false)
+    bool Compare(const std::u32string& rhs, const bool caseSensitive = true, const bool bigEndian = false) const
     {
         if (bigEndian)
             return Compare(_utf32BE, rhs, caseSensitive, true);
@@ -1865,7 +1846,7 @@ public:
     /// <c>bool caseSensitive</c> (optional): Consider case sensitivity (true = case sensitive (default), false = case insensitive.
     /// <c>int format</c>: The format the strings should be interpreted as.</param>
     /// </summary>
-    bool Compare(const char* rhs, const bool caseSensitive = true, const int format = ASCII)
+    bool Compare(const char* rhs, const bool caseSensitive = true, const int format = ASCII) const
     {
         switch (format)
         {
@@ -1908,12 +1889,12 @@ public:
         }
     }
 
-    bool Compare(const wchar_t* rhs, const bool caseSensitive = true, const bool isBigEndian = false)
+    bool Compare(const wchar_t* rhs, const bool caseSensitive = true, const bool isBigEndian = false) const
     {
         return Compare(isBigEndian ? _utf16BE.c_str() : _utf16LE.c_str(), rhs, caseSensitive, isBigEndian);
     }
 
-    bool Compare(const char32_t* rhs, const bool caseSensitive = true, const bool isBigEndian = false)
+    bool Compare(const char32_t* rhs, const bool caseSensitive = true, const bool isBigEndian = false) const
     {
         return Compare(isBigEndian ? _utf32BE.c_str() : _utf32LE.c_str(), rhs, caseSensitive, isBigEndian);
     }
@@ -1923,7 +1904,7 @@ public:
     /// <param><c>std::string&amp; subset</c>: std::string&amp; to be found. 
     /// <c>bool caseSensitive</c> (optional): Consider case sensitivity (true = case sensitive (default), false = case insensitive.</param>
     /// </summary>
-    int Find(const std::string& subset, const bool caseSensitive = true)
+    int Find(const std::string& subset, const bool caseSensitive = true) const
     {
         return Find(_utf8, subset, caseSensitive);
     }
@@ -1934,7 +1915,7 @@ public:
     /// <c>bool caseSensitive</c> (optional): Consider case sensitivity (true = case sensitive (default), false = case insensitive.
     /// <c>bool isBigEndian</c>: true to return the big endian value, false to return the little endian value.</param>
     /// </summary>
-    int Find(const std::wstring& subset, const bool caseSensitive = true, const bool bigEndian = false)
+    int Find(const std::wstring& subset, const bool caseSensitive = true, const bool bigEndian = false) const
     {
         if(caseSensitive)
             return Find(_utf16BE, subset, caseSensitive, true);
@@ -1948,7 +1929,7 @@ public:
     /// <c>bool caseSensitive</c> (optional): Consider case sensitivity (true = case sensitive (default), false = case insensitive.
     /// <c>bool isBigEndian</c>: true to return the big endian value, false to return the little endian value.</param>
     /// </summary>
-    int Find(const std::u32string& subset, const bool caseSensitive = true, const bool bigEndian = false)
+    int Find(const std::u32string& subset, const bool caseSensitive = true, const bool bigEndian = false) const
     {
         if (caseSensitive)
             return Find(_utf32BE, subset, caseSensitive, true);
@@ -1962,7 +1943,7 @@ public:
     /// <c>int format</c>: format value.
     /// <c>bool caseSensitive</c> (optional): Consider case sensitivity (true = case sensitive (default), false = case insensitive.</param>
     /// </summary>
-    int Find(const char* subset, const int format, const bool caseSensitive = true)
+    int Find(const char* subset, const int format, const bool caseSensitive = true) const
     {
         switch (format)
         {
@@ -2148,7 +2129,7 @@ public:
     /// <summary>
     /// Returns the primary format. This is useful if other parts of your code don't which format to output.
     /// </summary>
-    int GetPrimaryFormat()
+    int GetPrimaryFormat() const
     {
         return _primaryFormat;
     }
@@ -2195,10 +2176,12 @@ public:
     /// </summary>
     void SetASCII(const char* input)
     {
-        if (_updatedFlags & Flags::FLAG_ASCII)
+        if (_updatedFlags & FLAG_ASCII)
             delete[] _ascii;
-        strcpy(_ascii, input);
-        _updatedFlags = Flags::FLAG_ASCII;
+
+        _ascii = new char[strlen(input) + 1];
+        strcpy_s(_ascii, strlen(input) + 1, input);
+        _updatedFlags = FLAG_ASCII;
     }
 
     /// <summary>
@@ -2208,10 +2191,12 @@ public:
     /// </summary>
     void SetShiftJis(const char* input)
     {
-        if (_updatedFlags & Flags::FLAG_SHIFTJIS)
+        if (_updatedFlags & FLAG_SHIFTJIS)
             delete[] _shiftJis;
-        strcpy(_shiftJis, input);
-        _updatedFlags = Flags::FLAG_SHIFTJIS;
+
+        _shiftJis = new char[strlen(input) + 1];
+        strcpy_s(_shiftJis, strlen(input) + 1, input);
+        _updatedFlags = FLAG_SHIFTJIS;
     }
 
     /// <summary>
@@ -2222,97 +2207,129 @@ public:
     /// </summary>
     void SetISO8859X(const char* input, const int format)
     {
+        const int length = strlen(input) + 1;
+
         switch (format)
         {
         case ISO_8859_2:
-            if (_updatedFlags & Flags::FLAG_ISO_8859_2)
+            if (_updatedFlags & FLAG_ISO_8859_2)
                 delete[] _iso_8859_2;
-            strcpy(_iso_8859_2, input);
-            _updatedFlags = Flags::FLAG_ISO_8859_2;
+
+            _iso_8859_2 = new char[length];
+            strcpy_s(_iso_8859_2, length, input);
+            _updatedFlags = FLAG_ISO_8859_2;
             break;
         case ISO_8859_3:
-            if (_updatedFlags & Flags::FLAG_ISO_8859_3)
+            if (_updatedFlags & FLAG_ISO_8859_3)
                 delete[] _iso_8859_3;
-            strcpy(_iso_8859_3, input);
-            _updatedFlags = Flags::FLAG_ISO_8859_3;
+
+            _iso_8859_3 = new char[length];
+            strcpy_s(_iso_8859_3, length, input);
+            _updatedFlags = FLAG_ISO_8859_3;
             break;
         case ISO_8859_4:
-            if (_updatedFlags & Flags::FLAG_ISO_8859_4)
+            if (_updatedFlags & FLAG_ISO_8859_4)
                 delete[] _iso_8859_4;
-            strcpy(_iso_8859_4, input);
-            _updatedFlags = Flags::FLAG_ISO_8859_4;
+
+            _iso_8859_4 = new char[length];
+            strcpy_s(_iso_8859_4, length, input);
+            _updatedFlags = FLAG_ISO_8859_4;
             break;
         case ISO_8859_5:
-            if (_updatedFlags & Flags::FLAG_ISO_8859_5)
+            if (_updatedFlags & FLAG_ISO_8859_5)
                 delete[] _iso_8859_5;
-            strcpy(_iso_8859_5, input);
-            _updatedFlags = Flags::FLAG_ISO_8859_5;
+
+            _iso_8859_5 = new char[length];
+            strcpy_s(_iso_8859_5, length, input);
+            _updatedFlags = FLAG_ISO_8859_5;
             break;
         case ISO_8859_6:
-            if (_updatedFlags & Flags::FLAG_ISO_8859_6)
+            if (_updatedFlags & FLAG_ISO_8859_6)
                 delete[] _iso_8859_6;
-            strcpy(_iso_8859_6, input);
-            _updatedFlags = Flags::FLAG_ISO_8859_6;
+
+            _iso_8859_6 = new char[length];
+            strcpy_s(_iso_8859_6, length, input);
+            _updatedFlags = FLAG_ISO_8859_6;
             break;
         case ISO_8859_7:
-            if (_updatedFlags & Flags::FLAG_ISO_8859_7)
+            if (_updatedFlags & FLAG_ISO_8859_7)
                 delete[] _iso_8859_7;
-            strcpy(_iso_8859_7, input);
-            _updatedFlags = Flags::FLAG_ISO_8859_7;
+
+            _iso_8859_7 = new char[length];
+            strcpy_s(_iso_8859_7, length, input);
+            _updatedFlags = FLAG_ISO_8859_7;
             break;
         case ISO_8859_8:
-            if (_updatedFlags & Flags::FLAG_ISO_8859_8)
+            if (_updatedFlags & FLAG_ISO_8859_8)
                 delete[] _iso_8859_8;
-            strcpy(_iso_8859_8, input);
-            _updatedFlags = Flags::FLAG_ISO_8859_8;
+
+            _iso_8859_8 = new char[length];
+            strcpy_s(_iso_8859_8, length, input);
+            _updatedFlags = FLAG_ISO_8859_8;
             break;
         case ISO_8859_9:
-            if (_updatedFlags & Flags::FLAG_ISO_8859_9)
+            if (_updatedFlags & FLAG_ISO_8859_9)
                 delete[] _iso_8859_9;
-            strcpy(_iso_8859_9, input);
-            _updatedFlags = Flags::FLAG_ISO_8859_9;
+
+            _iso_8859_9 = new char[length];
+            strcpy_s(_iso_8859_9, length, input);
+            _updatedFlags = FLAG_ISO_8859_9;
             break;
         case ISO_8859_10:
-            if (_updatedFlags & Flags::FLAG_ISO_8859_10)
+            if (_updatedFlags & FLAG_ISO_8859_10)
                 delete[] _iso_8859_10;
-            strcpy(_iso_8859_10, input);
-            _updatedFlags = Flags::FLAG_ISO_8859_10;
+
+            _iso_8859_10 = new char[length];
+            strcpy_s(_iso_8859_10, length, input);
+            _updatedFlags = FLAG_ISO_8859_10;
             break;
         case ISO_8859_11:
-            if (_updatedFlags & Flags::FLAG_ISO_8859_11)
+            if (_updatedFlags & FLAG_ISO_8859_11)
                 delete[] _iso_8859_11;
-            strcpy(_iso_8859_11, input);
-            _updatedFlags = Flags::FLAG_ISO_8859_11;
+
+            _iso_8859_11 = new char[length];
+            strcpy_s(_iso_8859_11, length, input);
+            _updatedFlags = FLAG_ISO_8859_11;
             break;
         case ISO_8859_13:
-            if (_updatedFlags & Flags::FLAG_ISO_8859_13)
+            if (_updatedFlags & FLAG_ISO_8859_13)
                 delete[] _iso_8859_13;
-            strcpy(_iso_8859_13, input);
-            _updatedFlags = Flags::FLAG_ISO_8859_13;
+
+            _iso_8859_13 = new char[length];
+            strcpy_s(_iso_8859_13, length, input);
+            _updatedFlags = FLAG_ISO_8859_13;
             break;
         case ISO_8859_14:
-            if (_updatedFlags & Flags::FLAG_ISO_8859_14)
+            if (_updatedFlags & FLAG_ISO_8859_14)
                 delete[] _iso_8859_14;
-            strcpy(_iso_8859_14, input);
-            _updatedFlags = Flags::FLAG_ISO_8859_14;
+
+            _iso_8859_14 = new char[length];
+            strcpy_s(_iso_8859_14, length, input);
+            _updatedFlags = FLAG_ISO_8859_14;
             break;
         case ISO_8859_15:
-            if (_updatedFlags & Flags::FLAG_ISO_8859_15)
+            if (_updatedFlags & FLAG_ISO_8859_15)
                 delete[] _iso_8859_15;
-            strcpy(_iso_8859_15, input);
-            _updatedFlags = Flags::FLAG_ISO_8859_15;
+
+            _iso_8859_15 = new char[length];
+            strcpy_s(_iso_8859_15, length, input);
+            _updatedFlags = FLAG_ISO_8859_15;
             break;
         case ISO_8859_16:
-            if (_updatedFlags & Flags::FLAG_ISO_8859_16)
+            if (_updatedFlags & FLAG_ISO_8859_16)
                 delete[] _iso_8859_16;
-            strcpy(_iso_8859_16, input);
-            _updatedFlags = Flags::FLAG_ISO_8859_16;
+
+            _iso_8859_16 = new char[length];
+            strcpy_s(_iso_8859_16, length, input);
+            _updatedFlags = FLAG_ISO_8859_16;
             break;
         default:// ISO 8859-1
-            if (_updatedFlags & Flags::FLAG_ISO_8859_1)
+            if (_updatedFlags & FLAG_ISO_8859_1)
                 delete[] _iso_8859_1;
-            strcpy(_iso_8859_1, input);
-            _updatedFlags = Flags::FLAG_ISO_8859_1;
+
+            _iso_8859_1 = new char[length];
+            strcpy_s(_iso_8859_1, length, input);
+            _updatedFlags = FLAG_ISO_8859_1;
             break;
         }
     }
@@ -2324,7 +2341,7 @@ public:
     void SetUTF8(const std::string& str)
     {
         _utf8 = str;
-        _updatedFlags = Flags::FLAG_UTF8;
+        _updatedFlags = FLAG_UTF8;
     }
 
     /// <summary>
@@ -2337,12 +2354,12 @@ public:
         if (isBigEndian)
         {
             _utf16BE = input;
-            _updatedFlags = Flags::FLAG_UTF16BE;
+            _updatedFlags = FLAG_UTF16BE;
         }
         else
         {
             _utf16LE = input;
-            _updatedFlags = Flags::FLAG_UTF16LE;
+            _updatedFlags = FLAG_UTF16LE;
         }
     }
 
@@ -2366,12 +2383,12 @@ public:
         if (isBigEndian)
         {
             _utf32LE = input;
-            _updatedFlags = Flags::FLAG_UTF32BE;
+            _updatedFlags = FLAG_UTF32BE;
         }
         else
         {
             _utf32LE = input;
-            _updatedFlags = Flags::FLAG_UTF32LE;
+            _updatedFlags = FLAG_UTF32LE;
         }
     }
 
@@ -2402,91 +2419,110 @@ public:
         _utf16BE = other._utf16BE;
         _utf32LE = other._utf32LE;
         _utf32BE = other._utf32BE;
+
         if (other._ascii)
         {
-            _ascii = new char[strlen(other._ascii)+1];
-            strcpy(_ascii, other._ascii);
+            const int length = strlen(other._ascii) + 1;
+            _ascii = new char[length];
+            strcpy_s(_ascii, length, other._ascii);
         }
         if (other._iso_8859_1)
         {
-            _iso_8859_1 = new char[strlen(other._iso_8859_1) + 1];
-            strcpy(_iso_8859_1, other._iso_8859_1);
+            const int length = strlen(other._iso_8859_1) + 1;
+            _iso_8859_1 = new char[length];
+            strcpy_s(_iso_8859_1, length, other._iso_8859_1);
         }
         if (other._iso_8859_2)
         {
-            _iso_8859_2 = new char[strlen(other._iso_8859_2) + 1];
-            strcpy(_iso_8859_2, other._iso_8859_2);
+            const int length = strlen(other._iso_8859_2) + 1;
+            _iso_8859_2 = new char[length];
+            strcpy_s(_iso_8859_2, length, other._iso_8859_2);
         }
         if (other._iso_8859_3)
         {
-            _iso_8859_3 = new char[strlen(other._iso_8859_3) + 1];
-            strcpy(_iso_8859_3, other._iso_8859_3);
+            const int length = strlen(other._iso_8859_3) + 1;
+            _iso_8859_3 = new char[length];
+            strcpy_s(_iso_8859_3, length, other._iso_8859_3);
         }
         if (other._iso_8859_4)
         {
-            _iso_8859_4 = new char[strlen(other._iso_8859_4) + 1];
-            strcpy(_iso_8859_4, other._iso_8859_4);
+            const int length = strlen(other._iso_8859_4) + 1;
+            _iso_8859_4 = new char[length];
+            strcpy_s(_iso_8859_4, length, other._iso_8859_4);
         }
         if (other._iso_8859_5)
         {
-            _iso_8859_5 = new char[strlen(other._iso_8859_5) + 1];
-            strcpy(_iso_8859_5, other._iso_8859_5);
+            const int length = strlen(other._iso_8859_5) + 1;
+            _iso_8859_5 = new char[length];
+            strcpy_s(_iso_8859_5, length, other._iso_8859_5);
         }
         if (other._iso_8859_6)
         {
-            _iso_8859_6 = new char[strlen(other._iso_8859_6) + 1];
-            strcpy(_iso_8859_6, other._iso_8859_6);
+            const int length = strlen(other._iso_8859_6) + 1;
+            _iso_8859_6 = new char[length];
+            strcpy_s(_iso_8859_6, length, other._iso_8859_6);
         }
         if (other._iso_8859_7)
         {
-            _iso_8859_7 = new char[strlen(other._iso_8859_7) + 1];
-            strcpy(_iso_8859_7, other._iso_8859_7);
+            const int length = strlen(other._iso_8859_7) + 1;
+            _iso_8859_7 = new char[length];
+            strcpy_s(_iso_8859_7, length, other._iso_8859_7);
         }
         if (other._iso_8859_8)
         {
-            _iso_8859_8 = new char[strlen(other._iso_8859_8) + 1];
-            strcpy(_iso_8859_8, other._iso_8859_8);
+            const int length = strlen(other._iso_8859_8) + 1;
+            _iso_8859_8 = new char[length];
+            strcpy_s(_iso_8859_8, length, other._iso_8859_8);
         }
         if (other._iso_8859_9)
         {
-            _iso_8859_9 = new char[strlen(other._iso_8859_9) + 1];
-            strcpy(_iso_8859_9, other._iso_8859_9);
+            const int length = strlen(other._iso_8859_9) + 1;
+            _iso_8859_9 = new char[length];
+            strcpy_s(_iso_8859_9, length, other._iso_8859_9);
         }
         if (other._iso_8859_10)
         {
-            _iso_8859_10 = new char[strlen(other._iso_8859_10) + 1];
-            strcpy(_iso_8859_10, other._iso_8859_10);
+            const int length = strlen(other._iso_8859_10) + 1;
+            _iso_8859_10 = new char[length];
+            strcpy_s(_iso_8859_10, length, other._iso_8859_10);
         }
         if (other._iso_8859_11)
         {
-            _iso_8859_11 = new char[strlen(other._iso_8859_11) + 1];
-            strcpy(_iso_8859_11, other._iso_8859_11);
+            const int length = strlen(other._iso_8859_11) + 1;
+            _iso_8859_11 = new char[length];
+            strcpy_s(_iso_8859_11, length, other._iso_8859_11);
         }
         if (other._iso_8859_13)
         {
-            _iso_8859_13 = new char[strlen(other._iso_8859_13) + 1];
-            strcpy(_iso_8859_13, other._iso_8859_13);
+            const int length = strlen(other._iso_8859_13) + 1;
+            _iso_8859_13 = new char[length];
+            strcpy_s(_iso_8859_13, length, other._iso_8859_13);
         }
         if (other._iso_8859_14)
         {
-            _iso_8859_14 = new char[strlen(other._iso_8859_14) + 1];
-            strcpy(_iso_8859_14, other._iso_8859_14);
+            const int length = strlen(other._iso_8859_14) + 1;
+            _iso_8859_14 = new char[length];
+            strcpy_s(_iso_8859_14, length, other._iso_8859_14);
         }
         if (other._iso_8859_15)
         {
-            _iso_8859_15 = new char[strlen(other._iso_8859_15) + 1];
-            strcpy(_iso_8859_15, other._iso_8859_15);
+            const int length = strlen(other._iso_8859_15) + 1;
+            _iso_8859_15 = new char[length];
+            strcpy_s(_iso_8859_15, length, other._iso_8859_15);
         }
         if (other._iso_8859_16)
         {
-            _iso_8859_16 = new char[strlen(other._iso_8859_16) + 1];
-            strcpy(_iso_8859_16, other._iso_8859_16);
+            const int length = strlen(other._iso_8859_16) + 1;
+            _iso_8859_16 = new char[length];
+            strcpy_s(_iso_8859_16, length, other._iso_8859_16);
         }
         if (other._shiftJis)
         {
-            _shiftJis = new char[strlen(other._shiftJis) + 1];
-            strcpy(_shiftJis, other._shiftJis);
+            const int length = strlen(other._shiftJis) + 1;
+            _shiftJis = new char[length];
+            strcpy_s(_shiftJis, length, other._shiftJis);
         }
+
         _updatedFlags = other._updatedFlags;
         _primaryFormat = other._primaryFormat;
     }
