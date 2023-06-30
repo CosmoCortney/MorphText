@@ -2176,9 +2176,7 @@ public:
     /// </summary>
     void SetASCII(const char* input)
     {
-        if (_updatedFlags & FLAG_ASCII)
-            delete[] _ascii;
-
+        delete[] _ascii;
         _ascii = new char[strlen(input) + 1];
         strcpy_s(_ascii, strlen(input) + 1, input);
         _updatedFlags = FLAG_ASCII;
@@ -2191,9 +2189,7 @@ public:
     /// </summary>
     void SetShiftJis(const char* input)
     {
-        if (_updatedFlags & FLAG_SHIFTJIS)
-            delete[] _shiftJis;
-
+        delete[] _shiftJis;
         _shiftJis = new char[strlen(input) + 1];
         strcpy_s(_shiftJis, strlen(input) + 1, input);
         _updatedFlags = FLAG_SHIFTJIS;
@@ -2212,121 +2208,91 @@ public:
         switch (format)
         {
         case ISO_8859_2:
-            if (_updatedFlags & FLAG_ISO_8859_2)
-                delete[] _iso_8859_2;
-
+        	delete[] _iso_8859_2;
             _iso_8859_2 = new char[length];
             strcpy_s(_iso_8859_2, length, input);
             _updatedFlags = FLAG_ISO_8859_2;
             break;
         case ISO_8859_3:
-            if (_updatedFlags & FLAG_ISO_8859_3)
-                delete[] _iso_8859_3;
-
+        	delete[] _iso_8859_3;
             _iso_8859_3 = new char[length];
             strcpy_s(_iso_8859_3, length, input);
             _updatedFlags = FLAG_ISO_8859_3;
             break;
         case ISO_8859_4:
-            if (_updatedFlags & FLAG_ISO_8859_4)
-                delete[] _iso_8859_4;
-
+        	delete[] _iso_8859_4;
             _iso_8859_4 = new char[length];
             strcpy_s(_iso_8859_4, length, input);
             _updatedFlags = FLAG_ISO_8859_4;
             break;
         case ISO_8859_5:
-            if (_updatedFlags & FLAG_ISO_8859_5)
-                delete[] _iso_8859_5;
-
+        	delete[] _iso_8859_5;
             _iso_8859_5 = new char[length];
             strcpy_s(_iso_8859_5, length, input);
             _updatedFlags = FLAG_ISO_8859_5;
             break;
         case ISO_8859_6:
-            if (_updatedFlags & FLAG_ISO_8859_6)
-                delete[] _iso_8859_6;
-
+        	delete[] _iso_8859_6;
             _iso_8859_6 = new char[length];
             strcpy_s(_iso_8859_6, length, input);
             _updatedFlags = FLAG_ISO_8859_6;
             break;
         case ISO_8859_7:
-            if (_updatedFlags & FLAG_ISO_8859_7)
-                delete[] _iso_8859_7;
-
+            delete[] _iso_8859_7;
             _iso_8859_7 = new char[length];
             strcpy_s(_iso_8859_7, length, input);
             _updatedFlags = FLAG_ISO_8859_7;
             break;
         case ISO_8859_8:
-            if (_updatedFlags & FLAG_ISO_8859_8)
-                delete[] _iso_8859_8;
-
+        	delete[] _iso_8859_8;
             _iso_8859_8 = new char[length];
             strcpy_s(_iso_8859_8, length, input);
             _updatedFlags = FLAG_ISO_8859_8;
             break;
         case ISO_8859_9:
-            if (_updatedFlags & FLAG_ISO_8859_9)
-                delete[] _iso_8859_9;
-
+        	delete[] _iso_8859_9;
             _iso_8859_9 = new char[length];
             strcpy_s(_iso_8859_9, length, input);
             _updatedFlags = FLAG_ISO_8859_9;
             break;
         case ISO_8859_10:
-            if (_updatedFlags & FLAG_ISO_8859_10)
-                delete[] _iso_8859_10;
-
+        	delete[] _iso_8859_10;
             _iso_8859_10 = new char[length];
             strcpy_s(_iso_8859_10, length, input);
             _updatedFlags = FLAG_ISO_8859_10;
             break;
         case ISO_8859_11:
-            if (_updatedFlags & FLAG_ISO_8859_11)
-                delete[] _iso_8859_11;
-
+        	delete[] _iso_8859_11;
             _iso_8859_11 = new char[length];
             strcpy_s(_iso_8859_11, length, input);
             _updatedFlags = FLAG_ISO_8859_11;
             break;
         case ISO_8859_13:
-            if (_updatedFlags & FLAG_ISO_8859_13)
-                delete[] _iso_8859_13;
-
+        	delete[] _iso_8859_13;
             _iso_8859_13 = new char[length];
             strcpy_s(_iso_8859_13, length, input);
             _updatedFlags = FLAG_ISO_8859_13;
             break;
         case ISO_8859_14:
-            if (_updatedFlags & FLAG_ISO_8859_14)
-                delete[] _iso_8859_14;
-
+        	delete[] _iso_8859_14;
             _iso_8859_14 = new char[length];
             strcpy_s(_iso_8859_14, length, input);
             _updatedFlags = FLAG_ISO_8859_14;
             break;
         case ISO_8859_15:
-            if (_updatedFlags & FLAG_ISO_8859_15)
-                delete[] _iso_8859_15;
-
+        	delete[] _iso_8859_15;
             _iso_8859_15 = new char[length];
             strcpy_s(_iso_8859_15, length, input);
             _updatedFlags = FLAG_ISO_8859_15;
             break;
         case ISO_8859_16:
-            if (_updatedFlags & FLAG_ISO_8859_16)
-                delete[] _iso_8859_16;
-
+        	delete[] _iso_8859_16;
             _iso_8859_16 = new char[length];
             strcpy_s(_iso_8859_16, length, input);
             _updatedFlags = FLAG_ISO_8859_16;
             break;
         default:// ISO 8859-1
-            if (_updatedFlags & FLAG_ISO_8859_1)
-                delete[] _iso_8859_1;
-
+        	delete[] _iso_8859_1;
             _iso_8859_1 = new char[length];
             strcpy_s(_iso_8859_1, length, input);
             _updatedFlags = FLAG_ISO_8859_1;
