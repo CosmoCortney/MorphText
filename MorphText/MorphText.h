@@ -1,4 +1,4 @@
-﻿#include <string>
+#include <string>
 #include <Windows.h>
 #include <locale>
 #include <codecvt>
@@ -355,6 +355,7 @@ private:
 
     void utf8ToAscii()
     {
+        delete[] _ascii;
         _ascii = Utf8_To_ASCII(_utf8);
         _updatedFlags |= FLAG_ASCII;
     }
@@ -420,48 +421,63 @@ private:
         switch (format)
         {
         case ISO_8859_2:
+            delete[] _iso_8859_2;
             _iso_8859_2 = Utf8_To_ISO8859X(_utf8, format);
             break;
         case ISO_8859_3:
+            delete[] _iso_8859_3;
             _iso_8859_3 = Utf8_To_ISO8859X(_utf8, format);
             break;
         case ISO_8859_4:
+            delete[] _iso_8859_4;
             _iso_8859_4 = Utf8_To_ISO8859X(_utf8, format);
             break;
         case ISO_8859_5:
+            delete[] _iso_8859_5;
             _iso_8859_5 = Utf8_To_ISO8859X(_utf8, format);
             break;
         case ISO_8859_6:
+            delete[] _iso_8859_6;
             _iso_8859_6 = Utf8_To_ISO8859X(_utf8, format);
             break;
         case ISO_8859_7:
+            delete[] _iso_8859_7;
             _iso_8859_7 = Utf8_To_ISO8859X(_utf8, format);
             break;
         case ISO_8859_8:
+            delete[] _iso_8859_8;
             _iso_8859_8 = Utf8_To_ISO8859X(_utf8, format);
             break;
         case ISO_8859_9:
+            delete[] _iso_8859_9;
             _iso_8859_9 = Utf8_To_ISO8859X(_utf8, format);
             break;
         case ISO_8859_10:
+            delete[] _iso_8859_10;
             _iso_8859_10 = Utf8_To_ISO8859X(_utf8, format);
             break;
         case ISO_8859_11:
+            delete[] _iso_8859_11;
             _iso_8859_11 = Utf8_To_ISO8859X(_utf8, format);
             break;
         case ISO_8859_13:
+            delete[] _iso_8859_13;
             _iso_8859_13 = Utf8_To_ISO8859X(_utf8, format);
             break;
         case ISO_8859_14:
+            delete[] _iso_8859_14;
             _iso_8859_14 = Utf8_To_ISO8859X(_utf8, format);
             break;
         case ISO_8859_15:
+            delete[] _iso_8859_15;
             _iso_8859_15 = Utf8_To_ISO8859X(_utf8, format);
             break;
         case ISO_8859_16:
+            delete[] _iso_8859_16;
             _iso_8859_16 = Utf8_To_ISO8859X(_utf8, format);
             break;
         default:// ISO 8859-1
+            delete[] _iso_8859_1;
             _iso_8859_1 = Utf8_To_ISO8859X(_utf8, format);
             break;
         }
