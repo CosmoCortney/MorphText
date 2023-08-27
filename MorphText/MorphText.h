@@ -1,4 +1,4 @@
-#include <string>
+﻿#include <string>
 #include <Windows.h>
 #include <locale>
 #include <codecvt>
@@ -1232,10 +1232,8 @@ public:
     {
         if (!caseSensitive)
         {
-            const char* lowerLhs = new char[strlen(lhs) + 1];
-            const char* lowerRhs = new char[strlen(rhs) + 1];
-            lowerLhs = ToLower(lhs, format);
-            lowerRhs = ToLower(rhs, format);
+            const char* lowerLhs = ToLower(lhs, format);
+            const char* lowerRhs = ToLower(rhs, format);
             const int result = strcmp(lowerLhs, lowerRhs);
             delete[] lowerLhs;
             delete[] lowerRhs;
@@ -1248,10 +1246,8 @@ public:
     {
         if (!caseSensitive)
         {
-            const wchar_t* lowerLhs = new wchar_t[wcslen(lhs) + 1];
-            const wchar_t* lowerRhs = new wchar_t[wcslen(rhs) + 1];
-            lowerLhs = ToLower(lhs, isBigEndian);
-            lowerRhs = ToLower(rhs, isBigEndian);
+            const wchar_t* lowerLhs = ToLower(lhs, isBigEndian);
+            const wchar_t* lowerRhs = ToLower(rhs, isBigEndian);
             const int result = wcscmp(lowerLhs, lowerRhs);
             delete[] lowerLhs;
             delete[] lowerRhs;
@@ -1267,10 +1263,8 @@ public:
 
         if (!caseSensitive)
         {
-            const char32_t* lowerLhs = new char32_t[lhsLength];
-            const char32_t* lowerRhs = new char32_t[lhrLength];
-            lowerLhs = ToLower(lhs, isBigEndian);
-            lowerRhs = ToLower(rhs, isBigEndian);
+            const char32_t* lowerLhs = ToLower(lhs, isBigEndian);
+            const char32_t* lowerRhs = ToLower(rhs, isBigEndian);
             const int result = std::char_traits<char32_t>::compare(lowerLhs, lowerRhs, lhsLength);
             delete[] lowerLhs;
             delete[] lowerRhs;
