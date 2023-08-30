@@ -885,14 +885,14 @@ public:
     /// Converts the passed ASCII char&ast; string to a UTF-8 std::string&amp;.
     /// <param><c>char&ast; input: string to be processed.</param>
     /// </summary>
-    static std::string ASCII_To_Utf8(const char* input, uint32_t maxLength = -1) //Converts the ASCII input to UTF-8
+    static std::string ASCII_To_Utf8(const char* input, const int32_t maxLength = -1) //Converts the ASCII input to UTF-8
     {
-        std::string output(input);
+        std::string output = maxLength == -1 ? std::string(input, strlen(input)) : std::string(input, maxLength);
 
         for (int i = 0; i < output.size() && i < maxLength; ++i)
             output[i] = input[i] < 0 ? '?' : input[i];
 
-        if (strlen(input) < maxLength)
+        if (maxLength > 0 && strlen(input) < maxLength)
             output[maxLength] = '\0';
 
         return output;
