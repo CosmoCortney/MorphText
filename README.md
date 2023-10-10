@@ -19,6 +19,8 @@ Takes a char* string to create a new instance.
 * ASCII: MorphText::ASCII
 * ISO-8849-X: see <i>ISO-8859 Enum Values</i> below
 * Shift-Jis: MorphText::SCHIFTJIS
+* Jis x 0201 Full Width: MorphText::JIS_X_0201_FULLWIDTH
+* Jis x 0201 Half Width: MorphText::JIS_X_0201_HALFWIDTH
 * Invalid format value will be considered as ASCII.
 
 ### ``MorphText(wchar_t* charStr, bool isBigEndian = false)``
@@ -38,7 +40,7 @@ Supported datatypes:
 * std::string (UTF-8)
 * std::wstring (UTF-16, Little Endian expected)
 * std::u32string (UTF-32, Little Endian expected)
-* wchar_t* (UTF-16), Little Endian expected)
+* wchar_t* (UTF-16, Little Endian expected)
 
 ## Static Function Calls
 ### ``std::string ASCII_To_Utf8(char* input)``
@@ -76,6 +78,18 @@ Takes an input Shift-Jis char* string and returns it as a UTF-8 std::string.
 
 ### ``char* Utf8_To_ShiftJis(std::string input)``
 Takes an input UTF-8 std::string as reference and returns it as a char* Shift-Jis string.
+
+### ``char* Utf8_To_JIS_X_0201_FullWidth(std::string input)``
+Takes an input UTF-8 std::string as reference and returns it as a char* JIS X 0201 Full Width string.
+
+### ``std::string JIS_X_0201_FullWidth_To_Utf8(char* input)``
+Takes an input JIS X 0201 Full Width char* string and returns it as a UTF-8 std::string.
+
+### ``char* Utf8_To_JIS_X_0201_HalfWidth(std::string input)``
+Takes an input UTF-8 std::string as reference and returns it as a char* JIS X 0201 Half Width string.
+
+### ``std::string JIS_X_0201_HalfWidth_To_Utf8(char* input)``
+Takes an input JIS X 0201 Half Width char* string and returns it as a UTF-8 std::string.
 
 ### ``std::string ISO8859X_To_Utf8(char* input, int format = LATIN1)``
 Takes an input ISO-8849-X char* string and returns it as a UTF-8 std::string.
@@ -189,6 +203,12 @@ Returns the instance's ASCII char* string.
 ### ``std::string GetShiftJis()``
 Returns the instance's Shift-Jis char* string.
 
+### ``std::string GetJisX0201FullWidth()``
+Returns the instance's Jis x 0201 Full Width char* string.
+
+### ``std::string GetJisX0201HalfWidth()``
+Returns the instance's Jis x 0201 Half Width char* string.
+
 ### ``std::string GetISO8859X(int format)``
 Returns the instance's ISO-8859 char* string.
 *format*: Set the considered string format.
@@ -199,6 +219,12 @@ Sets the instance's ASCII value.
 
 ### ``SetShiftJis(char* input)``
 Sets the instance's ShiftJis value.
+
+### ``SetJisX0201FullWidth(char* input)``
+Sets the instance's Jis x 0201 Full Width value.
+
+### ``SetJisX0201HalfWidth(char* input)``
+Sets the instance's Jis x 0201 Half Width value.
 
 ### ``SetUTF8(std::string& str)``
 Sets the instance's UTF-8 value.
