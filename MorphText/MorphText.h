@@ -562,6 +562,14 @@ private:
         _jis_x_0201_halfwidth = nullptr;
     }
 
+    static void cleanString(std::string& dirt)
+    {
+        for (int i = 0; i < dirt.size() - 1; ++i)
+            if (dirt[i] == 0 && dirt[i + 1] != 0)
+                for (; i < dirt.size(); ++i)
+                    dirt[i] = 0;
+    }
+
 public:
     MorphText()
     {
@@ -810,14 +818,16 @@ public:
     /// </summary>
     static char* Utf8_To_ShiftJis(const std::string& input)
     {
-        const int wideLength = MultiByteToWideChar(CP_UTF8, 0, input.c_str(), -1, nullptr, 0);
+        std::string temp = input;
+        cleanString(temp);
+        const int wideLength = MultiByteToWideChar(CP_UTF8, 0, temp.c_str(), -1, nullptr, 0);
 
         if (!wideLength)
             return nullptr;
 
         wchar_t* wideStr = new wchar_t[wideLength];
 
-        if (MultiByteToWideChar(CP_UTF8, 0, input.c_str(), -1, wideStr, wideLength) == 0)
+        if (MultiByteToWideChar(CP_UTF8, 0, temp.c_str(), -1, wideStr, wideLength) == 0)
         {
             delete[] wideStr;
             return nullptr;
@@ -859,8 +869,10 @@ public:
     /// </summary>
     static std::wstring Utf8_To_Utf16LE(const std::string& input)
     {
+        std::string temp = input;
+        cleanString(temp);
         std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-        return converter.from_bytes(input);
+        return converter.from_bytes(temp);
     }
 
     /// <summary>
@@ -879,8 +891,7 @@ public:
     /// </summary>
     static std::wstring Utf8_To_Utf16BE(const std::string& input)
     {
-        std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
-        std::u16string utf16 = converter.from_bytes(input);
+        std::wstring utf16 = Utf8_To_Utf16LE(input);
         std::wstring output;
         output.reserve(utf16.size());
 
@@ -905,8 +916,10 @@ public:
     /// </summary>
     static std::u32string Utf8_To_Utf32LE(const std::string& input)
     {
+        std::string temp = input;
+        cleanString(temp);
         std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
-        std::u32string utf32 = converter.from_bytes(input);
+        std::u32string utf32 = converter.from_bytes(temp);
         return utf32.data();
     }
 
@@ -926,8 +939,7 @@ public:
     /// </summary>
     static std::u32string Utf8_To_Utf32BE(const std::string& input)
     {
-        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
-        std::u32string utf32 = converter.from_bytes(input);
+        std::u32string utf32 = Utf8_To_Utf32LE(input);
 
         for (int i = 0; i < utf32.size(); ++i)
             swapBytes(&utf32[i]);
@@ -958,11 +970,13 @@ public:
     /// </summary>
     static char* Utf8_To_ASCII(const std::string& input)
     {
-        int size = input.size() + 1;
+        std::string temp = input;
+        cleanString(temp);
+        int size = temp.size() + 1;
         char* output = new char[size];
 
         for (int i = 0; i < size; ++i)
-            output[i] = input[i] < 0 ? '?' : input[i];
+            output[i] = temp[i] < 0 ? '?' : temp[i];
 
         return output;
     }
@@ -1106,8 +1120,7 @@ public:
     /// </summary>
     static char* Utf8_To_ISO8859X(const std::string& input, const int format = ISO_8859_1)
     {
-        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-        const std::wstring utf16 = converter.from_bytes(input);
+        const std::wstring utf16 = Utf8_To_Utf16LE(input);
         wchar_t* lookup;
 
         switch (format)
