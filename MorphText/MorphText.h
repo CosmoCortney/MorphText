@@ -1009,7 +1009,7 @@ public:
         {
             wchar_t ch = (uint8_t)input[i];
 
-            if(ch > 0xA0 && ch < 0xE0)
+            if (ch > 0xA0 && ch < 0xE0)
                 temp[i] = lookup[ch - 0xA0];
             else if (input[i] == 0x5C)
                 temp[i] = L'¥';
@@ -1017,6 +1017,10 @@ public:
                 temp[i] = L'‾';
             else if (input[i] == L'\0')
                 break;
+            else if (input[i] > 0xDF)
+                input[i] == L'?';
+            else if (input[i] > 0x7f && input[i] < 0xA1)
+                input[i] == L'?';
             else
                 temp[i] = input[i];
         }
@@ -1045,6 +1049,10 @@ public:
                 temp[i] = L'‾';
             else if (ch == L'\0')
                 break;
+            else if (input[i] > 0xDF)
+                input[i] == L'?';
+            else if (input[i] > 0x7f && input[i] < 0xA1)
+                input[i] == L'?';
             else
                 temp[i] = input[i];
         }
