@@ -919,8 +919,7 @@ public:
         std::string temp = input;
         cleanString(temp);
         std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
-        std::u32string utf32 = converter.from_bytes(temp);
-        return utf32.data();
+        return converter.from_bytes(temp);;
     }
 
     /// <summary>
@@ -937,8 +936,7 @@ public:
             inputLE.push_back(c);
         }
 
-        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
-        return converter.to_bytes(inputLE);
+        return Utf32LE_To_Utf8(inputLE);
     }
 
     /// <summary>
