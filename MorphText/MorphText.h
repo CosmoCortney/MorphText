@@ -929,8 +929,16 @@ public:
     /// </summary>
     static std::string Utf32BE_To_Utf8(const std::u32string& input)
     {
+        std::u32string inputLE;
+
+        for (char32_t c: input)
+        {
+            swapBytes(&c);
+            inputLE.push_back(c);
+        }
+
         std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
-        return converter.to_bytes(input);
+        return converter.to_bytes(inputLE);
     }
 
     /// <summary>
