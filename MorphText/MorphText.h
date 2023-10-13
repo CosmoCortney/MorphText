@@ -881,8 +881,15 @@ public:
     /// </summary>
     static std::string Utf16BE_To_Utf8(const std::wstring& input)
     {
-        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t, 0x10ffff, std::codecvt_mode::consume_header>, wchar_t> converter;
-        return converter.to_bytes(input);
+        std::wstring temp;
+
+        for (wchar_t c : input)
+        {
+            swapBytes(&c);
+            temp.push_back(c);
+        }
+
+        return Utf16LE_To_Utf8(temp);
     }
 
     /// <summary>
