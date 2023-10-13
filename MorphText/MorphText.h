@@ -564,10 +564,11 @@ private:
 
     static void cleanString(std::string& dirt)
     {
-        for (int i = 0; i < dirt.size() - 1; ++i)
-            if (dirt[i] == 0 && dirt[i + 1] != 0)
-                for (; i < dirt.size(); ++i)
-                    dirt[i] = 0;
+        if(dirt.size())
+            for (int i = 0; i < dirt.size() - 1; ++i)
+                if (dirt[i] == 0 && dirt[i + 1] != 0)
+                    for (; i < dirt.size(); ++i)
+                        dirt[i] = 0;
     }
 
 public:
