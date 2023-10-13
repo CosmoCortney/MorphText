@@ -928,13 +928,11 @@ public:
     {
         std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
         std::u32string utf32 = converter.from_bytes(input);
-        std::u32string output;
-        output.reserve(utf32.size());
 
-        for (char32_t c : utf32)
-            output.push_back(static_cast<wchar_t>((c >> 24) | ((c >> 8) & 0xFF00) | ((c << 8) & 0xFF0000) | (c << 24)));
+        for (int i = 0; i < utf32.size(); ++i)
+            swapBytes(&utf32[i]);
 
-        return output;
+        return utf32;
     }
 
     /// <summary>
