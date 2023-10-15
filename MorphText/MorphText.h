@@ -246,6 +246,26 @@ private:
         FLAG_JIS_X_0201_HALFWIDTH = 1 << Formats::JIS_X_0201_HALFWIDTH
     };
 
+    static void replaceIllegalChars(std::u32string& str, const bool isBE = false)
+    {
+        if (isBE)
+        {
+            for (char32_t& ch : str)
+            {
+                if (ch > 0xffff1000)
+                    ch = 0x3f000000;
+            }
+        }
+        else
+        {
+            for (char32_t& ch : str)
+            {
+                if (ch > 0x10FFFF)
+                    ch = 0x3f;
+            }
+        }
+    }
+
     static void swapBytes(const wchar_t* src)
     {
         char* ref = (char*)src;
@@ -915,7 +935,9 @@ public:
     /// </summary>
     static std::string Utf32LE_To_Utf8(const std::u32string& input)
     {
-        return std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t>().to_bytes(input);
+        std::u32string unchecked = input;
+        replaceIllegalChars(unchecked);
+        return std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t>().to_bytes(unchecked);
     }
     
     /// <summary>
@@ -2675,14 +2697,17 @@ public:
     /// </summary>
     void SetUTF32(const std::u32string& input, const bool isBigEndian = false)
     {
+
         if (isBigEndian)
         {
-            _utf32LE = input;
+            _utf32BE = input;
+            replaceIllegalChars(_utf32BE, isBigEndian);
             _updatedFlags = FLAG_UTF32BE;
         }
         else
         {
             _utf32LE = input;
+            replaceIllegalChars(_utf32LE, isBigEndian);
             _updatedFlags = FLAG_UTF32LE;
         }
     }
