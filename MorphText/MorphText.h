@@ -999,16 +999,16 @@ public:
     /// </summary>
     static std::string Utf8_To_ASCII(const std::string& input)
     {
-        std::string output = input;
-        cleanString(output);
+        std::wstring temp = Utf8_To_Utf16LE(input);
+        //cleanString(temp);
 
-            for (char& ch: output)
+            for (wchar_t& ch: temp)
             {
-                if (ch < 0)
+                if (ch > 0x7f)
                     ch = '?';
             }
 
-        return output;
+        return Utf16LE_To_Utf8(temp);
     }
 
     /// <summary>
