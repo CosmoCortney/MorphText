@@ -66,7 +66,7 @@ private:
     std::wstring _utf16BE;
     std::u32string _utf32LE;
     std::u32string _utf32BE;
-    char* _ascii;
+    std::string _ascii;
     char* _iso_8859_1;
     char* _iso_8859_2;
     char* _iso_8859_3;
@@ -417,7 +417,6 @@ private:
 
     void utf8ToAscii()
     {
-        delete[] _ascii;
         _ascii = Utf8_To_ASCII(_utf8);
         _updatedFlags |= FLAG_ASCII;
     }
@@ -561,7 +560,6 @@ private:
 
     void initArrays()
     {
-        _ascii = nullptr;
         _iso_8859_1 = nullptr;
         _iso_8859_2 = nullptr;
         _iso_8859_3 = nullptr;
@@ -761,9 +759,7 @@ public:
         } break;
         default: // ASCII
         {
-            _ascii = new char[length + 1];
-            strcpy(_ascii, charStr);
-            _ascii[length] = '\0';
+            _ascii = charStr;
             _updatedFlags |= FLAG_ASCII;
         }
         }
@@ -987,15 +983,12 @@ public:
     /// Converts the passed ASCII char&ast; string to a UTF-8 std::string&amp;.
     /// <param><c>char&ast; input: string to be processed.</param>
     /// </summary>
-    static std::string ASCII_To_Utf8(const char* input, const int32_t maxLength = -1) //Converts the ASCII input to UTF-8
+    static std::string ASCII_To_Utf8(const std::string input, const int32_t maxLength = -1) //Converts the ASCII input to UTF-8
     {
-        std::string output = maxLength == -1 ? std::string(input, strlen(input)) : std::string(input, maxLength);
+        std::string output = maxLength == -1 ? input : std::string(input.c_str(), maxLength);
 
         for (int i = 0; i < output.size() && i < maxLength; ++i)
             output[i] = input[i] < 0 ? '?' : input[i];
-
-        if (maxLength > 0 && strlen(input) < maxLength)
-            output[maxLength] = '\0';
 
         return output;
     }
@@ -1004,15 +997,16 @@ public:
     /// Converts the passed std::string&amp; to an ASCII char&ast; string.
     /// <param><c>std::string&amp; input: string to be processed.</param>
     /// </summary>
-    static char* Utf8_To_ASCII(const std::string& input)
+    static std::string Utf8_To_ASCII(const std::string& input)
     {
-        std::string temp = input;
-        cleanString(temp);
-        int size = temp.size() + 1;
-        char* output = new char[size];
+        std::string output = input;
+        cleanString(output);
 
-        for (int i = 0; i < size; ++i)
-            output[i] = temp[i] < 0 ? '?' : temp[i];
+            for (char& ch: output)
+            {
+                if (ch < 0)
+                    ch = '?';
+            }
 
         return output;
     }
@@ -2196,7 +2190,7 @@ public:
         case ISO_8859_16:
             return Compare(_iso_8859_16, rhs, caseSensitive, format);
         default: //ASCII
-            return Compare(_ascii, rhs, caseSensitive, format);
+            return Compare(_ascii.c_str(), rhs, caseSensitive, format);
         }
     }
 
@@ -2351,7 +2345,7 @@ public:
     /// <summary>
     /// Returns the instance's <b>ASCII</b> value.
     /// </summary>
-    char* GetASCII()
+    std::string GetASCII()
     {
         if (!(_updatedFlags & FLAG_ASCII))
             utf8ToAscii();
@@ -2511,9 +2505,18 @@ public:
     /// </summary>
     void SetASCII(const char* input)
     {
-        delete[] _ascii;
-        _ascii = new char[strlen(input) + 1];
-        strcpy_s(_ascii, strlen(input) + 1, input);
+        _ascii = input;
+        _updatedFlags = FLAG_ASCII;
+    }
+
+    /// <summary>
+    /// Sets the instance's <b>ASCII</b> value.
+    /// <param><c>char&ast; input</c>: ASCII std::string to be set.</param>
+    /// <example> instance.SetASCII(text);</example>
+    /// </summary>
+    void SetASCII(const std::string& input)
+    {
+        _ascii = input;
         _updatedFlags = FLAG_ASCII;
     }
 
@@ -2739,13 +2742,8 @@ public:
         _utf16BE = other._utf16BE;
         _utf32LE = other._utf32LE;
         _utf32BE = other._utf32BE;
-
-        if (other._ascii)
-        {
-            const int length = strlen(other._ascii) + 1;
-            _ascii = new char[length];
-            strcpy_s(_ascii, length, other._ascii);
-        }
+        _ascii = other._ascii;
+       
         if (other._iso_8859_1)
         {
             const int length = strlen(other._iso_8859_1) + 1;
