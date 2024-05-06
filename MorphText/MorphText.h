@@ -1,12 +1,12 @@
 ﻿#pragma once
 #include <string>
-#include <Windows.h>
 #include <locale>
 #include <codecvt>
 #include<iostream>
 #include<algorithm>
 #include <cstdint>
 #include<cwctype>
+#include"ShiftJis.h"
 
 class MorphText
 {
@@ -793,40 +793,47 @@ public:
     /// Converts the passed Shift-Jis char&ast; string to a UTF-8 std::string&amp;.
     /// <param><c>char&ast; input: string to be processed.</param>
     /// </summary>
-    static std::string ShiftJis_To_Utf8(const char* input) {
-        int length = MultiByteToWideChar(932, 0, input, -1, nullptr, 0);
+    static std::string ShiftJis_To_Utf8(const char* input)
+    {
+        int inputIndex = -1;
+        int length = strlen(input);
+        std::string output(length, 0);
+        std::wstring temp(length, 0);
+        wchar_t* lookup = (wchar_t*)_shift_jis_CP10001_map;
 
-        if (!length)
-            return "";
-
-        wchar_t* wideStr = new wchar_t[length];
-        if (MultiByteToWideChar(932, 0, input, -1, wideStr, length) == 0)
+        for (int i = 0; i < length; ++i)
         {
-            delete[] wideStr;
-            return "";
+            ++inputIndex;
+            uint8_t ch = (uint8_t)input[inputIndex];
+
+            if (input[inputIndex] == 0x5C)
+                temp[i] = L'¥';
+            else if (input[inputIndex] == 0x7E)
+                temp[i] = L'‾';
+            else if (input[inputIndex] == L'\0')
+                break;
+            else if (input[inputIndex] > 0xFD)
+                temp[i] = L'©';
+            else if (input[inputIndex] > 0xFE)
+                temp[i] = L'™';
+            else if (input[inputIndex] > 0xFF)
+                temp[i] = L'…';
+            else if ((input[inputIndex] > 0x7f && input[inputIndex+1] < 0x40) && (input[inputIndex] < 0xFD && input[inputIndex + 1] > 0x4F))
+                temp[i] = L'?';
+            else if (ch >= 0x81 && ch <= 0xFC)
+            {
+                uint16_t sjIndex = ch << 8;
+                ++inputIndex;
+                sjIndex |= input[inputIndex] & 0xFF;
+                temp[i] = lookup[sjIndex - 0x8140];
+            }
+            else if (input[inputIndex] < 0x80)
+                temp[i] = input[inputIndex];
+            else
+                temp[i] = L'?';
         }
 
-        int mbLength = WideCharToMultiByte(CP_UTF8, 0, wideStr, -1, nullptr, 0, nullptr, nullptr);
-        if (!mbLength)
-        {
-            delete[] wideStr;
-            return "";
-        }
-
-        char* mbStr = new char[mbLength];
-        if (WideCharToMultiByte(CP_UTF8, 0, wideStr, -1, mbStr, mbLength, nullptr, nullptr) == 0)
-        {
-            delete[] wideStr;
-            delete[] mbStr;
-            return "";
-        }
-
-        std::string output(mbStr);
-
-        delete[] wideStr;
-        delete[] mbStr;
-
-        return output;
+        return Utf16LE_To_Utf8(temp);
     }
 
     /// <summary>
@@ -835,40 +842,52 @@ public:
     /// </summary>
     static char* Utf8_To_ShiftJis(const std::string& input)
     {
-        std::string temp = input;
-        cleanString(temp);
-        const int wideLength = MultiByteToWideChar(CP_UTF8, 0, temp.c_str(), -1, nullptr, 0);
+        int outputIndex = -1;
+        std::wstring utf16 = Utf8_To_Utf16LE(input);
+        int length = utf16.size();
+        std::string output(length * 2 +1, '\0');
+        wchar_t* lookup = (wchar_t*)_shift_jis_CP10001_map;
 
-        if (!wideLength)
-            return nullptr;
-
-        wchar_t* wideStr = new wchar_t[wideLength];
-
-        if (MultiByteToWideChar(CP_UTF8, 0, temp.c_str(), -1, wideStr, wideLength) == 0)
+        for (int i = 0; i < utf16.size(); ++i)
         {
-            delete[] wideStr;
-            return nullptr;
+            ++outputIndex;
+            wchar_t ch = utf16[i];
+
+            if (utf16[i] == L'¥')
+                output[outputIndex] = 0x5C;
+            else if (utf16[i] == L'‾')
+                output[outputIndex] = 0x7E;
+            else if (utf16[i] == L'©')
+                output[outputIndex] = 0xFD;
+            else if (utf16[i] == L'™')
+                output[outputIndex] = 0xFE;
+            else if (utf16[i] == L'…')
+                output[outputIndex] = 0xFF;
+            else if (utf16[i] < 0x80)
+                output[outputIndex] = (char)utf16[i];
+            else if (utf16[i] >= 0x80 && utf16[i] <= 0xFD)
+                output[outputIndex] = '\?';
+            else if (utf16[i] == L'\0')
+                break;
+            else
+                for (uint16_t lookupIndex = 0; lookupIndex < 0x7B10; ++lookupIndex)
+                {
+                    if (lookup[lookupIndex] == ch)
+                    {
+                        output[outputIndex] = static_cast<char>((lookupIndex + 0x8140) >> 8);
+                        ++outputIndex;
+                        output[outputIndex] = static_cast<char>(lookupIndex + 0x8140);
+                        break;
+                    }
+                    else if (lookupIndex == 0x7B0F)
+                        output[outputIndex] = L'?';
+                }
         }
 
-        int sjisLength = WideCharToMultiByte(932, 0, wideStr, -1, nullptr, 0, nullptr, nullptr);
-
-        if (!sjisLength)
-        {
-            delete[] wideStr;
-            return nullptr;
-        }
-
-        char* sjisStr = new char[sjisLength];
-
-        if (WideCharToMultiByte(932, 0, wideStr, -1, sjisStr, sjisLength, nullptr, nullptr) == 0)
-        {
-            delete[] wideStr;
-            delete[] sjisStr;
-            return nullptr;
-        }
-
-        delete[] wideStr;
-        return sjisStr;
+        output = output.c_str();
+        char* rtOut = new char[output.size()+1];
+        strcpy_s(rtOut, output.size()+1, output.c_str());
+        return rtOut;
     }
 
     /// <summary>
