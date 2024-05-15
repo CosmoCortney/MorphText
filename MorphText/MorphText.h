@@ -8,6 +8,8 @@
 #include<cwctype>
 #include"Lookup.h"
 
+//ToDO: Test if functions taking wchar_t* and char32_t* can be removed
+
 class MorphText
 {
 public:
@@ -67,24 +69,24 @@ private:
     std::u32string _utf32LE;
     std::u32string _utf32BE;
     std::string _ascii;
-    char* _iso_8859_1;
-    char* _iso_8859_2;
-    char* _iso_8859_3;
-    char* _iso_8859_4;
-    char* _iso_8859_5;
-    char* _iso_8859_6;
-    char* _iso_8859_7;
-    char* _iso_8859_8;
-    char* _iso_8859_9;
-    char* _iso_8859_10;
-    char* _iso_8859_11;
-    char* _iso_8859_13;
-    char* _iso_8859_14;
-    char* _iso_8859_15;
-    char* _iso_8859_16;
-    char* _shiftJis;
-    char* _jis_x_0201_halfwidth;
-    char* _jis_x_0201_fullwidth;
+    std::string _iso_8859_1;
+    std::string _iso_8859_2;
+    std::string _iso_8859_3;
+    std::string _iso_8859_4;
+    std::string _iso_8859_5;
+    std::string _iso_8859_6;
+    std::string _iso_8859_7;
+    std::string _iso_8859_8;
+    std::string _iso_8859_9;
+    std::string _iso_8859_10;
+    std::string _iso_8859_11;
+    std::string _iso_8859_13;
+    std::string _iso_8859_14;
+    std::string _iso_8859_15;
+    std::string _iso_8859_16;
+    std::string _shiftJis;
+    std::string _jis_x_0201_halfwidth;
+    std::string _jis_x_0201_fullwidth;
     int _updatedFlags = 0;
     int _primaryFormat;
     uint32_t _maxLength = -1;
@@ -116,6 +118,17 @@ private:
         FLAG_JIS_X_0201_FULLWIDTH = 1 << Formats::JIS_X_0201_FULLWIDTH,
         FLAG_JIS_X_0201_HALFWIDTH = 1 << Formats::JIS_X_0201_HALFWIDTH
     };
+
+    static bool compareRaw(const char* lhs, const char* rhs)
+    {
+        const int len = strlen(lhs);
+
+        for (int i = 0; i < len; ++i)
+            if (lhs[i] != rhs[i])
+                return false;
+
+        return true;
+    }
 
     static void replaceIllegalChars(std::u32string& str, const bool isBE = false)
     {
@@ -296,7 +309,7 @@ private:
 
     void iso8859xToUtf8(const int format)
     {
-        char* txt;
+        std::string txt;
 
         switch (format)
         {
@@ -355,63 +368,48 @@ private:
         switch (format)
         {
         case ISO_8859_2:
-            delete[] _iso_8859_2;
             _iso_8859_2 = Utf8_To_ISO8859X(_utf8, format);
             break;
         case ISO_8859_3:
-            delete[] _iso_8859_3;
             _iso_8859_3 = Utf8_To_ISO8859X(_utf8, format);
             break;
         case ISO_8859_4:
-            delete[] _iso_8859_4;
             _iso_8859_4 = Utf8_To_ISO8859X(_utf8, format);
             break;
         case ISO_8859_5:
-            delete[] _iso_8859_5;
             _iso_8859_5 = Utf8_To_ISO8859X(_utf8, format);
             break;
         case ISO_8859_6:
-            delete[] _iso_8859_6;
             _iso_8859_6 = Utf8_To_ISO8859X(_utf8, format);
             break;
         case ISO_8859_7:
-            delete[] _iso_8859_7;
             _iso_8859_7 = Utf8_To_ISO8859X(_utf8, format);
             break;
         case ISO_8859_8:
-            delete[] _iso_8859_8;
             _iso_8859_8 = Utf8_To_ISO8859X(_utf8, format);
             break;
         case ISO_8859_9:
-            delete[] _iso_8859_9;
             _iso_8859_9 = Utf8_To_ISO8859X(_utf8, format);
             break;
         case ISO_8859_10:
-            delete[] _iso_8859_10;
             _iso_8859_10 = Utf8_To_ISO8859X(_utf8, format);
             break;
         case ISO_8859_11:
-            delete[] _iso_8859_11;
             _iso_8859_11 = Utf8_To_ISO8859X(_utf8, format);
             break;
         case ISO_8859_13:
-            delete[] _iso_8859_13;
             _iso_8859_13 = Utf8_To_ISO8859X(_utf8, format);
             break;
         case ISO_8859_14:
-            delete[] _iso_8859_14;
             _iso_8859_14 = Utf8_To_ISO8859X(_utf8, format);
             break;
         case ISO_8859_15:
-            delete[] _iso_8859_15;
             _iso_8859_15 = Utf8_To_ISO8859X(_utf8, format);
             break;
         case ISO_8859_16:
-            delete[] _iso_8859_16;
             _iso_8859_16 = Utf8_To_ISO8859X(_utf8, format);
             break;
         default:// ISO 8859-1
-            delete[] _iso_8859_1;
             _iso_8859_1 = Utf8_To_ISO8859X(_utf8, format);
             break;
         }
@@ -431,28 +429,6 @@ private:
         _updatedFlags |= FLAG_UTF8;
     }
 
-    void initArrays()
-    {
-        _iso_8859_1 = nullptr;
-        _iso_8859_2 = nullptr;
-        _iso_8859_3 = nullptr;
-        _iso_8859_4 = nullptr;
-        _iso_8859_5 = nullptr;
-        _iso_8859_6 = nullptr;
-        _iso_8859_7 = nullptr;
-        _iso_8859_8 = nullptr;
-        _iso_8859_9 = nullptr;
-        _iso_8859_10 = nullptr;
-        _iso_8859_11 = nullptr;
-        _iso_8859_13 = nullptr;
-        _iso_8859_14 = nullptr;
-        _iso_8859_15 = nullptr;
-        _iso_8859_16 = nullptr;
-        _shiftJis = nullptr;
-        _jis_x_0201_fullwidth = nullptr;
-        _jis_x_0201_halfwidth = nullptr;
-    }
-
     static void cleanString(std::string& dirt)
     {
         if(dirt.size())
@@ -465,21 +441,100 @@ private:
 public:
     MorphText()
     {
-        initArrays();
     }
 
-    MorphText(const std::string& utf8)
+    MorphText(const std::string& str, const int format = UTF8)
     {
-        initArrays();
-        _utf8 = utf8;
-        _updatedFlags |= FLAG_UTF8;
-        _primaryFormat = UTF8;
+        switch (format)
+        {
+            case ASCII: {
+                _ascii = str;
+                _updatedFlags |= FLAG_ASCII;
+            } break;
+            case ISO_8859_1: {
+                _iso_8859_1 = str;
+                _updatedFlags |= FLAG_ISO_8859_1;
+            } break;
+            case ISO_8859_2: {
+                _iso_8859_2 = str;
+                _updatedFlags |= FLAG_ISO_8859_2;
+            } break;
+            case ISO_8859_3: {
+                _iso_8859_3 = str;
+                _updatedFlags |= FLAG_ISO_8859_3;
+            } break;
+            case ISO_8859_4: {
+                _iso_8859_4 = str;
+                _updatedFlags |= FLAG_ISO_8859_4;
+            } break;
+            case ISO_8859_5: {
+                _iso_8859_5 = str;
+                _updatedFlags |= FLAG_ISO_8859_5;
+            } break;
+            case ISO_8859_6: {
+                _iso_8859_6 = str;
+                _updatedFlags |= FLAG_ISO_8859_6;
+            } break;
+            case ISO_8859_7: {
+                _iso_8859_7 = str;
+                _updatedFlags |= FLAG_ISO_8859_7;
+            } break;
+            case ISO_8859_8: {
+                _iso_8859_8 = str;
+                _updatedFlags |= FLAG_ISO_8859_8;
+            } break;
+            case ISO_8859_9: {
+                _iso_8859_9 = str;
+                _updatedFlags |= FLAG_ISO_8859_9;
+            } break;
+            case ISO_8859_10: {
+                _iso_8859_10 = str;
+                _updatedFlags |= FLAG_ISO_8859_10;
+            } break;
+            case ISO_8859_11: {
+                _iso_8859_11 = str;
+                _updatedFlags |= FLAG_ISO_8859_11;
+            } break;
+            case ISO_8859_13: {
+                _iso_8859_13 = str;
+                _updatedFlags |= FLAG_ISO_8859_13;
+            } break;
+            case ISO_8859_14: {
+                _iso_8859_14 = str;
+                _updatedFlags |= FLAG_ISO_8859_14;
+            } break;
+            case ISO_8859_15: {
+                _iso_8859_15 = str;
+                _updatedFlags |= FLAG_ISO_8859_15;
+            } break;
+            case ISO_8859_16: {
+                _iso_8859_16 = str;
+                _updatedFlags |= FLAG_ISO_8859_16;
+            } break;
+            case SHIFTJIS: {
+                _shiftJis = str;
+                _updatedFlags |= FLAG_SHIFTJIS;
+            } break;
+            case JIS_X_0201_FULLWIDTH: {
+                _jis_x_0201_fullwidth = str;
+                _updatedFlags |= FLAG_JIS_X_0201_FULLWIDTH;
+            } break;
+            case JIS_X_0201_HALFWIDTH: {
+                _jis_x_0201_halfwidth = str;
+                _updatedFlags |= FLAG_JIS_X_0201_HALFWIDTH;
+            } break;
+            default: // UTF8
+            {
+                _utf8 = str;
+                _updatedFlags |= FLAG_UTF8;
+            }
+        }
+
+        _primaryFormat = format;
     }
 
     MorphText(const std::wstring& utf16, const bool bigEndian = false)
     {
-        initArrays();
-
         if (bigEndian)
         {
             _utf16BE = utf16;
@@ -496,8 +551,6 @@ public:
 
     MorphText(const std::u32string& utf32, const bool bigEndian = false)
     {
-        initArrays();
-
         if (bigEndian)
         {
             _utf32BE = utf32;
@@ -514,147 +567,21 @@ public:
 
     MorphText(const char* charStr, const int format = 0)
     {
-        initArrays();
-        const int length = strlen(charStr);
-
-        switch (format)
-        {
-        case Formats::UTF8: {
-            *this = MorphText(std::string(charStr));
-        } break;
-        case ISO_8859_1: {
-            _iso_8859_1 = new char[length + 1];
-            strcpy(_iso_8859_1, charStr);
-            _iso_8859_1[length] = '\0';
-            _updatedFlags |= FLAG_ISO_8859_1;
-        } break;
-        case ISO_8859_2: {
-            _iso_8859_2 = new char[length + 1];
-            strcpy(_iso_8859_2, charStr);
-            _iso_8859_2[length] = '\0';
-            _updatedFlags |= FLAG_ISO_8859_2;
-        } break;
-        case ISO_8859_3: {
-            _iso_8859_3 = new char[length + 1];
-            strcpy(_iso_8859_3, charStr);
-            _iso_8859_3[length] = '\0';
-            _updatedFlags |= FLAG_ISO_8859_3;
-        } break;
-        case ISO_8859_4: {
-            _iso_8859_4 = new char[length + 1];
-            strcpy(_iso_8859_4, charStr);
-            _iso_8859_4[length] = '\0';
-            _updatedFlags |= FLAG_ISO_8859_4;
-        } break;
-        case ISO_8859_5: {
-            _iso_8859_5 = new char[length + 1];
-            strcpy(_iso_8859_5, charStr);
-            _iso_8859_5[length] = '\0';
-            _updatedFlags |= FLAG_ISO_8859_5;
-        } break;
-        case ISO_8859_6: {
-            _iso_8859_6 = new char[length + 1];
-            strcpy(_iso_8859_6, charStr);
-            _iso_8859_6[length] = '\0';
-            _updatedFlags |= FLAG_ISO_8859_6;
-        } break;
-        case ISO_8859_7: {
-            _iso_8859_7 = new char[length + 1];
-            strcpy(_iso_8859_7, charStr);
-            _iso_8859_7[length] = '\0';
-            _updatedFlags |= FLAG_ISO_8859_7;
-        } break;
-        case ISO_8859_8: {
-            _iso_8859_8 = new char[length + 1];
-            strcpy(_iso_8859_8, charStr);
-            _iso_8859_8[length] = '\0';
-            _updatedFlags |= FLAG_ISO_8859_8;
-        } break;
-        case ISO_8859_9: {
-            _iso_8859_9 = new char[length + 1];
-            strcpy(_iso_8859_9, charStr);
-            _iso_8859_9[length] = '\0';
-            _updatedFlags |= FLAG_ISO_8859_9;
-        } break;
-        case ISO_8859_10: {
-            _iso_8859_10 = new char[length + 1];
-            strcpy(_iso_8859_10, charStr);
-            _iso_8859_10[length] = '\0';
-            _updatedFlags |= FLAG_ISO_8859_10;
-        } break;
-        case ISO_8859_11: {
-            _iso_8859_11 = new char[length + 1];
-            strcpy(_iso_8859_11, charStr);
-            _iso_8859_11[length] = '\0';
-            _updatedFlags |= FLAG_ISO_8859_11;
-        } break;
-        case ISO_8859_13: {
-            _iso_8859_13 = new char[length + 1];
-            strcpy(_iso_8859_13, charStr);
-            _iso_8859_13[length] = '\0';
-            _updatedFlags |= FLAG_ISO_8859_13;
-        } break;
-        case ISO_8859_14: {
-            _iso_8859_14 = new char[length + 1];
-            strcpy(_iso_8859_14, charStr);
-            _iso_8859_14[length] = '\0';
-            _updatedFlags |= FLAG_ISO_8859_14;
-        } break;
-        case ISO_8859_15: {
-            _iso_8859_15 = new char[length + 1];
-            strcpy(_iso_8859_15, charStr);
-            _iso_8859_15[length] = '\0';
-            _updatedFlags |= FLAG_ISO_8859_15;
-        } break;
-        case ISO_8859_16: {
-            _iso_8859_16 = new char[length + 1];
-            strcpy(_iso_8859_16, charStr);
-            _iso_8859_16[length] = '\0';
-            _updatedFlags |= FLAG_ISO_8859_16;
-        } break;
-        case Formats::SHIFTJIS: {
-            _shiftJis = new char[length + 1];
-            strcpy(_shiftJis, charStr);
-            _shiftJis[length] = '\0';
-            _updatedFlags |= FLAG_SHIFTJIS;
-        } break;
-        case Formats::JIS_X_0201_FULLWIDTH: {
-            _jis_x_0201_fullwidth = new char[length + 1];
-            strcpy(_jis_x_0201_fullwidth, charStr);
-            _jis_x_0201_fullwidth[length] = '\0';
-            _updatedFlags |= FLAG_JIS_X_0201_FULLWIDTH;
-        } break;
-        case Formats::JIS_X_0201_HALFWIDTH: {
-            _jis_x_0201_halfwidth = new char[length + 1];
-            strcpy(_jis_x_0201_halfwidth, charStr);
-            _jis_x_0201_halfwidth[length] = '\0';
-            _updatedFlags |= FLAG_JIS_X_0201_HALFWIDTH;
-        } break;
-        default: // ASCII
-        {
-            _ascii = charStr;
-            _updatedFlags |= FLAG_ASCII;
-        }
-        }
-
-        _primaryFormat = format;
+       *this = MorphText(std::string(charStr), format);
     }
 
     MorphText(const wchar_t* charStr, const bool bigEndian = false)
     {
-        initArrays();
         *this = MorphText(std::wstring(charStr), bigEndian);
     }
 
     MorphText(const MorphText& other)
     {
-        initArrays();
         *this = other;
     }
 
     MorphText(const char32_t* charStr, const bool bigEndian = false)
     {
-        initArrays();
         *this = MorphText(std::u32string(charStr), bigEndian);
     }
 
@@ -668,17 +595,20 @@ public:
     /// Converts the passed Shift-Jis char&ast; string to a UTF-8 std::string&amp;.
     /// <param><c>char&ast; input: string to be processed.</param>
     /// </summary>
-    static std::string ShiftJis_To_Utf8(const char* input)
+    static std::string ShiftJis_To_Utf8(const std::string& input)
     {
         int inputIndex = -1;
-        int length = strlen(input);
-        std::string output(length, 0);
-        std::wstring temp(length, 0);
+        std::string output(input.size(), 0);
+        std::wstring temp(input.size(), 0);
         wchar_t* lookup = (wchar_t*)_shift_jis_CP10001_map;
 
-        for (int i = 0; i < length; ++i)
+        for (int i = 0; i < input.size(); ++i)
         {
             ++inputIndex;
+
+            if (inputIndex >= input.size())
+                break;
+
             uint8_t ch = (uint8_t)input[inputIndex];
 
             if (input[inputIndex] == 0x5C)
@@ -715,7 +645,7 @@ public:
     /// Converts the passed std::string&amp; to a Shift-Jis char&ast; string.
     /// <param><c>std::string&amp; input: string to be processed.</param>
     /// </summary>
-    static char* Utf8_To_ShiftJis(const std::string& input)
+    static std::string Utf8_To_ShiftJis(const std::string& input)
     {
         int outputIndex = -1;
         std::wstring utf16 = Utf8_To_Utf16LE(input);
@@ -759,10 +689,7 @@ public:
                 }
         }
 
-        output = output.c_str();
-        char* rtOut = new char[output.size()+1];
-        strcpy_s(rtOut, output.size()+1, output.c_str());
-        return rtOut;
+        return output.c_str();
     }
 
     /// <summary>
@@ -909,14 +836,13 @@ public:
     /// Converts the passed JIS-X-0201 Full Width char&ast; string to a UTF-8 std::string&amp;.
     /// <param><c>char&ast; input: string to be processed.</param>
     /// </summary>
-    static std::string JIS_X_0201_FullWidth_To_Utf8(const char* input)
+    static std::string JIS_X_0201_FullWidth_To_Utf8(const std::string& input)
     {
-        int length = strlen(input);
-        std::string output(length, 0);
-        std::wstring temp(length, 0);
+        std::string output(input.size(), 0);
+        std::wstring temp(input.size(), 0);
         wchar_t* lookup = (wchar_t*)_jis_x_0201_fullwidth_map;
 
-        for (int i = 0; i < length; ++i)
+        for (int i = 0; i < input.size(); ++i)
         {
             wchar_t ch = (uint8_t)input[i];
 
@@ -943,12 +869,11 @@ public:
     /// Converts the passed JIS-X-0201 Half Width char&ast; string to a UTF-8 std::string&amp;.
     /// <param><c>char&ast; input: string to be processed.</param>
     /// </summary>
-    static std::string JIS_X_0201_HalfWidth_To_Utf8(const char* input)
+    static std::string JIS_X_0201_HalfWidth_To_Utf8(const std::string& input)
     {
-        int length = strlen(input);
-        std::wstring temp(length, 0);
+        std::wstring temp(input.size(), 0);
 
-        for (int i = 0; i < length; ++i)
+        for (int i = 0; i < input.size(); ++i)
         {
             uint8_t ch = input[i];
 
@@ -976,10 +901,9 @@ public:
     /// <param><c>char&ast; input: string to be processed.
     /// <c>int format: ISO-8859 format of the passed string.</param>
     /// </summary>
-    static std::string ISO8859X_To_Utf8(const char* input, const int format = ISO_8859_1)
+    static std::string ISO8859X_To_Utf8(const std::string input, const int format = ISO_8859_1)
     {
-        int length = strlen(input);
-        wchar_t* temp = new wchar_t[length+1];
+        std::wstring temp(input.size(), '\0');
         wchar_t* lookup;
 
         switch (format)
@@ -1030,18 +954,15 @@ public:
             lookup = (wchar_t*)_iso8859_1_map;
         }
 
-        for (int index = 0; index < length; ++index)
+        for (int index = 0; index < input.size(); ++index)
         {
             wchar_t ch = (uint8_t)input[index];
             temp[index] = (ch > 0xA0) ? lookup[ch - 0xA0] : ch;
             if (ch == '\0') break;
         }
 
-        temp[length] = 0;
-        const std::wstring utf16(temp);
-        delete[] temp;
         std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-        std::string output = converter.to_bytes(utf16);
+        std::string output = converter.to_bytes(temp);
         return output;
     }
 
@@ -1050,7 +971,7 @@ public:
     /// <param><c>std::string&amp; input: string to be processed.
     /// <c>int format</c>: ISO-8859 format for the string to be returned.</param>
     /// </summary>
-    static char* Utf8_To_ISO8859X(const std::string& input, const int format = ISO_8859_1)
+    static std::string Utf8_To_ISO8859X(const std::string& input, const int format = ISO_8859_1)
     {
         const std::wstring utf16 = Utf8_To_Utf16LE(input);
         wchar_t* lookup;
@@ -1105,10 +1026,9 @@ public:
         }
         }
 
-        const int length = utf16.size();
-        char* output = new char[length + 1];
+        std::string output(utf16.size(), '\0');
 
-        for (int index = 0; index < length; ++index)
+        for (int index = 0; index < utf16.size(); ++index)
         {
             wchar_t ch = utf16[index];
 
@@ -1128,7 +1048,6 @@ public:
                 output[index] = ch;
         }
         
-        output[length] = 0;
         return output;
     }
 
@@ -1136,12 +1055,10 @@ public:
     /// Converts the passed UTF-8 string to a JIS-X-0201 Full Width string.
     /// <param><c>std::string input: string to be processed.</param>
     /// </summary>
-    static char* Utf8_To_JIS_X_0201_FullWidth(const std::string input)
+    static std::string Utf8_To_JIS_X_0201_FullWidth(const std::string& input)
     {
         std::wstring utf16 = Utf8_To_Utf16LE(input);
-        int length = utf16.size();
-        char* output = new char[length + 1];
-        output[length] = 0;
+        std::string output(utf16.size(), 0);
         wchar_t* lookup = (wchar_t*)_jis_x_0201_fullwidth_map;
 
         for (int i = 0; i < utf16.size(); ++i)
@@ -1176,12 +1093,10 @@ public:
     /// Converts the passed UTF-8 string to a JIS-X-0201 Half Width string.
     /// <param><c>std::string input: string to be processed.</param>
     /// </summary>
-    static char* Utf8_To_JIS_X_0201_HalfWidth(const std::string input)
+    static std::string Utf8_To_JIS_X_0201_HalfWidth(const std::string input)
     {
         std::wstring utf16 = Utf8_To_Utf16LE(input);
-        int length = utf16.size();
-        char* output = new char[length + 1];
-        output[length] = 0;
+        std::string output(utf16.size(), '\0');
 
         for (int i = 0; i < utf16.size(); ++i)
         {
@@ -1216,14 +1131,31 @@ public:
     /// <summary>
     /// Checks if the right-hand std::string&amp; parameter appears within the left-hand std::string. Returns the position of appearance, otherwise -1.
     /// <param><c>std::string&amp; lhs</c>: left-hand std::string&amp;. 
-    /// <c>std::u32string&amp; rhs</c>: std::u32string&amp; to be found. 
+    /// <c>std::string&amp; rhs</c>: std::string&amp; to be found. 
     /// <c>bool caseSensitive</c> (optional): Consider case sensitivity (true = case sensitive (default), false = case insensitive.</param>
     /// </summary>
-    static int Find(const std::string& superset, const std::string& subset, const bool caseSensitive = true)
+    static int Find(const std::string& superset, const std::string& subset, const int format, const bool caseSensitive = true)
     {
-        const std::string sups = caseSensitive ? superset : ToLower(superset);
-        const std::string subs = caseSensitive ? subset : ToLower(subset);
-        return sups.find(subs);
+        switch (format)//all except default call this function recursively
+        {
+            case SHIFTJIS:
+                return Find(ShiftJis_To_Utf8(superset), ShiftJis_To_Utf8(subset), UTF8, caseSensitive);
+            case JIS_X_0201_FULLWIDTH:
+                return Find(JIS_X_0201_FullWidth_To_Utf8(superset), JIS_X_0201_FullWidth_To_Utf8(subset), UTF8, caseSensitive);
+            case JIS_X_0201_HALFWIDTH:
+                return Find(JIS_X_0201_HalfWidth_To_Utf8(superset), JIS_X_0201_HalfWidth_To_Utf8(subset), UTF8, caseSensitive);
+            case ISO_8859_1:  case ISO_8859_2:  case ISO_8859_3:  case ISO_8859_4:
+            case ISO_8859_5:  case ISO_8859_6:  case ISO_8859_7:  case ISO_8859_8: 
+            case ISO_8859_9:  case ISO_8859_10: case ISO_8859_11: case ISO_8859_13: 
+            case ISO_8859_14: case ISO_8859_15: case ISO_8859_16:
+                return Find(ISO8859X_To_Utf8(superset, format), ISO8859X_To_Utf8(subset, format), UTF8, caseSensitive);
+            default: //UTF8, ASCII
+            {
+                const std::string sups = caseSensitive ? superset : ToLower(superset);
+                const std::string subs = caseSensitive ? subset : ToLower(subset);
+                return sups.find(subs);
+            }
+        }
     }
 
     /// <summary>
@@ -1270,34 +1202,6 @@ public:
             return Utf32LE_To_Utf8(superset).find(Utf32LE_To_Utf8(subset));
 
         return ToLower(Utf32LE_To_Utf8(superset)).find(ToLower(Utf32LE_To_Utf8(subset)));
-    }
-
-    /// <summary>
-    /// Checks if the right-hand char&ast; parameter appears within the left-hand string. Returns the position of appearance, otherwise -1.
-    /// <param><c>char&ast; lhs</c>: left-hand char&ast;. 
-    /// <c>std::u32string&amp; rhs</c>: std::u32string&amp; to be found. 
-    /// <c>bool caseSensitive</c> (optional): Consider case sensitivity (true = case sensitive (default), false = case insensitive.
-    /// <c>bool isBigEndian</c>: true to return the big endian value, false to return the little endian value.</param>
-    /// </summary>
-    static int Find(const char* superset, const char* subset, const int format, const bool caseSensitive = true)
-    {
-        switch (format)
-        {
-        case ASCII:
-            return Find(ASCII_To_Utf8(superset), ASCII_To_Utf8(subset), caseSensitive);
-            break;
-        case JIS_X_0201_FULLWIDTH:
-            return Find(JIS_X_0201_FullWidth_To_Utf8(superset), JIS_X_0201_FullWidth_To_Utf8(subset), caseSensitive);
-            break;
-        case JIS_X_0201_HALFWIDTH:
-            return Find(JIS_X_0201_HalfWidth_To_Utf8(superset), JIS_X_0201_HalfWidth_To_Utf8(subset), caseSensitive);
-            break;
-        case SHIFTJIS:
-            return Find(ShiftJis_To_Utf8(superset), ShiftJis_To_Utf8(subset), caseSensitive);
-            break;
-        default: //ISO 8859-X
-            return Find(ISO8859X_To_Utf8(superset, format), ISO8859X_To_Utf8(subset, format), caseSensitive);
-        }
     }
 
 //Compare-------------------------------------------------------------------------------
@@ -1376,16 +1280,30 @@ public:
     /// </summary>
     static bool Compare(const char* lhs, const char* rhs, const bool caseSensitive = true, const int format = 0)
     {
-        if (!caseSensitive)
+        switch (format)
         {
-            const char* lowerLhs = ToLower(lhs, format);
-            const char* lowerRhs = ToLower(rhs, format);
-            const int result = strcmp(lowerLhs, lowerRhs);
-            delete[] lowerLhs;
-            delete[] lowerRhs;
-            return result == 0;
+            case SHIFTJIS: case JIS_X_0201_FULLWIDTH: case JIS_X_0201_HALFWIDTH:
+            {
+                if (!caseSensitive)
+                {
+                    const std::string lowerLhs = ToLower(lhs, format);
+                    const std::string lowerRhs = ToLower(rhs, format);
+                    return compareRaw(lowerLhs.c_str(), lowerRhs.c_str());
+                }
+
+                return compareRaw(lhs, rhs);
+            }
+            default:
+            {        
+                if (!caseSensitive)
+                {
+                    const std::string lowerLhs = ToLower(lhs, format);
+                    const std::string lowerRhs = ToLower(rhs, format);
+                    return strcmp(lowerLhs.c_str(), lowerRhs.c_str()) == 0;
+                }
+                return strcmp(lhs, rhs) == 0;
+            }
         }
-        return strcmp(lhs, rhs) == 0;
     }
 
     static bool Compare(const wchar_t* lhs, const wchar_t* rhs, const bool caseSensitive = true, const bool isBigEndian = false)
@@ -1425,36 +1343,174 @@ public:
     /// Returns the passed std::string&amp; in <b>uppercase</b>.
     /// <param><c>std::string&amp; input: string to be processed.</param>
     /// </summary>
-    static std::string ToLower(const std::string& input)
+    static std::string ToLower(const std::string& input, const int format = UTF8)
     {
         std::string result = input;
-        std::transform(result.begin(), result.end(), result.begin(), tolower);
-        return result;
+
+        switch (format)
+        {
+            case ISO_8859_1:  case ISO_8859_2:  case ISO_8859_3:
+            case ISO_8859_4:  case ISO_8859_5:  case ISO_8859_6:
+            case ISO_8859_7:  case ISO_8859_8:  case ISO_8859_9:
+            case ISO_8859_10: case ISO_8859_11: case ISO_8859_13:
+            case ISO_8859_14: case ISO_8859_15: case ISO_8859_16:
+            {
+                std::string temp = ISO8859X_To_Utf8(input, format);
+                temp = ToLower(temp, UTF8);
+                return Utf8_To_ISO8859X(temp);
+            }
+            case JIS_X_0201_FULLWIDTH: case JIS_X_0201_HALFWIDTH: {
+                for (int i = 0; i < result.size(); ++i)
+                    if (result[i] < 0x7F)
+                        result[i] = std::tolower(result[i]);
+
+                return result;
+            }
+            case SHIFTJIS: {
+                for (size_t i = 0; i < result.size();)
+                {
+                    if (static_cast<unsigned char>(result[i]) < 0x80)
+                    {
+                        if (i > 0 && static_cast<unsigned char>(result[i - 1]) < 0x80)
+                            result[i] = static_cast<char>(std::tolower(static_cast<unsigned char>(result[i])));
+                        else
+                            result[i] = static_cast<char>(std::tolower(static_cast<unsigned char>(result[i])));
+                        ++i;
+                    }
+                    else
+                    {
+                        uint16_t current = static_cast<unsigned char>(result[i]) << 8;
+                        current |= static_cast<unsigned char>(result[i + 1]);
+                        if ((current > 0x839E && current < 0x83A7) ||
+                            (current > 0x843F && current < 0x8462))
+                        {
+                            current += 0x20;
+                        }
+                        else if ((current > 0x8260 && current < 0x827A))
+                            current += 0x21;
+
+                        result[i] = static_cast<char>(current >> 8);
+                        result[i + 1] = static_cast<char>(current & 0xFF);
+                        i += 2;
+                    }
+                }
+
+                return result;
+            }
+            default: { //UTF8, ASCII
+                std::transform(result.begin(), result.end(), result.begin(), tolower);
+                return result;
+            }
+        }
     }
 
     /// <summary>
     /// Returns the passed std::string&amp; in <b>uppercase</b>.
     /// <param><c>std::string&amp; input: string to be processed.</param>
     /// </summary>
-    static std::string ToUpper(const std::string& input)
+    static std::string ToUpper(const std::string& input, const int format = UTF8)
     {
         std::string result = input;
-        std::transform(result.begin(), result.end(), result.begin(), toupper);
-        return result;
+
+        switch (format)
+        {
+            case ISO_8859_1:  case ISO_8859_2:  case ISO_8859_3:
+            case ISO_8859_4:  case ISO_8859_5:  case ISO_8859_6:
+            case ISO_8859_7:  case ISO_8859_8:  case ISO_8859_9:
+            case ISO_8859_10: case ISO_8859_11: case ISO_8859_13:
+            case ISO_8859_14: case ISO_8859_15: case ISO_8859_16:
+            {
+                std::string temp = ISO8859X_To_Utf8(input, format);
+                temp = ToUpper(temp, UTF8);
+                return Utf8_To_ISO8859X(temp);
+            }
+            case JIS_X_0201_FULLWIDTH: case JIS_X_0201_HALFWIDTH: {
+                for (int i = 0; i < result.size(); ++i)
+                    if (result[i] < 0x7F)
+                        result[i] = std::toupper(result[i]);
+
+                return result;
+            }
+            case SHIFTJIS: {
+                for (size_t i = 0; i < result.size();)
+                {
+                    if (static_cast<unsigned char>(result[i]) < 0x80)
+                    {
+                        if (i > 0 && static_cast<unsigned char>(result[i - 1]) < 0x80)
+                            result[i] = static_cast<char>(std::toupper(static_cast<unsigned char>(result[i])));
+                        else
+                            result[i] = static_cast<char>(std::toupper(static_cast<unsigned char>(result[i])));
+                        ++i;
+                    }
+                    else
+                    {
+                        uint16_t current = static_cast<unsigned char>(result[i]) << 8;
+                        current |= static_cast<unsigned char>(result[i + 1]);
+                        if ((current > 0x839E && current < 0x83A7) ||
+                            (current > 0x843F && current < 0x8462))
+                        {
+                            current += 0x20;
+                        }
+                        else if ((current > 0x8260 && current < 0x827A))
+                            current += 0x21;
+
+                        result[i] = static_cast<char>(current >> 8);
+                        result[i + 1] = static_cast<char>(current & 0xFF);
+                        i += 2;
+                    }
+                }
+
+                return result;
+            }
+            default: { //UTF8, ASCII
+                std::transform(result.begin(), result.end(), result.begin(), toupper);
+                return result;
+            }
+        }
     }
 
     /// <summary>
     /// Returns the passed std::string&amp; with sarcastic energy.
     /// <param><c>std::string&amp; input: string to be processed.</param>
     /// </summary>
-    static std::string ToSarcasm(const std::string& input)
+    static std::string ToSarcasm(const std::string& input, const int format = UTF8)
     {
         std::string result = input;
 
-        for (int i = 0; i < result.size(); ++i)
-                result[i] = (i & 1) ? std::tolower(input[i]) : std::toupper(input[i]);
+        switch (format)
+        {
+            case ISO_8859_1:  case ISO_8859_2:  case ISO_8859_3:
+            case ISO_8859_4:  case ISO_8859_5:  case ISO_8859_6:
+            case ISO_8859_7:  case ISO_8859_8:  case ISO_8859_9:
+            case ISO_8859_10: case ISO_8859_11: case ISO_8859_13:
+            case ISO_8859_14: case ISO_8859_15: case ISO_8859_16:
+            {
 
-        return result;
+                result = ISO8859X_To_Utf8(input, format);
+                result = ToSarcasm(result, UTF8);
+                return Utf8_To_ISO8859X(result);
+            }
+            case JIS_X_0201_FULLWIDTH: case JIS_X_0201_HALFWIDTH:
+            {
+                for (int i = 0; i < result.size(); ++i)
+                    if (result[i] < 0x7F)
+                        result[i] = i & 1 ? std::tolower(result[i]) : std::toupper(result[i]);
+
+                return result;
+            }
+            case SHIFTJIS: 
+            {
+                result = ShiftJis_To_Utf8(input);
+                result = ToSarcasm(result, UTF8);
+                return Utf8_To_ShiftJis(result);
+            }
+            default: { //UTF8, ASCII
+                for (int i = 0; i < result.size(); ++i)
+                    result[i] = (i & 1) ? std::tolower(input[i]) : std::toupper(input[i]);
+
+                return result;
+            }
+        }
     }
 
     /// <summary>
@@ -1527,67 +1583,6 @@ public:
         std::string temp = isBigEndian ? Utf32BE_To_Utf8(input) : Utf32LE_To_Utf8(input);
         temp = ToSarcasm(temp);
         return isBigEndian ? Utf8_To_Utf32BE(temp) : Utf8_To_Utf32LE(temp);
-    }
-
-    /// <summary>
-    /// Returns the passed char&ast; string in <b>lowercase</b>.
-    /// <param><c>char&ast; input: string to be processed.
-    /// <c>int format</c>: set format to select char&ast; type.</param>
-    /// </summary>
-    static char* ToLower(const char* input, const int format)
-    {
-        const int length = strlen(input) + 1;
-        char* result = new char[length];
-        strcpy_s(result, length, input);
-
-        switch (format)
-        {
-        case ASCII: case UTF8: {
-            for (char* i = result; *i != '\0'; ++i)
-                *i = std::tolower(*i);
-        }break;
-        case JIS_X_0201_FULLWIDTH: case JIS_X_0201_HALFWIDTH: {
-            for (char* i = result; *i != '\0'; ++i)
-                if(*i < 0x7F)
-                    *i = std::tolower(*i);
-        } break;
-        case SHIFTJIS: {
-            for (size_t i = 0; i < length;)
-            {
-                if (static_cast<unsigned char>(result[i]) < 0x80)
-                {
-                    if (i > 0 && static_cast<unsigned char>(result[i - 1]) < 0x80)
-                        result[i] = static_cast<char>(std::tolower(static_cast<unsigned char>(result[i])));
-                    else
-                        result[i] = static_cast<char>(std::tolower(static_cast<unsigned char>(result[i])));
-                    ++i;
-                }
-                else
-                {
-                    uint16_t current = static_cast<unsigned char>(result[i]) << 8;
-                    current |= static_cast<unsigned char>(result[i + 1]);
-                    if ((current > 0x839E && current < 0x83A7) ||
-                        (current > 0x843F && current < 0x8462))
-                    {
-                        current += 0x20;
-                    }
-                    else if ((current > 0x8260 && current < 0x827A))
-                        current += 0x21;
-
-                    result[i] = static_cast<char>(current >> 8);
-                    result[i + 1] = static_cast<char>(current & 0xFF);
-                    i += 2;
-                }
-            }
-        }break;
-        default: { //ISO 8859-X
-            std::string temp = ISO8859X_To_Utf8(input, format);
-            temp = ToLower(temp);
-            result = Utf8_To_ISO8859X(temp);
-        }
-        }
-
-        return result;
     }
 
     static wchar_t* ToLower(const wchar_t* input, const bool isBigEndian = true)
@@ -1715,105 +1710,6 @@ public:
         const int length = std::char_traits<char32_t>::length(input) + 1;
         char32_t* result = new char32_t[length];
         std::char_traits<char32_t>::copy(result, ToSarcasm(std::u32string(input), isBigEndian).c_str(), length);
-        return result;
-    }
-
-    /// <summary>
-    /// Returns the passed char&ast; string in <b>uppercase</b>.
-    /// <param><c>char&ast; input: string to be processed.
-    /// <c>int format</c>: set format to select char&ast; type.</param>
-    /// </summary>
-    static char* ToUpper(const char* input, const int format)
-    {
-        const int length = strlen(input) + 1;
-        char* result = new char[length];
-        strcpy_s(result, length, input);
-
-        switch (format)
-        {
-        case ASCII: case UTF8: {
-            for (char* i = result; *i != '\0'; ++i)
-                *i = std::toupper(*i);
-            }break;
-        case JIS_X_0201_FULLWIDTH: case JIS_X_0201_HALFWIDTH: {
-            for (char* i = result; *i != '\0'; ++i)
-                if (*i < 0x7F)
-                    *i = std::toupper(*i);
-        } break;
-        case SHIFTJIS: {
-            for (size_t i = 0; i < length;)
-            {
-                if (static_cast<unsigned char>(result[i]) < 0x80)
-                {
-                    if (i > 0 && static_cast<unsigned char>(result[i - 1]) < 0x80)
-                        result[i] = static_cast<char>(std::toupper(static_cast<unsigned char>(result[i])));
-                    else
-                        result[i] = static_cast<char>(std::toupper(static_cast<unsigned char>(result[i])));
-                    ++i;
-                }
-                else
-                {
-                    uint16_t current = static_cast<unsigned char>(result[i]) << 8;
-                    current |= static_cast<unsigned char>(result[i + 1]);
-                    if ((current > 0x83BE && current < 0x83D7) ||
-                        (current > 0x846F && current < 0x8492))
-                    {
-                        current -= 0x20;
-                    }
-                    else if ((current > 0x8280 && current < 0x829B))
-                        current -= 0x21;
-
-                    result[i] = static_cast<char>(current >> 8);
-                    result[i + 1] = static_cast<char>(current & 0xFF);
-                    i += 2;
-                }
-            }
-        }break;
-        default: { //ISO 8859-X
-            std::string temp = ISO8859X_To_Utf8(input, format);
-            temp = ToUpper(temp);
-            result = Utf8_To_ISO8859X(temp);
-        }
-        }
-
-        return result;
-    }
-
-    /// <summary>
-    /// Returns the passed char&ast; string with sarcastic energy.
-    /// <param><c>char&ast; input: string to be processed.
-    /// <c>int format</c>: set format to select char&ast; type.</param>
-    /// </summary>
-    static char* ToSarcasm(const char* input, const int format)
-    {
-        std::string temp;
-        const int length = strlen(input) + 1;
-        char* result = new char[length];
-        strcpy_s(result, length, input);
-
-        switch (format)
-        {
-        case ASCII: case UTF8: {
-            for (char* i = result; *i != '\0'; ++i)
-                *i = reinterpret_cast<uint64_t>(i) & 1 ? std::tolower(*i) : std::toupper(*i);
-        }break;
-        case JIS_X_0201_FULLWIDTH: case JIS_X_0201_HALFWIDTH: {
-            for (char* i = result; *i != '\0'; ++i)
-                if (*i < 0x7F)
-                    *i = reinterpret_cast<uint64_t>(i) & 1 ? std::tolower(*i) : std::toupper(*i);
-        }break;
-        case SHIFTJIS: { //guess it's okay doing it this way here since this function won't be used in performance-critical situations
-            temp = ShiftJis_To_Utf8(input);
-            temp = ToSarcasm(temp);
-            result = Utf8_To_ShiftJis(temp);
-        }break;
-        default: { //ISO 8859-X
-            temp = ISO8859X_To_Utf8(input, format);
-            temp = ToSarcasm(temp);
-            result = Utf8_To_ISO8859X(temp);
-        }
-        }
-
         return result;
     }
 
@@ -2056,41 +1952,41 @@ public:
         case UTF8:
             return Compare(_utf8.c_str(), rhs, caseSensitive, format);
         case SHIFTJIS:
-            return Compare(_shiftJis, rhs, caseSensitive, format);
+            return Compare(_shiftJis.c_str(), rhs, caseSensitive, format);
         case JIS_X_0201_FULLWIDTH:
-            return Compare(_jis_x_0201_fullwidth, rhs, caseSensitive, format);
+            return Compare(_jis_x_0201_fullwidth.c_str(), rhs, caseSensitive, format);
         case JIS_X_0201_HALFWIDTH: 
-            return Compare(_jis_x_0201_halfwidth, rhs, caseSensitive, format);
+            return Compare(_jis_x_0201_halfwidth.c_str(), rhs, caseSensitive, format);
         case ISO_8859_1:
-            return Compare(_iso_8859_1, rhs, caseSensitive, format);
+            return Compare(_iso_8859_1.c_str(), rhs, caseSensitive, format);
         case ISO_8859_2:
-            return Compare(_iso_8859_2, rhs, caseSensitive, format);
+            return Compare(_iso_8859_2.c_str(), rhs, caseSensitive, format);
         case ISO_8859_3:
-            return Compare(_iso_8859_3, rhs, caseSensitive, format);
+            return Compare(_iso_8859_3.c_str(), rhs, caseSensitive, format);
         case ISO_8859_4:
-            return Compare(_iso_8859_4, rhs, caseSensitive, format);
+            return Compare(_iso_8859_4.c_str(), rhs, caseSensitive, format);
         case ISO_8859_5:
-            return Compare(_iso_8859_5, rhs, caseSensitive, format);
+            return Compare(_iso_8859_5.c_str(), rhs, caseSensitive, format);
         case ISO_8859_6:
-            return Compare(_iso_8859_6, rhs, caseSensitive, format);
+            return Compare(_iso_8859_6.c_str(), rhs, caseSensitive, format);
         case ISO_8859_7:
-            return Compare(_iso_8859_7, rhs, caseSensitive, format);
+            return Compare(_iso_8859_7.c_str(), rhs, caseSensitive, format);
         case ISO_8859_8:
-            return Compare(_iso_8859_8, rhs, caseSensitive, format);
+            return Compare(_iso_8859_8.c_str(), rhs, caseSensitive, format);
         case ISO_8859_9:
-            return Compare(_iso_8859_9, rhs, caseSensitive, format);
+            return Compare(_iso_8859_9.c_str(), rhs, caseSensitive, format);
         case ISO_8859_10:
-            return Compare(_iso_8859_10, rhs, caseSensitive, format);
+            return Compare(_iso_8859_10.c_str(), rhs, caseSensitive, format);
         case ISO_8859_11:
-            return Compare(_iso_8859_11, rhs, caseSensitive, format);
+            return Compare(_iso_8859_11.c_str(), rhs, caseSensitive, format);
         case ISO_8859_13:
-            return Compare(_iso_8859_13, rhs, caseSensitive, format);
+            return Compare(_iso_8859_13.c_str(), rhs, caseSensitive, format);
         case ISO_8859_14:
-            return Compare(_iso_8859_14, rhs, caseSensitive, format);
+            return Compare(_iso_8859_14.c_str(), rhs, caseSensitive, format);
         case ISO_8859_15:
-            return Compare(_iso_8859_15, rhs, caseSensitive, format);
+            return Compare(_iso_8859_15.c_str(), rhs, caseSensitive, format);
         case ISO_8859_16:
-            return Compare(_iso_8859_16, rhs, caseSensitive, format);
+            return Compare(_iso_8859_16.c_str(), rhs, caseSensitive, format);
         default: //ASCII
             return Compare(_ascii.c_str(), rhs, caseSensitive, format);
         }
@@ -2262,11 +2158,10 @@ public:
     /// <summary>
     /// Returns the instance's <b>Shift-Jis</b> value as char*.
     /// </summary>
-    char* GetShiftJis()
+    std::string GetShiftJis()
     {
         if (!(_updatedFlags & FLAG_SHIFTJIS))
             utf8ToShiftJis();
-
         return _shiftJis;
     }
 
@@ -2274,7 +2169,7 @@ public:
     /// Returns the instance's <b>ISO-8859-X</b> value as char*.
     /// <param><c>int format</c>: ISO-8859-X format to return.</param>
     /// </summary>
-    char* GetISO8859X(const int format)
+    std::string GetISO8859X(const int format)
     {
         switch (format)
         {
@@ -2341,14 +2236,14 @@ public:
         }
     }
 
-    char* GetJisX0201FullWidth()
+    std::string GetJisX0201FullWidth()
     {
         if (!(_updatedFlags & FLAG_JIS_X_0201_FULLWIDTH))
             utf8ToJisX0201FW();
         return _jis_x_0201_fullwidth;
     }
 
-    char* GetJisX0201HalfWidth()
+    std::string GetJisX0201HalfWidth()
     {
         if (!(_updatedFlags & FLAG_JIS_X_0201_HALFWIDTH))
             utf8ToJisX0201HW();
@@ -2435,27 +2330,21 @@ public:
     /// <param><c>char&ast; input</c>: Shift-Jis char* string to be set.</param>
     /// <example> instance.SetShiftJis(text);</example>
     /// </summary>
-    void SetShiftJis(const char* input)
+    void SetShiftJis(const std::string& input)
     {
-        delete[] _shiftJis;
-        _shiftJis = new char[strlen(input) + 1];
-        strcpy_s(_shiftJis, strlen(input) + 1, input);
+        _shiftJis = input;
         _updatedFlags = FLAG_SHIFTJIS;
     }
 
-    void SetJisX0201FullWidth(const char* input)
+    void SetJisX0201FullWidth(const std::string& input)
     {
-        delete[] _jis_x_0201_fullwidth;
-        _jis_x_0201_fullwidth = new char[strlen(input) + 1];
-        strcpy_s(_jis_x_0201_fullwidth, strlen(input) + 1, input);
+        _jis_x_0201_fullwidth = input;
         _updatedFlags = FLAG_JIS_X_0201_FULLWIDTH;
     }
 
     void SetJisX0201HalfWidth(const char* input)
     {
-        delete[] _jis_x_0201_halfwidth;
-        _jis_x_0201_halfwidth = new char[strlen(input) + 1];
-        strcpy_s(_jis_x_0201_halfwidth, strlen(input) + 1, input);
+        _jis_x_0201_halfwidth = input;
         _updatedFlags = FLAG_JIS_X_0201_HALFWIDTH;
     }
 
@@ -2465,100 +2354,68 @@ public:
     /// <c>int format</c>: ISO-8859 Format.</param>
     /// <example> instance.SetISO8859X(text, MorphText::ISO_8859_3);</example>
     /// </summary>
-    void SetISO8859X(const char* input, const int format)
+    void SetISO8859X(const std::string input, const int format)
     {
-        const int length = strlen(input) + 1;
-
         switch (format)
         {
         case ISO_8859_2:
-        	delete[] _iso_8859_2;
-            _iso_8859_2 = new char[length];
-            strcpy_s(_iso_8859_2, length, input);
+            _iso_8859_2 = input;
             _updatedFlags = FLAG_ISO_8859_2;
             break;
         case ISO_8859_3:
-        	delete[] _iso_8859_3;
-            _iso_8859_3 = new char[length];
-            strcpy_s(_iso_8859_3, length, input);
+            _iso_8859_3 = input;
             _updatedFlags = FLAG_ISO_8859_3;
             break;
         case ISO_8859_4:
-        	delete[] _iso_8859_4;
-            _iso_8859_4 = new char[length];
-            strcpy_s(_iso_8859_4, length, input);
+            _iso_8859_4 = input;
             _updatedFlags = FLAG_ISO_8859_4;
             break;
         case ISO_8859_5:
-        	delete[] _iso_8859_5;
-            _iso_8859_5 = new char[length];
-            strcpy_s(_iso_8859_5, length, input);
+            _iso_8859_5 = input;
             _updatedFlags = FLAG_ISO_8859_5;
             break;
         case ISO_8859_6:
-        	delete[] _iso_8859_6;
-            _iso_8859_6 = new char[length];
-            strcpy_s(_iso_8859_6, length, input);
+            _iso_8859_6 = input;
             _updatedFlags = FLAG_ISO_8859_6;
             break;
         case ISO_8859_7:
-            delete[] _iso_8859_7;
-            _iso_8859_7 = new char[length];
-            strcpy_s(_iso_8859_7, length, input);
+            _iso_8859_7 = input;
             _updatedFlags = FLAG_ISO_8859_7;
             break;
         case ISO_8859_8:
-        	delete[] _iso_8859_8;
-            _iso_8859_8 = new char[length];
-            strcpy_s(_iso_8859_8, length, input);
+            _iso_8859_8 = input;
             _updatedFlags = FLAG_ISO_8859_8;
             break;
         case ISO_8859_9:
-        	delete[] _iso_8859_9;
-            _iso_8859_9 = new char[length];
-            strcpy_s(_iso_8859_9, length, input);
+            _iso_8859_9 = input;
             _updatedFlags = FLAG_ISO_8859_9;
             break;
         case ISO_8859_10:
-        	delete[] _iso_8859_10;
-            _iso_8859_10 = new char[length];
-            strcpy_s(_iso_8859_10, length, input);
+            _iso_8859_10 = input;
             _updatedFlags = FLAG_ISO_8859_10;
             break;
         case ISO_8859_11:
-        	delete[] _iso_8859_11;
-            _iso_8859_11 = new char[length];
-            strcpy_s(_iso_8859_11, length, input);
+            _iso_8859_11 = input;
             _updatedFlags = FLAG_ISO_8859_11;
             break;
         case ISO_8859_13:
-        	delete[] _iso_8859_13;
-            _iso_8859_13 = new char[length];
-            strcpy_s(_iso_8859_13, length, input);
+            _iso_8859_13 = input;
             _updatedFlags = FLAG_ISO_8859_13;
             break;
         case ISO_8859_14:
-        	delete[] _iso_8859_14;
-            _iso_8859_14 = new char[length];
-            strcpy_s(_iso_8859_14, length, input);
+            _iso_8859_14 = input;
             _updatedFlags = FLAG_ISO_8859_14;
             break;
         case ISO_8859_15:
-        	delete[] _iso_8859_15;
-            _iso_8859_15 = new char[length];
-            strcpy_s(_iso_8859_15, length, input);
+            _iso_8859_15 = input;
             _updatedFlags = FLAG_ISO_8859_15;
             break;
         case ISO_8859_16:
-        	delete[] _iso_8859_16;
-            _iso_8859_16 = new char[length];
-            strcpy_s(_iso_8859_16, length, input);
+            _iso_8859_16 = input;
             _updatedFlags = FLAG_ISO_8859_16;
             break;
         default:// ISO 8859-1
-        	delete[] _iso_8859_1;
-            _iso_8859_1 = new char[length];
-            strcpy_s(_iso_8859_1, length, input);
+            _iso_8859_1 = input;
             _updatedFlags = FLAG_ISO_8859_1;
             break;
         }
@@ -2648,142 +2505,65 @@ public:
     void operator = (const MorphText& other)
     {
         this->~MorphText();
-        initArrays();
         _utf8 = other._utf8;
         _utf16LE = other._utf16LE;
         _utf16BE = other._utf16BE;
         _utf32LE = other._utf32LE;
         _utf32BE = other._utf32BE;
         _ascii = other._ascii;
-       
-        if (other._iso_8859_1)
-        {
-            const int length = strlen(other._iso_8859_1) + 1;
-            _iso_8859_1 = new char[length];
-            strcpy_s(_iso_8859_1, length, other._iso_8859_1);
-        }
-        if (other._iso_8859_2)
-        {
-            const int length = strlen(other._iso_8859_2) + 1;
-            _iso_8859_2 = new char[length];
-            strcpy_s(_iso_8859_2, length, other._iso_8859_2);
-        }
-        if (other._iso_8859_3)
-        {
-            const int length = strlen(other._iso_8859_3) + 1;
-            _iso_8859_3 = new char[length];
-            strcpy_s(_iso_8859_3, length, other._iso_8859_3);
-        }
-        if (other._iso_8859_4)
-        {
-            const int length = strlen(other._iso_8859_4) + 1;
-            _iso_8859_4 = new char[length];
-            strcpy_s(_iso_8859_4, length, other._iso_8859_4);
-        }
-        if (other._iso_8859_5)
-        {
-            const int length = strlen(other._iso_8859_5) + 1;
-            _iso_8859_5 = new char[length];
-            strcpy_s(_iso_8859_5, length, other._iso_8859_5);
-        }
-        if (other._iso_8859_6)
-        {
-            const int length = strlen(other._iso_8859_6) + 1;
-            _iso_8859_6 = new char[length];
-            strcpy_s(_iso_8859_6, length, other._iso_8859_6);
-        }
-        if (other._iso_8859_7)
-        {
-            const int length = strlen(other._iso_8859_7) + 1;
-            _iso_8859_7 = new char[length];
-            strcpy_s(_iso_8859_7, length, other._iso_8859_7);
-        }
-        if (other._iso_8859_8)
-        {
-            const int length = strlen(other._iso_8859_8) + 1;
-            _iso_8859_8 = new char[length];
-            strcpy_s(_iso_8859_8, length, other._iso_8859_8);
-        }
-        if (other._iso_8859_9)
-        {
-            const int length = strlen(other._iso_8859_9) + 1;
-            _iso_8859_9 = new char[length];
-            strcpy_s(_iso_8859_9, length, other._iso_8859_9);
-        }
-        if (other._iso_8859_10)
-        {
-            const int length = strlen(other._iso_8859_10) + 1;
-            _iso_8859_10 = new char[length];
-            strcpy_s(_iso_8859_10, length, other._iso_8859_10);
-        }
-        if (other._iso_8859_11)
-        {
-            const int length = strlen(other._iso_8859_11) + 1;
-            _iso_8859_11 = new char[length];
-            strcpy_s(_iso_8859_11, length, other._iso_8859_11);
-        }
-        if (other._iso_8859_13)
-        {
-            const int length = strlen(other._iso_8859_13) + 1;
-            _iso_8859_13 = new char[length];
-            strcpy_s(_iso_8859_13, length, other._iso_8859_13);
-        }
-        if (other._iso_8859_14)
-        {
-            const int length = strlen(other._iso_8859_14) + 1;
-            _iso_8859_14 = new char[length];
-            strcpy_s(_iso_8859_14, length, other._iso_8859_14);
-        }
-        if (other._iso_8859_15)
-        {
-            const int length = strlen(other._iso_8859_15) + 1;
-            _iso_8859_15 = new char[length];
-            strcpy_s(_iso_8859_15, length, other._iso_8859_15);
-        }
-        if (other._iso_8859_16)
-        {
-            const int length = strlen(other._iso_8859_16) + 1;
-            _iso_8859_16 = new char[length];
-            strcpy_s(_iso_8859_16, length, other._iso_8859_16);
-        }
-        if (other._shiftJis)
-        {
-            const int length = strlen(other._shiftJis) + 1;
-            _shiftJis = new char[length];
-            strcpy_s(_shiftJis, length, other._shiftJis);
-        }
-        if (other._jis_x_0201_fullwidth)
-        {
-            const int length = strlen(other._jis_x_0201_fullwidth) + 1;
-            _jis_x_0201_fullwidth = new char[length];
-            strcpy_s(_jis_x_0201_fullwidth, length, other._jis_x_0201_fullwidth);
-        }
-        if (other._jis_x_0201_halfwidth)
-        {
-            const int length = strlen(other._jis_x_0201_halfwidth) + 1;
-            _jis_x_0201_halfwidth = new char[length];
-            strcpy_s(_jis_x_0201_halfwidth, length, other._jis_x_0201_halfwidth);
-        }
-
+        _jis_x_0201_fullwidth = other._jis_x_0201_fullwidth;
+        _jis_x_0201_halfwidth = other._jis_x_0201_halfwidth;
+        _shiftJis = other._shiftJis;
+        _iso_8859_1 = other._iso_8859_1;
+        _iso_8859_2 = other._iso_8859_2;
+        _iso_8859_3 = other._iso_8859_3;
+        _iso_8859_4 = other._iso_8859_4;
+        _iso_8859_5 = other._iso_8859_5;
+        _iso_8859_6 = other._iso_8859_6;
+        _iso_8859_7 = other._iso_8859_7;
+        _iso_8859_8 = other._iso_8859_8;
+        _iso_8859_9 = other._iso_8859_9;
+        _iso_8859_10 = other._iso_8859_10;
+        _iso_8859_11 = other._iso_8859_11;
+        _iso_8859_13 = other._iso_8859_13;
+        _iso_8859_14 = other._iso_8859_14;
+        _iso_8859_15 = other._iso_8859_15;
+        _iso_8859_16 = other._iso_8859_16;
         _updatedFlags = other._updatedFlags;
         _primaryFormat = other._primaryFormat;
     }
 
+#ifndef NDEBUG
     void Test()
     {
         std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
 
         std::cout << "ASCII: " << _ascii << " --- updated: " << (bool)(_updatedFlags & FLAG_ASCII) << "\n";
-        std::cout << "LATIN1: " << _iso_8859_1 << " --- updated: " << (bool)(_updatedFlags & FLAG_ISO_8859_1) << "\n";
-        std::cout << "LATIN2: " << _iso_8859_2 << " --- updated: " << (bool)(_updatedFlags & FLAG_ISO_8859_2) << "\n";
-        std::cout << "LATIN3: " << _iso_8859_3 << " --- updated: " << (bool)(_updatedFlags & FLAG_ISO_8859_3) << "\n";
-        std::cout << "LATIN4: " << _iso_8859_4 << " --- updated: " << (bool)(_updatedFlags & FLAG_ISO_8859_4) << "\n";
+        std::cout << "ISO 8859 1: " << _iso_8859_1 << " --- updated: " << (bool)(_updatedFlags & FLAG_ISO_8859_1) << "\n";
+        std::cout << "ISO 8859 2: " << _iso_8859_2 << " --- updated: " << (bool)(_updatedFlags & FLAG_ISO_8859_2) << "\n";
+        std::cout << "ISO 8859 3: " << _iso_8859_3 << " --- updated: " << (bool)(_updatedFlags & FLAG_ISO_8859_3) << "\n";
+        std::cout << "ISO 8859 4: " << _iso_8859_4 << " --- updated: " << (bool)(_updatedFlags & FLAG_ISO_8859_4) << "\n";
+        std::cout << "ISO 8859 5: " << _iso_8859_5 << " --- updated: " << (bool)(_updatedFlags & FLAG_ISO_8859_5) << "\n";
+        std::cout << "ISO 8859 6: " << _iso_8859_6 << " --- updated: " << (bool)(_updatedFlags & FLAG_ISO_8859_6) << "\n";
+        std::cout << "ISO 8859 7: " << _iso_8859_7 << " --- updated: " << (bool)(_updatedFlags & FLAG_ISO_8859_7) << "\n";
+        std::cout << "ISO 8859 8: " << _iso_8859_8 << " --- updated: " << (bool)(_updatedFlags & FLAG_ISO_8859_8) << "\n";
+        std::cout << "ISO 8859 9: " << _iso_8859_9 << " --- updated: " << (bool)(_updatedFlags & FLAG_ISO_8859_9) << "\n";
+        std::cout << "ISO 8859 10: " << _iso_8859_10 << " --- updated: " << (bool)(_updatedFlags & FLAG_ISO_8859_10) << "\n";
+        std::cout << "ISO 8859 11: " << _iso_8859_11 << " --- updated: " << (bool)(_updatedFlags & FLAG_ISO_8859_11) << "\n";
+        std::cout << "ISO 8859 13: " << _iso_8859_13 << " --- updated: " << (bool)(_updatedFlags & FLAG_ISO_8859_13) << "\n";
+        std::cout << "ISO 8859 14: " << _iso_8859_14 << " --- updated: " << (bool)(_updatedFlags & FLAG_ISO_8859_14) << "\n";
+        std::cout << "ISO 8859 15: " << _iso_8859_15 << " --- updated: " << (bool)(_updatedFlags & FLAG_ISO_8859_15) << "\n";
+        std::cout << "ISO 8859 16: " << _iso_8859_16 << " --- updated: " << (bool)(_updatedFlags & FLAG_ISO_8859_16) << "\n";
         std::cout << "UTF-8: " << _utf8 << " --- updated: " << (bool)(_updatedFlags & FLAG_UTF8) << "\n";
         std::wcout << L"UTF-16LE: " << _utf16LE << " --- updated: " << (bool)(_updatedFlags & FLAG_UTF16LE) << "\n";
         std::wcout << L"UTF-16BE: " << _utf16BE << " --- updated: " << (bool)(_updatedFlags & FLAG_UTF16BE) << "\n";
         std::cout << "UTF-32LE: " << converter.to_bytes(_utf32LE) << " --- updated: " << (bool)(_updatedFlags & FLAG_UTF32LE) << "\n";
         std::cout << "UTF-32BE: " << converter.to_bytes(_utf32BE) << " --- updated: " << (bool)(_updatedFlags & FLAG_UTF32BE) << "\n";
+        std::cout << "Jis x 0201 Full Width: " << _jis_x_0201_fullwidth << " --- updated: " << (bool)(_updatedFlags & JIS_X_0201_FULLWIDTH) << "\n";
+        std::cout << "Jis x 0201 Half Width: " << _jis_x_0201_halfwidth << " --- updated: " << (bool)(_updatedFlags & JIS_X_0201_HALFWIDTH) << "\n";
+        std::cout << "Shift Jis: " << _shiftJis << " --- updated: " << (bool)(_updatedFlags & SHIFTJIS) << "\n";
         std::cout << "Primary Format: " << _primaryFormat << "\n";
         std::cout << "\n\n\n\n";
     }
+#endif
 };
