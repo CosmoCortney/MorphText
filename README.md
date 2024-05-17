@@ -270,3 +270,7 @@ Returns the instance's string of given value with sarcastic energy.
 * ISO-8849-14 (Celtic, Latin-8): MorphText::ISO_8859_14 or MorphText::CELTIC or MorphText::LATIN8
 * ISO-8849-15 (WEST_EUROPEAN, Latin-9): MorphText::ISO_8859_15 or MorphText::WESTERN_EUROPEAN or MorphText::LATIN9
 * ISO-8849-16 (Southeast European, Latin-10): MorphText::ISO_8859_16 or MorphText::SOUTHEAST_EUROPEAN or MorphText::LATIN10
+
+## Credits
+* Lawn Meower: Idea, Code
+* [sozysozbot](https://github.com/sozysozbot): original KS X 1001 table

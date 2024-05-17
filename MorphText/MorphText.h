@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <string>
 #include <locale>
 #include <codecvt>
@@ -39,6 +39,8 @@ public:
         SHIFTJIS,
         JIS_X_0201_FULLWIDTH,
         JIS_X_0201_HALFWIDTH,
+        KS_X_1001,
+        Reserved,
         LATIN1 = ISO_8859_1,
         LATIN2 = ISO_8859_2,
         LATIN3 = ISO_8859_3,
@@ -59,7 +61,8 @@ public:
         WEST_EUROPEAN = ISO_8859_15,
         LATIN9 = ISO_8859_15,
         SOUTHEAST_EUROPEAN = ISO_8859_16,
-        LATIN10 = ISO_8859_16
+        LATIN10 = ISO_8859_16,
+        EUC_KR = KS_X_1001
     };
 
 private:
@@ -87,6 +90,7 @@ private:
     std::string _shiftJis;
     std::string _jis_x_0201_halfwidth;
     std::string _jis_x_0201_fullwidth;
+    std::wstring _ks_x_1001;
     int _updatedFlags = 0;
     int _primaryFormat;
     uint32_t _maxLength = -1;
@@ -116,12 +120,25 @@ private:
         FLAG_ISO_8859_16 = 1 << Formats::ISO_8859_16,
         FLAG_SHIFTJIS = 1 << Formats::SHIFTJIS,
         FLAG_JIS_X_0201_FULLWIDTH = 1 << Formats::JIS_X_0201_FULLWIDTH,
-        FLAG_JIS_X_0201_HALFWIDTH = 1 << Formats::JIS_X_0201_HALFWIDTH
+        FLAG_JIS_X_0201_HALFWIDTH = 1 << Formats::JIS_X_0201_HALFWIDTH,
+        FLAG_KS_X_1001 = 1 << Formats::KS_X_1001,
+        FLAG_Reserved = 1 << Formats::Reserved
     };
 
     static bool compareRaw(const char* lhs, const char* rhs)
     {
         const int len = strlen(lhs);
+
+        for (int i = 0; i < len; ++i)
+            if (lhs[i] != rhs[i])
+                return false;
+
+        return true;
+    }
+
+    static bool compareRaw(const wchar_t* lhs, const wchar_t* rhs)
+    {
+        const int len = wcslen(lhs);
 
         for (int i = 0; i < len; ++i)
             if (lhs[i] != rhs[i])
@@ -217,6 +234,8 @@ private:
             jisX0201FWToUtf8();
         else if (_updatedFlags & FLAG_JIS_X_0201_HALFWIDTH)
             jisX0201HWToUtf8();
+        else if (_updatedFlags & FLAG_KS_X_1001)
+            ksX1001ToUtf8();
         else
             asciiToUtf8();
     }
@@ -429,6 +448,18 @@ private:
         _updatedFlags |= FLAG_UTF8;
     }
 
+    void utf8ToKsX1001(const bool highRange = false)
+    {
+        _ks_x_1001 = Utf8_To_KSX1001(_utf8, highRange);
+        _updatedFlags |= FLAG_KS_X_1001;
+    }
+
+    void ksX1001ToUtf8()
+    {
+        _utf8 = KSX1001_To_Utf8(_ks_x_1001);
+        _updatedFlags |= FLAG_UTF8;
+    }
+
     static void cleanString(std::string& dirt)
     {
         if(dirt.size())
@@ -533,17 +564,25 @@ public:
         _primaryFormat = format;
     }
 
-    MorphText(const std::wstring& utf16, const bool bigEndian = false)
+    MorphText(const std::wstring& str, const bool bigEndian = false, const int format = UTF16LE)
     {
+        if (format == KS_X_1001)
+    {
+            _ks_x_1001 = str;
+            _updatedFlags |= FLAG_KS_X_1001;
+            _primaryFormat = FLAG_KS_X_1001;
+            return;
+        }
+
         if (bigEndian)
         {
-            _utf16BE = utf16;
+            _utf16BE = str;
             _updatedFlags |= FLAG_UTF16BE;
             _primaryFormat = UTF16BE;
         }
         else
         {
-            _utf16LE = utf16;
+            _utf16LE = str;
             _updatedFlags |= FLAG_UTF16LE;
             _primaryFormat = UTF16LE;
         }
@@ -565,14 +604,14 @@ public:
         }
     }
 
-    MorphText(const char* charStr, const int format = 0)
+    MorphText(const char* charStr, const int format = UTF8)
     {
        *this = MorphText(std::string(charStr), format);
     }
 
-    MorphText(const wchar_t* charStr, const bool bigEndian = false)
+    MorphText(const wchar_t* charStr, const bool bigEndian = false, const int format = UTF16LE)
     {
-        *this = MorphText(std::wstring(charStr), bigEndian);
+        *this = MorphText(std::wstring(charStr), bigEndian, format);
     }
 
     MorphText(const MorphText& other)
@@ -691,6 +730,97 @@ public:
 
         return output.c_str();
     }
+
+    /// <summary>
+    /// Converts the passed KS X 1001 std::wstring&amp; to an UTF-8 std::string&amp;.
+    /// <param><c>std::wstring&amp; input: KS X 1001 wstring to be processed</param>
+    /// </summary>
+    static std::string KSX1001_To_Utf8(const std::wstring& input)
+    {
+        const uint16_t charOffset = (input[0] < 0x8000 ? 0x2120 : 0xA1A0); //whether it starts at 0x2121 or 0xA1A1
+        std::wstring temp(input.size(), '\0');
+        int32_t currentCharOffset;
+
+        for (int i = 0; i < input.size(); ++i)
+        {
+            currentCharOffset = input[i] - charOffset;
+
+            if (currentCharOffset < 0 || currentCharOffset > 0x7D7F)
+            {
+                temp[i] = 0xFF1F; //？
+                continue;
+            }
+
+            temp[i] = _ks_x_1001_map[currentCharOffset] == 0x0000 ? 0xFF1F/*？*/ : _ks_x_1001_map[currentCharOffset];
+        }
+
+        return Utf16LE_To_Utf8(temp);
+    }
+
+    /// <summary>
+    /// Converts the passed UTF-8 std::string&amp; to a KS X 1001 std::wstring&amp;.
+    /// <param><c>std::string&amp; input: string to be processed, highRange: whether the KS X 1001 string is encoded in the 0x2120 or 0xA1A0 range</param>
+    /// </summary>
+    static std::wstring Utf8_To_KSX1001(const std::string& input, const bool highRange = false)
+    {
+        const uint16_t charOffset = highRange ? 0x8080 : 0; //whether to add 0x8080 to each char
+        std::wstring output = Utf8_To_Utf16LE(input);
+
+        for (int ch = 0; ch < output.size(); ++ch)
+        {
+            switch (output[ch])
+            {
+                case L' ':
+                {
+                    output[ch] = 0x2121 + charOffset; //ideographic space
+                    continue;
+                }
+                case L'\\':
+                {
+                    output[ch] = 0x212C + charOffset; //ideographic backslash
+                    continue;
+                }
+                case L'~':
+                {
+                    output[ch] = 0x2226 + charOffset; //ideographic tilde
+                    continue;
+                }
+                case L'¯':
+                {
+                    output[ch] = 0x237E + charOffset; //ideographic macron
+                    continue;
+                }
+                case L'!': case L'"': case L'#': case L'$': case L'%': case L'&': case L'\'': case L'(': case L')': case L'*': case L'+': case L',': case L'-': case L'.': case L'/':
+                case L'0': case L'1': case L'2': case L'3': case L'4': case L'5': case L'6': case L'7': case L'8': case L'9': case L':': case L';': case L'<': case L'=': case L'>': case L'?':
+                case L'@': case L'A': case L'B': case L'C': case L'D': case L'E': case L'F': case L'G': case L'H': case L'I': case L'J': case L'K': case L'L': case L'M': case L'N': case L'O':
+                case L'P': case L'Q': case L'R': case L'S': case L'T': case L'U': case L'V': case L'W': case L'X': case L'Y': case L'Z': case L'[': case L']': case L'^ ': case L'_':
+                case L'`': case L'a': case L'b': case L'c': case L'd': case L'e': case L'f': case L'g': case L'h': case L'i': case L'j': case L'k': case L'l': case L'm': case L'n': case L'o':
+                case L'p': case L'q': case L'r': case L's': case L't': case L'u': case L'v': case L'w': case L'x': case L'y': case L'z': case L'{': case L'|': case L'}':
+                {
+                    output[ch] = 0x2320 - 0x20 + output[ch]; //Misc ASCII
+                    continue;
+                }
+            }
+
+            for (int i = 0; i < 0x5C80; ++i)
+            {
+                if (_ks_x_1001_map[i] == output[ch])
+                {
+                    output[ch] = i + 0x2120 + charOffset;
+                    continue;
+                }
+
+                if (i > 0x5C8E)
+                {
+                    output[ch] = 0x2330 + charOffset; //ideographic ？
+                    break;
+                }
+            }
+        }
+
+        return output;
+    }
+
 
     /// <summary>
     /// Converts the passed big endian UTF-16 std::u32string&amp; to a UTF-8 std::string&amp;.
@@ -1165,8 +1295,16 @@ public:
     /// <c>bool caseSensitive</c> (optional): Consider case sensitivity (true = case sensitive (default), false = case insensitive.
     /// <c>bool isBigEndian</c>: true to return the big endian value, false to return the little endian value.</param>
     /// </summary>
-    static int Find(const std::wstring& superset, const std::wstring& subset, const bool caseSensitive = true, const bool bigEndian = false)
+    static int Find(const std::wstring& superset, const std::wstring& subset, const bool caseSensitive = true, const bool bigEndian = false, const int format = UTF16LE)
     {
+        if (format == KS_X_1001)
+        {
+            if (caseSensitive)
+                return KSX1001_To_Utf8(superset).find(KSX1001_To_Utf8(subset));
+
+            return ToLower(KSX1001_To_Utf8(superset)).find(ToLower(KSX1001_To_Utf8(subset)));
+        }
+
         if (bigEndian)
         {
             if (caseSensitive)
@@ -1227,10 +1365,16 @@ public:
     /// <c>bool caseSensitive</c> (optional): Consider case sensitivity (true = case sensitive (default), false = case insensitive.
     /// <c>bool isBigEndian</c>: true to return the big endian value, false to return the little endian value.</param>
     /// </summary>
-    static bool Compare(const std::wstring& lhs, const std::wstring& rhs, const bool caseSensitive = true, const bool isBigEndian = false)
+    static bool Compare(const std::wstring& lhs, const std::wstring& rhs, const bool caseSensitive = true, const bool isBigEndian = false, const int format = UTF16LE)
     {
         std::string lhsOperand;
         std::string rhsOperand;
+
+        if (format == KS_X_1001)
+        {
+            lhsOperand = caseSensitive ? KSX1001_To_Utf8(lhs) : ToLower(KSX1001_To_Utf8(lhs));
+            rhsOperand = caseSensitive ? KSX1001_To_Utf8(rhs) : ToLower(KSX1001_To_Utf8(rhs));
+        }
 
         if (isBigEndian)
         {
@@ -1306,8 +1450,20 @@ public:
         }
     }
 
-    static bool Compare(const wchar_t* lhs, const wchar_t* rhs, const bool caseSensitive = true, const bool isBigEndian = false)
+    static bool Compare(const wchar_t* lhs, const wchar_t* rhs, const bool caseSensitive = true, const bool isBigEndian = false, const int format = UTF16LE)
     {
+        if (format == KS_X_1001)
+        {
+            if (!caseSensitive)
+            {
+                const std::wstring lowerLhs = ToLower(lhs, false, format);
+                const std::wstring lowerRhs = ToLower(rhs, false, format);
+                return compareRaw(lowerLhs.c_str(), lowerRhs.c_str());
+            }
+
+            return compareRaw(lhs, rhs);
+        }
+
         if (!caseSensitive)
         {
             const wchar_t* lowerLhs = ToLower(lhs, isBigEndian);
@@ -1518,8 +1674,21 @@ public:
     /// <param><c>std::u32string&amp; input: string to be processed.
     /// <c>bool isBigEndian</c>: set true if the passed string is big endian.</param>
     /// </summary>
-    static std::wstring ToLower(const std::wstring& input, const bool isBigEndian = false)
+    static std::wstring ToLower(const std::wstring& input, const bool isBigEndian = false, const int format = UTF16LE)
     {
+        if (format == KS_X_1001)
+        {
+            std::wstring output = input;
+
+            for (int i = 0; i < output.size(); ++i)
+            {
+                if (output[i] >= 0x2341 && output[i] <= 0x235A)
+                    output[i] |= 0x20;
+            }
+
+            return output;
+        }
+
         std::string temp = isBigEndian ? Utf16BE_To_Utf8(input) : Utf16LE_To_Utf8(input);
         temp = ToLower(temp);
         return isBigEndian ? Utf8_To_Utf16BE(temp) : Utf8_To_Utf16LE(temp);
@@ -1530,8 +1699,21 @@ public:
     /// <param><c>std::wstring&amp; input: string to be processed.
     /// <c>bool isBigEndian</c>: set true if the passed string is big endian.</param>
     /// </summary>
-    static std::wstring ToUpper(const std::wstring& input, const bool isBigEndian = false)
+    static std::wstring ToUpper(const std::wstring& input, const bool isBigEndian = false, const int format = UTF16LE)
     {
+        if (format == KS_X_1001)
+        {
+            std::wstring output = input;
+
+            for (int i = 0; i < output.size(); ++i)
+            {
+                if (output[i] >= 0x2361 && output[i] <= 0x237A)
+                    output[i] &= 0xDF;
+            }
+
+            return output;
+        }
+
         std::string temp = isBigEndian ? Utf16BE_To_Utf8(input) : Utf16LE_To_Utf8(input);
         temp = ToUpper(temp);
         return isBigEndian ? Utf8_To_Utf16BE(temp) : Utf8_To_Utf16LE(temp);
@@ -1542,8 +1724,29 @@ public:
     /// <param><c>std::wstring&amp; input: string to be processed.
     /// <c>bool isBigEndian</c>: set true if the passed string is big endian.</param>
     /// </summary>
-    static std::wstring ToSarcasm(const std::wstring& input, const bool isBigEndian = false)
+    static std::wstring ToSarcasm(const std::wstring& input, const bool isBigEndian = false, const int format = UTF16LE)
     {
+        if (format == KS_X_1001)
+        {
+            std::wstring output = input;
+
+            for (int i = 0; i < output.size(); ++i)
+            {
+                if (i & 1)
+                {
+                    if (output[i] >= 0x2361 && output[i] <= 0x237A)
+                        output[i] &= 0xDF;
+                }
+                else
+                {
+                    if (output[i] >= 0x2341 && output[i] <= 0x235A)
+                        output[i] |= 0x20;
+                }
+            }
+
+            return output;
+        }
+
         std::string temp = isBigEndian ? Utf16BE_To_Utf8(input) : Utf16LE_To_Utf8(input);
         temp = ToSarcasm(temp);
         return isBigEndian ? Utf8_To_Utf16BE(temp) : Utf8_To_Utf16LE(temp);
@@ -1717,7 +1920,7 @@ public:
     /// Returns the <b>lowercase</b> string of type T.
     /// <param><c>int format</c>: set format to select char&ast; type strings or big/little endiand wstring/u32string.</param>
     /// </summary>
-    template<typename T> T ToLower(const int format = 0)
+    template<typename T> T ToLower(const int format = UTF8)
     {
         convertToUtf8();
 
@@ -1727,25 +1930,29 @@ public:
         }
         else if constexpr (std::is_same_v<T, std::wstring>)
         {
-            if (format == UTF16BE)
+            switch (format)
             {
+                case UTF16BE:
                 utf8ToUtf16Be();
-                return ToLower(_utf16BE);
-            }
-
+                    return ToLower(_utf16BE, true);
+                case KS_X_1001:
+                    utf8ToKsX1001();
+                    return ToLower(_ks_x_1001, false, KS_X_1001);
+                default:// UTF16LE
             utf8ToUtf16Le();
-            return ToLower(_utf16LE);
+                    return ToLower(_utf16LE, false);
+            }
         }
         else if constexpr (std::is_same_v<T, std::u32string>)
         {
             if (format == UTF32BE)
             {
                 utf8ToUtf32Be();
-                return ToLower(_utf32BE);
+                return ToLower(_utf32BE, true);
             }
 
             utf8ToUtf32Le();
-            return ToLower(_utf32LE);
+            return ToLower(_utf32LE, false);
         }
         else // ASCII, ANSI, Shift Jist, ...
         {
@@ -1779,7 +1986,7 @@ public:
     /// Returns the <b>uppercase</b> string of type T.
     /// <param><c>int format</c>: set format to select char&ast; type strings or big/little endiand wstring/u32string.</param>
     /// </summary>
-    template<typename T> T ToUpper(const int format = 0)
+    template<typename T> T ToUpper(const int format = UTF8)
     {
         convertToUtf8();
 
@@ -1789,25 +1996,29 @@ public:
         }
         else if constexpr (std::is_same_v<T, std::wstring>)
         {
-            if (format == UTF16BE)
+            switch (format)
             {
+            case UTF16BE:
                 utf8ToUtf16Be();
-                return ToUpper(_utf16BE);
-            }
-
+                return ToUpper(_utf16BE, true);
+            case KS_X_1001:
+                utf8ToKsX1001();
+                return ToUpper(_ks_x_1001, false, KS_X_1001);
+            default:// UTF16LE
             utf8ToUtf16Le();
-            return ToUpper(_utf16LE);
+                return ToUpper(_utf16LE, false);
+            }
         }
         else if constexpr (std::is_same_v<T, std::u32string>)
         {
             if (format == UTF32BE)
             {
                 utf8ToUtf32Be();
-                return ToUpper(_utf32BE);
+                return ToUpper(_utf32BE, true);
             }
 
             utf8ToUtf32Le();
-            return ToUpper(_utf32LE);
+            return ToUpper(_utf32LE, false);
         }
         else // ASCII, ANSI, Shift Jist, ...
         {
@@ -1841,7 +2052,7 @@ public:
     /// Returns the string of type T with sarcastic energy.
     /// <param><c>int format</c>: set format to select char&ast; type strings or big/little endiand wstring/u32string.</param>
     /// </summary>
-    template<typename T> T ToSarcasm(const int format = 0)
+    template<typename T> T ToSarcasm(const int format = UTF8)
     {
         convertToUtf8();
 
@@ -1851,14 +2062,18 @@ public:
         }
         else if constexpr (std::is_same_v<T, std::wstring>)
         {
-            if (format == UTF16BE)
+            switch (format)
             {
+            case UTF16BE:
                 utf8ToUtf16Be();
                 return ToSarcasm(_utf16BE, true);
-            }
-
+            case KS_X_1001:
+                utf8ToKsX1001();
+                return ToSarcasm(_ks_x_1001, false, KS_X_1001);
+            default:// UTF16LE
             utf8ToUtf16Le();
-            return ToSarcasm(_utf16LE);
+                return ToSarcasm(_utf16LE, false);
+            }
         }
         else if constexpr (std::is_same_v<T, std::u32string>)
         {
@@ -1869,7 +2084,7 @@ public:
             }
 
             utf8ToUtf32Le();
-            return ToSarcasm(_utf32LE);
+            return ToSarcasm(_utf32LE, false);
         }
         else // ASCII, ANSI, Shift Jist, ...
         {
@@ -1915,8 +2130,13 @@ public:
     /// <c>bool caseSensitive</c> (optional): Consider case sensitivity (true = case sensitive (default), false = case insensitive.
     /// <c>bool isBigEndian</c>: true to return the big endian value, false to return the little endian value.</param>
     /// </summary>
-    bool Compare(const std::wstring& rhs, const bool caseSensitive = true, const bool bigEndian = false) const
+    bool Compare(const std::wstring& rhs, const bool caseSensitive = true, const bool bigEndian = false, const int format = UTF16LE) const
     {
+        if (format == KS_X_1001)
+        {
+            return compareRaw(_ks_x_1001.data(), rhs.data());
+        }
+
         if(bigEndian)
             return Compare(_utf16BE, rhs, caseSensitive, true);
 
@@ -1945,12 +2165,12 @@ public:
     /// <c>bool caseSensitive</c> (optional): Consider case sensitivity (true = case sensitive (default), false = case insensitive.
     /// <c>int format</c>: The format the strings should be interpreted as.</param>
     /// </summary>
-    bool Compare(const char* rhs, const bool caseSensitive = true, const int format = ASCII) const
+    bool Compare(const char* rhs, const bool caseSensitive = true, const int format = UTF8) const
     {
         switch (format)
         {
-        case UTF8:
-            return Compare(_utf8.c_str(), rhs, caseSensitive, format);
+        case ASCII:
+            return Compare(_ascii.c_str(), rhs, caseSensitive, format);
         case SHIFTJIS:
             return Compare(_shiftJis.c_str(), rhs, caseSensitive, format);
         case JIS_X_0201_FULLWIDTH:
@@ -1987,13 +2207,21 @@ public:
             return Compare(_iso_8859_15.c_str(), rhs, caseSensitive, format);
         case ISO_8859_16:
             return Compare(_iso_8859_16.c_str(), rhs, caseSensitive, format);
-        default: //ASCII
-            return Compare(_ascii.c_str(), rhs, caseSensitive, format);
+        default: //UTF8
+            return Compare(_utf8.c_str(), rhs, caseSensitive, format);
         }
     }
 
-    bool Compare(const wchar_t* rhs, const bool caseSensitive = true, const bool isBigEndian = false) const
+    bool Compare(const wchar_t* rhs, const bool caseSensitive = true, const bool isBigEndian = false, const int format = UTF16LE) const
     {
+        if (format == KS_X_1001)
+        {
+            if (caseSensitive)
+                return compareRaw(_ks_x_1001.data(), rhs);
+            else
+                return compareRaw(ToLower(_ks_x_1001, false, KS_X_1001).data(), ToLower(rhs, false, KS_X_1001).data());
+        }
+
         return Compare(isBigEndian ? _utf16BE.c_str() : _utf16LE.c_str(), rhs, caseSensitive, isBigEndian);
     }
 
@@ -2020,9 +2248,16 @@ public:
     /// <c>bool caseSensitive</c> (optional): Consider case sensitivity (true = case sensitive (default), false = case insensitive.
     /// <c>bool isBigEndian</c>: true to return the big endian value, false to return the little endian value.</param>
     /// </summary>
-    int Find(const std::wstring& subset, const bool caseSensitive = true, const bool bigEndian = false) const
+    int Find(const std::wstring& subset, const bool caseSensitive = true, const bool bigEndian = false, const int format = UTF16LE) const
     {
-        if(caseSensitive)
+        if (format == KS_X_1001)
+        {
+            const std::wstring sups = Utf8_To_Utf16LE(KSX1001_To_Utf8(_ks_x_1001));
+            const std::wstring subs = Utf8_To_Utf16LE(KSX1001_To_Utf8(subset));
+            return Find(sups, subs);
+        }
+
+        if(bigEndian)
             return Find(_utf16BE, subset, caseSensitive, true);
 
         return Find(_utf16LE, subset, caseSensitive, false);
@@ -2036,7 +2271,7 @@ public:
     /// </summary>
     int Find(const std::u32string& subset, const bool caseSensitive = true, const bool bigEndian = false) const
     {
-        if (caseSensitive)
+        if (bigEndian)
             return Find(_utf32BE, subset, caseSensitive, true);
 
         return Find(_utf32LE, subset, caseSensitive, false);
@@ -2100,7 +2335,9 @@ public:
     /// </summary>
     std::string GetUTF8()
     {
+        if(!(_updatedFlags & FLAG_UTF8))
         convertToUtf8();
+
         return _utf8;
     }
 
@@ -2163,6 +2400,16 @@ public:
         if (!(_updatedFlags & FLAG_SHIFTJIS))
             utf8ToShiftJis();
         return _shiftJis;
+    }
+
+    /// <summary>
+    /// Returns the instance's <b>KS X 1001</b> value as wchar*.
+    /// </summary>
+    std::wstring Get_KS_X_1001(const bool highRange = false)
+    {
+        if (!(_updatedFlags & FLAG_KS_X_1001))
+            utf8ToKsX1001(highRange);
+        return _ks_x_1001;
     }
 
     /// <summary>
@@ -2276,6 +2523,9 @@ public:
         case SHIFTJIS:
             utf8ToShiftJis();
             break;
+        case KS_X_1001:
+            utf8ToKsX1001();
+            break;
         case JIS_X_0201_FULLWIDTH:
             utf8ToJisX0201FW();
             break;
@@ -2334,6 +2584,17 @@ public:
     {
         _shiftJis = input;
         _updatedFlags = FLAG_SHIFTJIS;
+    }
+
+    /// <summary>
+    /// Sets the instance's <b>KS X 1001</b> value.
+    /// <param><c>char&ast; input</c>: KS X 1001 char* string to be set.</param>
+    /// <example> instance.SetShiftJis(text);</example>
+    /// </summary>
+    void Set_KS_X_1001(const std::wstring& input)
+    {
+        _ks_x_1001 = input;
+        _updatedFlags = FLAG_KS_X_1001;
     }
 
     void SetJisX0201FullWidth(const std::string& input)
@@ -2504,7 +2765,6 @@ public:
     /// </summary>
     void operator = (const MorphText& other)
     {
-        this->~MorphText();
         _utf8 = other._utf8;
         _utf16LE = other._utf16LE;
         _utf16BE = other._utf16BE;
@@ -2514,6 +2774,7 @@ public:
         _jis_x_0201_fullwidth = other._jis_x_0201_fullwidth;
         _jis_x_0201_halfwidth = other._jis_x_0201_halfwidth;
         _shiftJis = other._shiftJis;
+        _ks_x_1001 = other._ks_x_1001;
         _iso_8859_1 = other._iso_8859_1;
         _iso_8859_2 = other._iso_8859_2;
         _iso_8859_3 = other._iso_8859_3;
@@ -2534,7 +2795,7 @@ public:
     }
 
 #ifndef NDEBUG
-    void Test()
+    void Print()
     {
         std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
 
