@@ -1,14 +1,16 @@
-#pragma once
-#include <string>
-#include <locale>
+﻿#pragma once
+#include <algorithm>
 #include <codecvt>
-#include<iostream>
-#include<algorithm>
 #include <cstdint>
-#include<cwctype>
-#include"Lookup.h"
-
-//ToDO: Test if functions taking wchar_t* and char32_t* can be removed
+#include <cwctype>
+#include <iostream>
+#include <locale>
+#include "Lookup.h"
+#include <string>
+#ifndef NDEBUG
+#include <assert.h>
+#include <vector>
+#endif
 
 class MorphText
 {
@@ -567,7 +569,7 @@ public:
     MorphText(const std::wstring& str, const bool bigEndian = false, const int format = UTF16LE)
     {
         if (format == KS_X_1001)
-    {
+        {
             _ks_x_1001 = str;
             _updatedFlags |= FLAG_KS_X_1001;
             _primaryFormat = FLAG_KS_X_1001;
@@ -639,7 +641,7 @@ public:
         int inputIndex = -1;
         std::string output(input.size(), 0);
         std::wstring temp(input.size(), 0);
-        wchar_t* lookup = (wchar_t*)_shift_jis_CP10001_map;
+        wchar_t* lookup = (wchar_t*)_shift_jis_CP932_map;
 
         for (int i = 0; i < input.size(); ++i)
         {
@@ -662,8 +664,16 @@ public:
                 temp[i] = L'™';
             else if (input[inputIndex] > 0xFF)
                 temp[i] = L'…';
-            else if ((input[inputIndex] > 0x7f && input[inputIndex+1] < 0x40) && (input[inputIndex] < 0xFD && input[inputIndex + 1] > 0x4F))
+            else if ((input[inputIndex] > 0x7f && input[inputIndex+1] < 0x40) && (input[inputIndex] <= 0xA0 && input[inputIndex + 1] > 0x4F))
                 temp[i] = L'?';
+
+            
+            
+            else if (ch > 0xA0 && ch < 0xE0) //Half Width Katakana and such
+                temp[i] = 0xFEC0 + ch;
+            
+            
+            
             else if (ch >= 0x81 && ch <= 0xFC)
             {
                 uint16_t sjIndex = ch << 8;
@@ -674,9 +684,10 @@ public:
             else if (input[inputIndex] < 0x80)
                 temp[i] = input[inputIndex];
             else
-                temp[i] = L'?';
+                temp[i] = 0x8148;
         }
 
+        temp = temp.c_str();
         return Utf16LE_To_Utf8(temp);
     }
 
@@ -690,7 +701,7 @@ public:
         std::wstring utf16 = Utf8_To_Utf16LE(input);
         int length = utf16.size();
         std::string output(length * 2 +1, '\0');
-        wchar_t* lookup = (wchar_t*)_shift_jis_CP10001_map;
+        wchar_t* lookup = (wchar_t*)_shift_jis_CP932_map;
 
         for (int i = 0; i < utf16.size(); ++i)
         {
@@ -708,8 +719,10 @@ public:
             else if (utf16[i] == L'…')
                 output[outputIndex] = 0xFF;
             else if (utf16[i] < 0x80)
-                output[outputIndex] = (char)utf16[i];
-            else if (utf16[i] >= 0x80 && utf16[i] <= 0xFD)
+                output[outputIndex] = (char)utf16[i];            
+            else if (utf16[i] > 0xFF60 && utf16[i] < 0xFFA0) //Half Width Katakana and such
+                output[outputIndex] = utf16[i] - 0xFEC0;
+            else if (utf16[i] >= 0xF0 && utf16[i] <= 0xFD)
                 output[outputIndex] = '\?';
             else if (utf16[i] == L'\0')
                 break;
@@ -724,7 +737,7 @@ public:
                         break;
                     }
                     else if (lookupIndex == 0x7B0F)
-                        output[outputIndex] = L'?';
+                        output[outputIndex] = 0x8148;
                 }
         }
 
@@ -1164,6 +1177,8 @@ public:
 
             if (ch > 0xA0)
             {
+                output[index] = '?';
+
                 for (uint8_t lookupIndex = 0; lookupIndex < 0x60; ++lookupIndex)
                 {
                     if (lookup[lookupIndex] == ch)
@@ -1171,7 +1186,6 @@ public:
                         output[index] = lookupIndex + 0xA0;
                         break;
                     }
-                    output[index] = L'?';
                 }
             }
             else
@@ -1199,6 +1213,8 @@ public:
                 output[i] = 0x5C;
             else if (utf16[i] == L'‾')
                 output[i] = 0x7E;
+            else if (utf16[i] == 0x3000) //ideographic space
+                output[i] = 0x20;
             else if(utf16[i] < 0xA1)
                 output[i] = (char)utf16[i];
             else if (utf16[i] == L'\0')
@@ -1238,6 +1254,8 @@ public:
                 output[i] = 0x7E;
             else if (utf16[i] < 0xA1)
                 output[i] = (char)utf16[i];
+            else if (utf16[i] == 0x3000) //ideographic space
+                output[i] = 0x20;
             else if (utf16[i] == L'\0')
                 break;
             else
@@ -1427,6 +1445,10 @@ public:
         switch (format)
         {
             case SHIFTJIS: case JIS_X_0201_FULLWIDTH: case JIS_X_0201_HALFWIDTH:
+            case ISO_8859_1: case ISO_8859_2: case ISO_8859_3: case ISO_8859_4:
+            case ISO_8859_5: case ISO_8859_6: case ISO_8859_7: case ISO_8859_8:
+            case ISO_8859_9: case ISO_8859_10: case ISO_8859_11: case ISO_8859_13:
+            case ISO_8859_14: case ISO_8859_15: case ISO_8859_16:
             {
                 if (!caseSensitive)
                 {
@@ -1708,7 +1730,7 @@ public:
             for (int i = 0; i < output.size(); ++i)
             {
                 if (output[i] >= 0x2361 && output[i] <= 0x237A)
-                    output[i] &= 0xDF;
+                    output[i] &= 0xFFDF;
             }
 
             return output;
@@ -2237,9 +2259,9 @@ public:
     /// <param><c>std::string&amp; subset</c>: std::string&amp; to be found. 
     /// <c>bool caseSensitive</c> (optional): Consider case sensitivity (true = case sensitive (default), false = case insensitive.</param>
     /// </summary>
-    int Find(const std::string& subset, const bool caseSensitive = true) const
+    int Find(const std::string& subset, const bool caseSensitive = true, const int format = UTF8) const
     {
-        return Find(_utf8, subset, caseSensitive);
+        return Find(_utf8, subset, format, caseSensitive);
     }
 
     /// <summary>
@@ -2825,6 +2847,224 @@ public:
         std::cout << "Shift Jis: " << _shiftJis << " --- updated: " << (bool)(_updatedFlags & SHIFTJIS) << "\n";
         std::cout << "Primary Format: " << _primaryFormat << "\n";
         std::cout << "\n\n\n\n";
+    }
+
+    static void PrintHexChars(const std::string& str)
+    {
+        std::string hex;
+
+        for (int ch = 0; ch < str.size(); ++ch)
+        {
+            hex += "0x";
+            int temp;
+
+            for (int i = 0; i < 2; ++i)
+            {
+                if (i == 0)
+                    temp = (str[ch] >> 4) & 0x0F;
+                else
+                    temp = str[ch] & 0x0F;
+
+                if (temp < 0xA)
+                    hex += 0x30 + temp;
+                else
+                    hex += 0x37 + temp;
+            }
+
+            if(ch < str.size() - 1)
+                hex += ", ";
+        }
+
+        std::cout << hex << std::endl;
+    }
+
+    static void Test()
+    {
+        {
+            std::cout << "Running Tests... ";
+
+            std::string testStr = "Abcd123";
+            MorphText test(testStr, UTF8);
+            assert(MorphText::Compare(test.ToLower<std::string>(UTF8).c_str(), "abcd123", false, UTF8));
+            assert(MorphText::Compare(test.ToUpper<std::string>(UTF8).c_str(), "ABCD123", false, UTF8));
+            assert(MorphText::Compare(test.ToSarcasm<std::string>(UTF8).c_str(), "AbCd123", false, UTF8));
+            test.SetUTF8("This is a UTF-8 Sample Text.");
+            assert(test.Find(std::string("Sample"), true, UTF8) > -1);  //case sensitive
+            assert(test.Find(std::string("sAMPLE"), false, UTF8) > -1); //case insensitive
+            assert(test.Compare("This is a UTF-8 Sample Text.", true, UTF8));  //case sensitive
+            assert(test.Compare("This Is A UTF-8 Sample Text.", false, UTF8)); //case insensitive
+
+            std::wstring utf16L = Utf8_To_Utf16LE("ABCabc ÄÖÜẞäöüß Ññ オオヤマネコ　おおやまねこ　大山猫　스라소니");
+            std::wstring utf16R = L"ABCabc ÄÖÜẞäöüß Ññ オオヤマネコ　おおやまねこ　大山猫　스라소니";
+            assert(MorphText::Compare(utf16L, utf16R, true, false));
+            std::string utf8Comp = "ABCabc ÄÖÜẞäöüß Ññ オオヤマネコ　おおやまねこ　大山猫　스라소니";
+            std::string utf8 = MorphText::Utf16LE_To_Utf8(utf16L);
+            assert(MorphText::Compare(utf8Comp, utf8));
+
+            utf16L = Utf8_To_Utf16BE("ABCabc ÄÖÜẞäöüß Ññ オオヤマネコ　おおやまねこ　大山猫　스라소니");
+            for(wchar_t& ch : utf16R)
+                swapBytes(&ch);
+            assert(MorphText::Compare(utf16L, utf16R, true, true));
+            utf8 = MorphText::Utf16BE_To_Utf8(utf16L);
+            assert(MorphText::Compare(utf8Comp, utf8));
+
+            std::u32string utf32L = Utf8_To_Utf32LE("ABCabc ÄÖÜẞäöüß Ññ オオヤマネコ　おおやまねこ　大山猫　스라소니");
+            std::u32string utf32R = U"ABCabc ÄÖÜẞäöüß Ññ オオヤマネコ　おおやまねこ　大山猫　스라소니";
+            assert(MorphText::Compare(utf32L, utf32R, true, false));
+            utf8 = MorphText::Utf32LE_To_Utf8(utf32L);
+            assert(MorphText::Compare(utf8Comp, utf8));
+
+            utf32L = Utf8_To_Utf32BE("ABCabc ÄÖÜẞäöüß Ññ オオヤマネコ　おおやまねこ　大山猫　스라소니");
+            for (char32_t& ch : utf32R)
+                swapBytes(&ch);
+            assert(MorphText::Compare(utf32L, utf32R, true, true));
+            utf8 = MorphText::Utf32BE_To_Utf8(utf32L);
+            assert(MorphText::Compare(utf8Comp, utf8));
+
+            testStr = Utf8_To_ASCII("some ascii lol,.--+!0123");
+            std::vector<uint8_t> hexBin = { 0x73, 0x6F, 0x6D, 0x65, 0x20, 0x61, 0x73, 0x63, 0x69, 0x69, 0x20, 0x6C, 0x6F, 0x6C, 0x2C, 0x2E, 0x2D, 0x2D, 0x2B, 0x21, 0x30, 0x31, 0x32, 0x33, 0x00 };
+            assert(MorphText::Compare(testStr.c_str(), (char*)hexBin.data(), true, ASCII));
+            utf8Comp = "some ascii lol,.--+!0123";
+            utf8 = MorphText::ASCII_To_Utf8(testStr);
+            assert(MorphText::Compare(utf8Comp, utf8));
+
+            testStr = Utf8_To_ISO8859X("test äöüÄÖü", ISO_8859_1);
+            hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xE4, 0xF6, 0xFC, 0xC4, 0xD6, 0xFC, 0x00 };
+            assert(MorphText::Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_1));
+            utf8Comp = "test äöüÄÖü";
+            utf8 = MorphText::ISO8859X_To_Utf8(testStr, ISO_8859_1);
+            assert(MorphText::Compare(utf8Comp, utf8));
+
+            testStr = Utf8_To_ISO8859X("test ŔÂĂÄĹĆÇ", ISO_8859_2);
+            hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xC0, 0xC2, 0xC3, 0xC4, 0xC5, 0xC6, 0xC7, 0x00 };
+            assert(MorphText::Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_2));
+            utf8Comp = "test ŔÂĂÄĹĆÇ";
+            utf8 = MorphText::ISO8859X_To_Utf8(testStr, ISO_8859_2);
+            assert(MorphText::Compare(utf8Comp, utf8));
+
+            testStr = Utf8_To_ISO8859X("test çèéêëìíîï", ISO_8859_3);
+            hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xE7, 0xE8, 0xE9, 0xEA, 0xEB, 0xEC, 0xED, 0xEE, 0xEF, 0x00 };
+            assert(MorphText::Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_3));
+            utf8Comp = "test çèéêëìíîï";
+            utf8 = MorphText::ISO8859X_To_Utf8(testStr, ISO_8859_3);
+            assert(MorphText::Compare(utf8Comp, utf8));
+
+            testStr = Utf8_To_ISO8859X("test ŠĒĢŦ", ISO_8859_4);
+            hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xA9, 0xAA, 0xAB, 0xAC, 0x00 };
+            assert(MorphText::Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_4));
+            utf8Comp = "test ŠĒĢŦ";
+            utf8 = MorphText::ISO8859X_To_Utf8(testStr, ISO_8859_4);
+            assert(MorphText::Compare(utf8Comp, utf8));
+
+            testStr = Utf8_To_ISO8859X("test ежз", ISO_8859_5);
+            hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xD5, 0xD6, 0xD7, 0x00 };
+            assert(MorphText::Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_5));
+            utf8Comp = "test ежз";
+            utf8 = MorphText::ISO8859X_To_Utf8(testStr, ISO_8859_5);
+            assert(MorphText::Compare(utf8Comp, utf8));
+
+            testStr = Utf8_To_ISO8859X("test سشصض", ISO_8859_6);
+            hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xD3, 0xD4, 0xD5, 0xD6, 0xD7, 0x00 };
+            assert(MorphText::Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_6));
+            utf8Comp = "test سشصض";
+            utf8 = MorphText::ISO8859X_To_Utf8(testStr, ISO_8859_6);
+            assert(MorphText::Compare(utf8Comp, utf8));
+
+            testStr = Utf8_To_ISO8859X("test ΦΧΨΩΪ", ISO_8859_7);
+            hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xD6, 0xD7, 0xD8, 0xD9, 0xDA, 0x00 };
+            assert(MorphText::Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_7));
+            utf8Comp = "test ΦΧΨΩΪ";
+            utf8 = MorphText::ISO8859X_To_Utf8(testStr, ISO_8859_7);
+            assert(MorphText::Compare(utf8Comp, utf8));
+
+            testStr = Utf8_To_ISO8859X("test דהוזחטי", ISO_8859_8);
+            hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xE3, 0xE4, 0xE5, 0xE6, 0xE7, 0xE8, 0xE9, 0x00 };
+            assert(MorphText::Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_8));
+            utf8Comp = "test דהוזחטי";
+            utf8 = MorphText::ISO8859X_To_Utf8(testStr, ISO_8859_8);
+            assert(MorphText::Compare(utf8Comp, utf8));
+
+            testStr = Utf8_To_ISO8859X("test åæçèéê", ISO_8859_9);
+            hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xE5, 0xE6, 0xE7, 0xE8, 0xE9, 0xEA, 0x00 };
+            assert(MorphText::Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_9));
+            utf8Comp = "test åæçèéê";
+            utf8 = MorphText::ISO8859X_To_Utf8(testStr, ISO_8859_9);
+            assert(MorphText::Compare(utf8Comp, utf8));
+
+            testStr = Utf8_To_ISO8859X("test åæįčé", ISO_8859_10);
+            hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xE5, 0xE6, 0xE7, 0xE8, 0xE9, 0x00 };
+            assert(MorphText::Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_10));
+            utf8Comp = "test åæįčé";
+            utf8 = MorphText::ISO8859X_To_Utf8(testStr, ISO_8859_10);
+            assert(MorphText::Compare(utf8Comp, utf8));
+
+            testStr = Utf8_To_ISO8859X("test ฃคฅฆ", ISO_8859_11);
+            hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xA3, 0xA4, 0xA5, 0xA6, 0x00 };
+            assert(MorphText::Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_11));
+            utf8Comp = "test ฃคฅฆ";
+            utf8 = MorphText::ISO8859X_To_Utf8(testStr, ISO_8859_11);
+            assert(MorphText::Compare(utf8Comp, utf8));
+
+            testStr = Utf8_To_ISO8859X("test ÕÖ×ŲŁŚ", ISO_8859_13);
+            hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xD5, 0xD6, 0xD7, 0xD8, 0xD9, 0xDA, 0x00 };
+            assert(MorphText::Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_13));
+            utf8Comp = "test ÕÖ×ŲŁŚ";
+            utf8 = MorphText::ISO8859X_To_Utf8(testStr, ISO_8859_13);
+            assert(MorphText::Compare(utf8Comp, utf8));
+
+            testStr = Utf8_To_ISO8859X("test ÔÕÖṪØÙ", ISO_8859_14);
+            hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xD4, 0xD5, 0xD6, 0xD7, 0xD8, 0xD9, 0x00 };
+            assert(MorphText::Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_14));
+            utf8Comp = "test ÔÕÖṪØÙ";
+            utf8 = MorphText::ISO8859X_To_Utf8(testStr, ISO_8859_14);
+            assert(MorphText::Compare(utf8Comp, utf8));
+
+            testStr = Utf8_To_ISO8859X("test ÅÆÇÈÉÊËÌ", ISO_8859_15);
+            hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xC5, 0xC6, 0xC7, 0xC8, 0xC9, 0xCA, 0xCB, 0xCC, 0x00 };
+            assert(MorphText::Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_15));
+            utf8Comp = "test ÅÆÇÈÉÊËÌ";
+            utf8 = MorphText::ISO8859X_To_Utf8(testStr, ISO_8859_15);
+            assert(MorphText::Compare(utf8Comp, utf8));
+
+            testStr = Utf8_To_ISO8859X("test ÄĆ6ÆÇÈÉ", ISO_8859_16);
+            hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xC4, 0xC5, 0x36, 0xC6, 0xC7, 0xC8, 0xC9, 0x00 };
+            assert(MorphText::Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_16));
+            utf8Comp = "test ÄĆ6ÆÇÈÉ";
+            utf8 = MorphText::ISO8859X_To_Utf8(testStr, ISO_8859_16);
+            assert(MorphText::Compare(utf8Comp, utf8));
+
+            testStr = MorphText::Utf8_To_ShiftJis("ooyamaneko ｵｵﾔﾏﾈｺ　オオヤマネコ　おおやまねこ　大山猫");
+            hexBin = { 0x6F, 0x6F, 0x79, 0x61, 0x6D, 0x61, 0x6E, 0x65, 0x6B, 0x6F, 0x20, 0xB5, 0xB5, 0xD4, 0xCF, 0xC8, 0xBA, 0x81, 0x40, 0x83, 
+                       0x49, 0x83, 0x49, 0x83, 0x84, 0x83, 0x7D, 0x83, 0x6C, 0x83, 0x52, 0x81, 0x40, 0x82, 0xA8, 0x82, 0xA8, 0x82, 0xE2, 0x82,
+                       0xDC, 0x82, 0xCB, 0x82, 0xB1, 0x81, 0x40, 0x91, 0xE5, 0x8E, 0x52, 0x94, 0x4C, 0x00 };
+            assert(MorphText::Compare(testStr.c_str(), (char*)hexBin.data(), true, SHIFTJIS));
+            utf8Comp = "ooyamaneko ｵｵﾔﾏﾈｺ　オオヤマネコ　おおやまねこ　大山猫";
+            utf8 = MorphText::ShiftJis_To_Utf8(testStr);
+            assert(MorphText::Compare(utf8Comp, utf8));
+
+            testStr = MorphText::Utf8_To_JIS_X_0201_FullWidth("オオヤマネコ　ABCD abcd");
+            hexBin = { 0xB5, 0xB5, 0xD4, 0xCF, 0xC8, 0xBA, 0x20, 0x41, 0x42, 0x43, 0x44, 0x20, 0x61, 0x62, 0x63, 0x64 };
+            assert(MorphText::Compare(testStr.c_str(), (char*)hexBin.data(), true, JIS_X_0201_FULLWIDTH));
+            utf8Comp = "オオヤマネコ ABCD abcd";
+            utf8 = MorphText::JIS_X_0201_FullWidth_To_Utf8(testStr);
+            assert(MorphText::Compare(utf8Comp, utf8));
+
+            testStr = MorphText::Utf8_To_JIS_X_0201_HalfWidth("ｵｵﾔﾏﾈｺ　ABCD abcd");
+            assert(MorphText::Compare(testStr.c_str(), (char*)hexBin.data(), true, JIS_X_0201_HALFWIDTH));
+            utf8Comp = "ｵｵﾔﾏﾈｺ ABCD abcd";
+            utf8 = MorphText::JIS_X_0201_HalfWidth_To_Utf8(testStr);
+            assert(MorphText::Compare(utf8Comp, utf8));
+
+            std::wstring ksx = MorphText::Utf8_To_KSX1001("스라소니", true);
+            std::wstring whexBin(4, L'\0'); 
+            whexBin = {0xBDBA, 0xB6F3, 0xBCD2, 0xB4CF};
+            assert(MorphText::Compare(ksx, whexBin, true, KS_X_1001));
+            utf8Comp = "스라소니";
+            utf8 = MorphText::KSX1001_To_Utf8(ksx);
+            assert(MorphText::Compare(utf8Comp, utf8));
+
+            std::cout << "PASS\n";
+        }
     }
 #endif
 };

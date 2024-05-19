@@ -271,6 +271,13 @@ Returns the instance's string of given value with sarcastic energy.
 * ISO-8849-15 (WEST_EUROPEAN, Latin-9): MorphText::ISO_8859_15 or MorphText::WESTERN_EUROPEAN or MorphText::LATIN9
 * ISO-8849-16 (Southeast European, Latin-10): MorphText::ISO_8859_16 or MorphText::SOUTHEAST_EUROPEAN or MorphText::LATIN10
 
+## ToDo
+ * Check if double byte characters of Shift-Jis are stored in LE on LE machines
+ * Check if double byte characters of KS X 1001 are stored in BE on BE machines and in LE on LE machines
+ * Single byte character support for KS X 1001
+ * Pokémon text support 
+
 ## Credits
 * Lawn Meower: Idea, Code
 * [sozysozbot](https://github.com/sozysozbot): original KS X 1001 table
+* Wikipedia: [ISO 8859 Tables](https://en.wikipedia.org/wiki/ISO/IEC_8859), [JIS X 0201 Table](https://en.wikipedia.org/wiki/JIS_X_0201)
