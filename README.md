@@ -1,283 +1,257 @@
 # MorphText
-A class to process different kinds of texts/strings appearing in video games and elsewhere.
+A class to process and convert different kinds of texts/character encodings appearing in video games and elsewhere.
+
+## Encoding Identifiers
+These are used to tell function how to process input and output strings.
+* `PRIMARY`: Processes operation with previously set primary encoding
+* `UTF8`: [UTF-8](https://en.wikipedia.org/wiki/UTF-8)
+* `UTF16LE`: [UTF-16](https://en.wikipedia.org/wiki/UTF-16) in [Little Endian](https://en.wikipedia.org/wiki/Endianness)
+* `UTF16BE`: UTF-16 in Big Endian
+* `UTF32LE`: [UTF-32](https://en.wikipedia.org/wiki/UTF-32) in Little Endian
+* `UTF32BE`: UTF-32 in Big Endian
+* `ASCII`: [ASCII](https://en.wikipedia.org/wiki/ASCII)
+* `ISO_8859_1`: [ISO-8859-1](https://en.wikipedia.org/wiki/ISO/IEC_8859-1). Available aliases: `LATIN1`
+* `ISO_8859_2`: [ISO-8859-2](https://en.wikipedia.org/wiki/ISO/IEC_8859-2). Available aliases: `LATIN2`
+* `ISO_8859_3`: [ISO-8859-3](https://en.wikipedia.org/wiki/ISO/IEC_8859-3). Available aliases: `LATIN3`
+* `ISO_8859_4`: [ISO-8859-4](https://en.wikipedia.org/wiki/ISO/IEC_8859-4). Available aliases: `LATIN4`
+* `ISO_8859_5`: [ISO-8859-5](https://en.wikipedia.org/wiki/ISO/IEC_8859-5). Available aliases: `CYRILLIC`
+* `ISO_8859_6`: [ISO-8859-6](https://en.wikipedia.org/wiki/ISO/IEC_8859-6). Available aliases: `ARABIC`
+* `ISO_8859_7`: [ISO-8859-7](https://en.wikipedia.org/wiki/ISO/IEC_8859-7). Available aliases: `GREEK`
+* `ISO_8859_8`: [ISO-8859-8](https://en.wikipedia.org/wiki/ISO/IEC_8859-8). Available aliases: `HEBREW`
+* `ISO_8859_9`: [ISO-8859-9](https://en.wikipedia.org/wiki/ISO/IEC_8859-9). Available aliases: `TURKISH`, `LATIN5`
+* `ISO_8859_10`: [ISO-8859-10](https://en.wikipedia.org/wiki/ISO/IEC_8859-10). Available aliases: `NORDIC`, `LATIN6`
+* `ISO_8859_11`: [ISO-8859-11](https://en.wikipedia.org/wiki/ISO/IEC_8859-11). Available aliases: `THAI`
+* `ISO_8859_13`: [ISO-8859-13](https://en.wikipedia.org/wiki/ISO/IEC_8859-13). Available aliases: `BALTIC`, `LATIN7`
+* `ISO_8859_14`: [ISO-8859-14](https://en.wikipedia.org/wiki/ISO/IEC_8859-14). Available aliases: `CELTIC`, `LATIN8`
+* `ISO_8859_15`: [ISO-8859-15](https://en.wikipedia.org/wiki/ISO/IEC_8859-15). Available aliases: `WEST_EUROPEAN`, `LATIN9`
+* `ISO_8859_16`: [ISO-8859-16](https://en.wikipedia.org/wiki/ISO/IEC_8859-16). Available aliases: `SOUTHEAST_EUROPEAN`, `LATIN10`
+* `SHIFTJIS_CP932`: [Shift Jis](https://en.wikipedia.org/wiki/Shift_JIS) Code Page 932. Available aliases: `CP932`, `SHIFT_JIS_CP932`, `SJIS932`, `MS932`
+* `JIS_X_0201_FULLWIDTH`: [JIS X 0201](https://en.wikipedia.org/wiki/JIS_X_0201) in [Full Width](https://en.wikipedia.org/wiki/Katakana#Computer_encoding) Katakana
+* `JIS_X_0201_HALFWIDTH`: JIS X 0201 in [Half Width](https://en.wikipedia.org/wiki/Half-width_kana) Katakana
+* `KS_X_1001`: [KS X 1001](https://en.wikipedia.org/wiki/KS_X_1001). Available aliases: `EUC_KR`, `KS_C_5601`
+
+## Supported String Types
+UTF16LE, UTF16BE relate to std::wstring, const wchar_t*, and wchar_t* types.
+
+UTF32LE, UTF32BE relate to std::u32string, const char32_t*, and char32_t* types.
+
+All others relate to std::string, const char*, and char* types.
 
 ## Constructors
-### ``MorphText(std::string& utf8)``
-Takes a UTF-8 string as reference to create a new instance.
+### `MorphText()`
+Creates an empty instance.
 
-### ``MorphText(std::wstring& utf16, bool isBigEndian = false)``
-Takes a UTF-16 string as reference to create a new instance.
-*isBigEndian* (optional): Set true if source strings are big endian.
+### `MorphText(<String Type> str, const int encoding)`
+* str: input string of any supported type
+* encoding: Encoding identifier of the input string
 
-### ``MorphText(std::u32string& utf32, bool isBigEndian = false)``
-Takes a UTF-32 string as reference to create a new instance.
-*isBigEndian* (optional): Set true if source strings are big endian.
-
-### ``MorphText(char* charStr, int format = 0)``
-Takes a char* string to create a new instance.
-*format* (optional): Set the considered string format.
-* ASCII: MorphText::ASCII
-* ISO-8849-X: see <i>ISO-8859 Enum Values</i> below
-* Shift-Jis: MorphText::SCHIFTJIS
-* Jis x 0201 Full Width: MorphText::JIS_X_0201_FULLWIDTH
-* Jis x 0201 Half Width: MorphText::JIS_X_0201_HALFWIDTH
-* Invalid format value will be considered as ASCII.
-
-### ``MorphText(wchar_t* charStr, bool isBigEndian = false)``
-Takes a UTF-16 wchar_t* string as reference to create a new instance.
-*isBigEndian* (optional): Set true if source strings are big endian.
-
-### ``MorphText(char32_t* charStr, bool isBigEndian = false)``
-Takes a UTF-32 char32_t* string as reference to create a new instance.
-*isBigEndian* (optional): Set true if source strings are big endian.
+### `MorphText(MorphText& other)`
+Creates a copy of anoher instance
+* other: source instance
 
 ## Operators
 ### =
-Sets the right-hand value to set the left-hand instance
+The left-hand instance becomes a copy of the right-hand one.
 
-Supported datatypes:
-* MorphText
-* std::string (UTF-8)
-* std::wstring (UTF-16, Little Endian expected)
-* std::u32string (UTF-32, Little Endian expected)
-* wchar_t* (UTF-16, Little Endian expected)
+## Conversions
+### `outT Convert<inT, outT>(inT input, const int inputEncoding, const int outputEncoding)`
+Converts an input string of one encoding type to another.
 
-## Static Function Calls
-### ``std::string ASCII_To_Utf8(char* input)``
-Takes an input ASCII char* string and returns it as a UTF-8 std::string.
+* Template Parameters:
+  * `inT`: The type of the input string.
+  * `outT`: The type of the output string.
+* Parameters
+  * `input`: The input string of type `inT`
+  * `inputEncoding`: Character encoding identifier of the input string
+  * `outputEncoding`: Character encoding identifier of the output string
+* Returns: A string of type `outT`, encoded as `outputEncoding`.
 
-### ``char* Utf8_To_ASCII(std::string input)``
-Takes an input UTF-8 std::string as reference and returns it as a char* ASCII-string.
+#### Example:
+```cpp
+std::wstring utf16le = MorphText::Convert<const char*, std::wstring>("an example", UTF8, UTF16LE);
+```
 
-### ``std::string Utf16LE_To_Utf8(std::wstring input)``
-Takes an input little endian UTF-16 std::wstring as reference and returns it as a UTF-8 std::string.
+Note: If you want to convert the assigned string of a MorphText instane, simply return it with the GetString() function.
 
-### ``std::wstring Utf8_To_Utf16LE(std::string input)``
-Takes an input UTF-8 std::string as reference and returns it as a little endian UTF-16 std::wstring.
+### `inT ToLower(inT input, const int encoding)`
+Creates an all-lowercase copy of the input string.
 
-### ``std::string Utf16BE_To_Utf8(std::wstring input)``
-Takes an input big endian UTF-16 std::wstring as reference and returns it as a UTF-8 std::string.
+* Data types:
+  * `inT`: Any supported string type
+* Parameters
+  * `input`: The input string of type `inT`
+  * `inputEncoding`: Character encoding identifier of the input string
+* Returns: A string of type `inT` encoded as `inputEncoding` in all lowercase
 
-### ``std::wstring Utf8_To_Utf16BE(std::string input)``
-Takes an input UTF-8 std::string as reference and returns it as a big endian UTF-16 std::wstring.
+#### Example:
+```cpp
+std::string utf8 = MorphText::ToLower("Make Lowercase", UTF8);
+```
 
-### ``std::string Utf32LE_To_Utf8(std::u32string input)``
-Takes an input little endian UTF-32 std::u32string as reference and returns it as a UTF-8 std::string.
+### `inT ToUpper(inT input, const int encoding)`
+Creates an all-uppercase copy of the input string.
 
-### ``std::u32string Utf8_To_Utf32LE(std::string input)``
-Takes an input UTF-8 std::string as reference and returns it as a little endian UTF-32 std::u32string.
+* Data types:
+  * `inT`: Any supported string type
+* Parameters
+  * `input`: The input string of type `inT`
+  * `inputEncoding`: Character encoding identifier of the input string
+* Returns: A string of type `inT` encoded as `inputEncoding` in all uppercase
 
-### ``std::string Utf32BE_To_Utf8(std::u32string input)``
-Takes an input big endian UTF-32 std::u32string as reference and returns it as a UTF-8 std::string.
+#### Example:
+```cpp
+std::string utf8 = MorphText::ToUpper("make uppercase", UTF8);
+```
 
-### ``std::u32string Utf8_To_Utf32BE(std::string input)``
-Takes an input UTF-8 std::string as reference and returns it as a big endian UTF-32 std::u32string.
+### `inT ToSarcasm(inT input, const int encoding)`
+Creates a sarcastic copy of the input string.
 
-### ``std::string ShiftJis_To_Utf8(char* input)``
-Takes an input Shift-Jis char* string and returns it as a UTF-8 std::string.
+* Data types:
+  * `inT`: Any supported string type
+* Parameters
+  * `input`: The input string of type `inT`
+  * `inputEncoding`: Character encoding identifier of the input string
+* Returns: A string of type `inT` encoded as `inputEncoding` with sarcastic energy
 
-### ``char* Utf8_To_ShiftJis(std::string input)``
-Takes an input UTF-8 std::string as reference and returns it as a char* Shift-Jis string.
+#### Example:
+```cpp
+std::string utf8 = MorphText::ToSarcasm("you shouldn't be using camelcase for your projects", UTF8);
+```
 
-### ``char* Utf8_To_JIS_X_0201_FullWidth(std::string input)``
-Takes an input UTF-8 std::string as reference and returns it as a char* JIS X 0201 Full Width string.
+### `bool Compare(inT lhs, inT rhs, const bool caseSensitive, const int encoding)`
+Compares two strings for equality.
 
-### ``std::string JIS_X_0201_FullWidth_To_Utf8(char* input)``
-Takes an input JIS X 0201 Full Width char* string and returns it as a UTF-8 std::string.
+* Data types:
+  * `inT`: Any supported string type
+* Parameters
+  * `lhs`: Left-hand side string
+  * `rhs`: Right-hand side string
+  * `caseSensitive`: whether to consider case sensitivity
+  * `encoding`: Encoding identifier of the input strings
+* Returns: true if both strings are identcal, otherwise false.
 
-### ``char* Utf8_To_JIS_X_0201_HalfWidth(std::string input)``
-Takes an input UTF-8 std::string as reference and returns it as a char* JIS X 0201 Half Width string.
+#### Note
+Comparing C-style strings might be faster
 
-### ``std::string JIS_X_0201_HalfWidth_To_Utf8(char* input)``
-Takes an input JIS X 0201 Half Width char* string and returns it as a UTF-8 std::string.
+#### Example:
+```cpp
+bool match = MorphText::Compare("test", "test", true, UTF8);
+```
 
-### ``std::string ISO8859X_To_Utf8(char* input, int format = LATIN1)``
-Takes an input ISO-8849-X char* string and returns it as a UTF-8 std::string.
-*format* is the corresponding ISO standard. see <i>ISO-8859 Enum Values</i> below
-* Invalid format value will perform no conversion (ISO_8859_1/Latin-1).
 
-### ``char* Utf8_To_ISO8859X(std::string input, int format = LATIN1)``
-Takes an input UTF-8 std::string as reference and returns it as a char* ISO-8849-X string.
-*format* is the corresponding ISO standard.  see <i>ISO-8859 Enum Values</i> below
-* Invalid format value will perform no conversion (ISO_8859_1/Latin-1).
+### `bool Compare(inT rhs, const bool caseSensitive, const int encoding)`
+Compares the instance against another string for equality.
 
-### ``bool Compare(std::string lhs, std::string rhs, bool caseSensitive = true)``
-Compares the given input std::string for equality. 
-*caseSensitive* (optional): Set *caseSensitive* to false to ignore case sensitivity. Default is true.
-*subString* (optional): Set true to check if the left-hand string contains the entire right-hand string. Default: false
+* Data types:
+  * `inT`: Any supported string type
+* Parameters
+  * `rhs`: Right-hand side string
+  * `caseSensitive`: whether to consider case sensitivity
+  * `encoding`: Encoding identifier of the input strings
+* Returns: true if both strings are identcal, otherwise false.
 
-### ``bool Compare(std::wstring lhs, std::wstring rhs, bool caseSensitive = true, isBigEndian = false)``
-Compares the given input std::wstring for equality. 
-*caseSensitive* (optional): Set *caseSensitive* to false to ignore case sensitivity. Default is true.
-*subString* (optional): Set true to check if the left-hand string contains the entire right-hand string. Default: false
-*isBigEndian* (optional): Set true if source strings are big endian.
+#### Note
+Comparing C-style strings might be faster.
 
-### ``bool Compare(std::u32string lhs, std::u32string rhs, bool caseSensitive = true, bool isBigEndian = false)``
-Compares the given input std::u32string for equality. 
-*caseSensitive* (optional): Set *caseSensitive* to false to ignore case sensitivity. Default is true.
-*subString* (optional): Set true to check if the left-hand string contains the entire right-hand string. Default: false
-*isBigEndian* (optional): Set true if source strings are big endian.
+#### Example:
+```cpp
+bool match = MorphText::Compare("Test", false, ASCII);
+```
 
-### ``bool Compare(char* lhs, char* rhs, bool caseSensitive = true, int format = 0)``
-Compares the given input std::wstring for equality. 
-*caseSensitive* (optional): Set *caseSensitive* to false to ignore case sensitivity. Default is true.
-*subString* (optional): Set true to check if the left-hand string contains the entire right-hand string. Default: false
-*format* (optional): Set the considered string format.
-* ASCII: MorphText::ASCII
-* ISO-8849-X: see <i>ISO-8859 Enum Values</i> below
-* Shift-Jis: MorphText::SCHIFTJIS
-* Invalid format value will be considered as ASCII.
 
-### ``std::string ToLower(std::string input)``
-Returns the input string with all characters lowercase.
+### `int Find(intT superset, inT subset, const bool caseSensitive, const int encoding)`
+Finds the occurence of a subset string within a superset string.
 
-### ``std::string ToUpper(std::string input)``
-Returns the input string with all characters uppercase.
+* Data types:
+  * `inT`: Any supported string type
+* Parameters
+  * `superset`: String that may contain the substring
+  * `subset`: Substring that may appear within the superset string
+  * `caseSensitive`: whether to consider case sensitivity
+  * `encoding`: Encoding identifier of the input strings
+* Returns: The position of the subset appearing within the superset. Returns -1 if the subset has no occurence. If subset is empty 0 is being returned.
 
-### ``std::string ToSarcasm(std::string input)``
-Returns the input string with sarcastic energy.
+#### Note
+Finding C-style strings might be faster.
 
-### ``std::wstring ToLower(std::wstring input, bool isBigEndian = false)``
-Returns the input std::wstring with all characters lowercase.
-*isBigEndian* (optional): Set true if source strings are big endian.
+#### Example:
+```cpp
+int pos = MorphText::Find("where banana?", "banana", true, ASCII);
+```
 
-### ``std::wstring ToUpper(std::wstring input, bool isBigEndian = false)``
-Returns the input std::wstring with all characters uppercase.
-*isBigEndian* (optional): Set true if source strings are big endian.
+### `int Find(inT subset, const bool caseSensitive, const int encoding)`
+Finds the occurence of a subset string within the instance.
 
-### ``std::wstring ToSarcasm(std::wstring input, bool isBigEndian = false)``
-Returns the input std::wstring with sarcastic energy.
-*isBigEndian* (optional): Set true if source strings are big endian.
+* Data types:
+  * `inT`: Any supported string type
+* Parameters
+  * `subset`: Substring that may appear within the instance
+  * `caseSensitive`: whether to consider case sensitivity
+  * `encoding`: Encoding identifier of the input strings
+* Returns: The position of the subset appearing within the superset. Returns -1 if the subset has no occurence. If subset is empty 0 is being returned.
 
-### ``std::u32string ToLower(std::u32string input, bool isBigEndian = false)``
-Returns the input std::u32string with all characters lowercase.
-*isBigEndian* (optional): Set true if source strings are big endian.
+#### Note
+Finding C-style strings might be faster.
 
-### ``std::u32string ToUpper(std::u32string input, bool isBigEndian = false)``
-Returns the input std::u32string with all characters uppercase.
-*isBigEndian* (optional): Set true if source strings are big endian.
+#### Example:
+```cpp
+int pos = MorphText::Find("banana", false, ASCII);
+```
 
-### ``std::u32string ToSarcasm(std::u32string input, bool isBigEndian = false)``
-Returns the input std::u32string with sarcastic energy.
-*isBigEndian* (optional): Set true if source strings are big endian.
+### `T GetString(const int encoding)`
+Returns the instance's string by the desired encoding identifier.
 
-### ``char* ToLower(char* input, int type)``
-Returns the input char* with all characters lowercase.
-*format* (optional): Set the considered string format.
-* ASCII: MorphText::ASCII
-* ISO-8849-X: see <i>ISO-8859 Enum Values</i> below
-* Shift-Jis: MorphText::SCHIFTJIS
-* Invalid format value will be considered as ASCII.
+* Template Parameter
+  * `T`: string type
+* Parameter
+  * `encoding`: Encoding identifier of the output strings
+* Returns: The instance's string in the desired encoding and string type
 
-### ``char* ToUpper(char* input, int type)``
-Returns the input char* with all characters uppercase.
-*format* (optional): Set the considered string format.
-* ASCII: MorphText::ASCII
-* ISO-8849-X: see <i>ISO-8859 Enum Values</i> below
-* Shift-Jis: MorphText::SCHIFTJIS
-* Invalid format value will be considered as ASCII.
+#### Example:
+```cpp
+MorphText test("ニコニコ二ー", UTF8);
+test.GetString<std::string>(SHIFT_JIS);
+```
 
-### ``char* ToSarcasm(char* input, int type)``
-Returns the input char* with sarcastic energy.
-*format* (optional): Set the considered string format.
-* ASCII: MorphText::ASCII
-* ISO-8849-X: see <i>ISO-8859 Enum Values</i> below
-* Shift-Jis: MorphText::SCHIFTJIS
-* Invalid format value will be considered as ASCII.
+### `SetString<T>(T input, const int encoding)`
+Sets the instance's string in the desired encoding identifier.
 
-## Member Functions
-### ``std::string GetUTF8()``
-Returns the instance's UTF-8 std::string.
+* Datatype
+  * `T`: string type
+* Parameter
+  * `encoding`: Encoding identifier of the input strings
+* Returns: The instance's string in the desired encoding and string type
 
-### ``std::wstring GetUTF16(bool isBigEndian = false)``
-Returns the instance's UTF-16 std::wstring.
-*isBigEndian* (optional): Set true if source strings are big endian.
+#### Example:
+```cpp
+MorphText test;
+test.SetString("ニコニコ二ー", UTF8);
+```
 
-### ``std::u32string GetUTF32(bool isBigEndian = false)``
-Returns the instance's UTF-32 std::u32string.
-*isBigEndian* (optional): Set true if source strings are big endian.
+### `SetPrimaryEncoding(const int encoding)`
+Sets the instance's string in the desired encoding identifier.
 
-### ``std::string GetASCII()``
-Returns the instance's ASCII char* string.
+* Parameter
+  * `encoding`: Encoding identifier of the input strings
 
-### ``std::string GetShiftJis()``
-Returns the instance's Shift-Jis char* string.
+### `Print()`
+A test function that prints all instances. Only available in debug mode.
 
-### ``std::string GetJisX0201FullWidth()``
-Returns the instance's Jis x 0201 Full Width char* string.
-
-### ``std::string GetJisX0201HalfWidth()``
-Returns the instance's Jis x 0201 Half Width char* string.
-
-### ``std::string GetISO8859X(int format)``
-Returns the instance's ISO-8859 char* string.
-*format*: Set the considered string format.
-see <i>ISO-8859 Enum Values</i> below
-
-### ``SetASCII(char* input)``
-Sets the instance's ASCII value.
-
-### ``SetShiftJis(char* input)``
-Sets the instance's ShiftJis value.
-
-### ``SetJisX0201FullWidth(char* input)``
-Sets the instance's Jis x 0201 Full Width value.
-
-### ``SetJisX0201HalfWidth(char* input)``
-Sets the instance's Jis x 0201 Half Width value.
-
-### ``SetUTF8(std::string& str)``
-Sets the instance's UTF-8 value.
-
-### ``SetUTF16(std::wstring& input, bool isBigEndian)``
-Sets the instance's UTF-16 value. 
-*isBigEndian*: Sets endianness (true = big endian, false = little endian (default)
-
-### ``SetUTF16(wchar_t* input, bool isBigEndian)``
-Sets the instance's UTF-16 value. 
-*isBigEndian*: Sets endianness (true = big endian, false = little endian (default)
-
-### ``SetUTF32(std::u32string& input, bool isBigEndian)``
-Sets the instance's UTF-32 value. 
-*isBigEndian*: Sets endianness (true = big endian, false = little endian (default)
-
-### ``SetUTF32(char32_t* input, bool isBigEndian)``
-Sets the instance's UTF-32 value. 
-*isBigEndian*: Sets endianness (true = big endian, false = little endian (default)
-
-### ``template<typename T> T ToLower(int format = 0)``
-Returns the instance's string of given value type lowercase.
-
-### ``template<typename T> T ToUpper(int format = 0)``
-Returns the instance's string of given value type uppercase.
-
-### ``template<typename T> T ToSarcasm(int format = 0)``
-Returns the instance's string of given value with sarcastic energy.
-
-## ISO-8859 Enum Values
-* ISO-8849-1 (Latin-1): MorphText::ISO_8859_1 or MorphText::LATIN1
-* ISO-8849-2 (Latin-2): MorphText::ISO_8859_2 or MorphText::LATIN2
-* ISO-8849-3 (Latin-3): MorphText::ISO_8859_3 or MorphText::LATIN3
-* ISO-8849-4 (Latin-4): MorphText::ISO_8859_4 or MorphText::LATIN4
-* ISO-8849-5 (Cyrillic): MorphText::ISO_8859_5 or MorphText::CYRILLIC
-* ISO-8849-6 (Arabic): MorphText::ISO_8859_6 or MorphText::ARABIC
-* ISO-8849-7 (Greek): MorphText::ISO_8859_7 or MorphText::GREEK
-* ISO-8849-8 (Hebrew): MorphText::ISO_8859_8 or MorphText::HEBREW
-* ISO-8849-9 (Turkish, Latin-5): MorphText::ISO_8859_9 or MorphText::TURKISH or MorphText::LATIN5
-* ISO-8849-10 (Nordic, Latin-6): MorphText::ISO_8859_10 or MorphText::NORDIC or MorphText::LATIN6
-* ISO-8849-11 (Thai): MorphText::ISO_8859_11 or MorphText::Thai
-* ISO-8849-13 (Baltic, Latin-7): MorphText::ISO_8859_13 or MorphText::LATIN7 or MorphText::LATIN7
-* ISO-8849-14 (Celtic, Latin-8): MorphText::ISO_8859_14 or MorphText::CELTIC or MorphText::LATIN8
-* ISO-8849-15 (WEST_EUROPEAN, Latin-9): MorphText::ISO_8859_15 or MorphText::WESTERN_EUROPEAN or MorphText::LATIN9
-* ISO-8849-16 (Southeast European, Latin-10): MorphText::ISO_8859_16 or MorphText::SOUTHEAST_EUROPEAN or MorphText::LATIN10
+### `Test()`
+A test function that runs all functions. Only available in debug mode.
 
 ## ToDo
- * Check if double byte characters of Shift-Jis are stored in LE on LE machines
- * Check if double byte characters of KS X 1001 are stored in BE on BE machines and in LE on LE machines
- * Single byte character support for KS X 1001
- * Pok�mon text support 
-
+* check if double-byte characters of Shift-Jis are stored in LE on LE machines
+* check if double-byte characters of KS X 1001 are stored in BE on BE machines and in LE on LE machines
+* public static C-String type conversion specialization (convertToUTF8, convertFromUTF8)
+* fix convertToUTF8(), convertFromUTF8(), Convert() to be able to use references of std::string, std::wstring, and std::u32string
+* Pokémon encoding support
+* add Shift-Jis CP10001/2000, Shift-Jis CP10001/2016
+* improve ToLower, ToUpper, ToSarcasm functions by specializing them and considering characters like umlauts, full-width letters, etc
+* improve comparisons by specializing them for each encoding
+* make member comparison overloads for c-style input string work
+* specialize findRaw() function for any other encoding than ASCII or any other UTF type to consider umlauts, fullwidth letters, etc for case insensitivity
+	
 ## Credits
 * Lawn Meower: Idea, Code
 * [sozysozbot](https://github.com/sozysozbot): original KS X 1001 table
-* Wikipedia: [ISO 8859 Tables](https://en.wikipedia.org/wiki/ISO/IEC_8859), [JIS X 0201 Table](https://en.wikipedia.org/wiki/JIS_X_0201)
