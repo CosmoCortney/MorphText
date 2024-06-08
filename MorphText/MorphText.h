@@ -938,11 +938,11 @@ private:
     template<AllowedCStringType T> static std::string convertToUTF8(T input, const int encoding = UTF8)
     {
         if constexpr (std::is_same_v<T, char*> || std::is_same_v<T, const char*>)
-            return convertFromUTF8<std::string>(input, encoding);
+            return convertToUTF8<std::string>(input, encoding);
         if constexpr (std::is_same_v<T, wchar_t*> || std::is_same_v<T, const wchar_t*>)
-            return convertFromUTF8<std::wstring>(input, encoding);
+            return convertToUTF8<std::wstring>(input, encoding);
         if constexpr (std::is_same_v<T, char32_t*> || std::is_same_v<T, const char32_t*>)
-            return convertFromUTF8<std::u32string>(input, encoding);
+            return convertToUTF8<std::u32string>(input, encoding);
     }
 
     //member-modifying conversion functions
