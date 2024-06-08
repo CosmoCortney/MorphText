@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <algorithm>
 #include <assert.h>
 #include <codecvt>
@@ -483,105 +483,105 @@ public:
             case ISO_8859_1:
             {
                 if (!(_updatedFlags & FLAG_ISO_8859_1))
-                    m_utf8ToIso8859x(FLAG_ISO_8859_1);
+                    m_utf8ToIso8859x(ISO_8859_1);
 
                 return passString<std::string, T>(_iso_8859_1);
             }
             case ISO_8859_2:
             {
                 if (!(_updatedFlags & FLAG_ISO_8859_2))
-                    m_utf8ToIso8859x(FLAG_ISO_8859_2);
+                    m_utf8ToIso8859x(ISO_8859_2);
 
                 return passString<std::string, T>(_iso_8859_2);
             }
             case ISO_8859_3:
             {
                 if (!(_updatedFlags & FLAG_ISO_8859_3))
-                    m_utf8ToIso8859x(FLAG_ISO_8859_3);
+                    m_utf8ToIso8859x(ISO_8859_3);
 
                 return passString<std::string, T>(_iso_8859_3);
             }
             case ISO_8859_4:
             {
                 if (!(_updatedFlags & FLAG_ISO_8859_4))
-                    m_utf8ToIso8859x(FLAG_ISO_8859_4);
+                    m_utf8ToIso8859x(ISO_8859_4);
 
                 return passString<std::string, T>(_iso_8859_4);
             }
             case ISO_8859_5:
             {
                 if (!(_updatedFlags & FLAG_ISO_8859_5))
-                    m_utf8ToIso8859x(FLAG_ISO_8859_5);
+                    m_utf8ToIso8859x(ISO_8859_5);
 
                 return passString<std::string, T>(_iso_8859_5);
             }
             case ISO_8859_6:
             {
                 if (!(_updatedFlags & FLAG_ISO_8859_6))
-                    m_utf8ToIso8859x(FLAG_ISO_8859_6);
+                    m_utf8ToIso8859x(ISO_8859_6);
 
                 return passString<std::string, T>(_iso_8859_6);
             }
             case ISO_8859_7:
             {
                 if (!(_updatedFlags & FLAG_ISO_8859_7))
-                    m_utf8ToIso8859x(FLAG_ISO_8859_7);
+                    m_utf8ToIso8859x(ISO_8859_7);
 
                 return passString<std::string, T>(_iso_8859_7);
             }
             case ISO_8859_8:
             {
                 if (!(_updatedFlags & FLAG_ISO_8859_8))
-                    m_utf8ToIso8859x(FLAG_ISO_8859_8);
+                    m_utf8ToIso8859x(ISO_8859_8);
 
                 return passString<std::string, T>(_iso_8859_8);
             }
             case ISO_8859_9:
             {
                 if (!(_updatedFlags & FLAG_ISO_8859_9))
-                    m_utf8ToIso8859x(FLAG_ISO_8859_9);
+                    m_utf8ToIso8859x(ISO_8859_9);
 
                 return passString<std::string, T>(_iso_8859_9);
             }
             case ISO_8859_10:
             {
                 if (!(_updatedFlags & FLAG_ISO_8859_10))
-                    m_utf8ToIso8859x(FLAG_ISO_8859_10);
+                    m_utf8ToIso8859x(ISO_8859_10);
 
                 return passString<std::string, T>(_iso_8859_10);
             }
             case ISO_8859_11:
             {
                 if (!(_updatedFlags & FLAG_ISO_8859_11))
-                    m_utf8ToIso8859x(FLAG_ISO_8859_11);
+                    m_utf8ToIso8859x(ISO_8859_11);
 
                 return passString<std::string, T>(_iso_8859_11);
             }
             case ISO_8859_13:
             {
                 if (!(_updatedFlags & FLAG_ISO_8859_13))
-                    m_utf8ToIso8859x(FLAG_ISO_8859_13);
+                    m_utf8ToIso8859x(ISO_8859_13);
 
                 return passString<std::string, T>(_iso_8859_13);
             }
             case ISO_8859_14:
             {
                 if (!(_updatedFlags & FLAG_ISO_8859_14))
-                    m_utf8ToIso8859x(FLAG_ISO_8859_14);
+                    m_utf8ToIso8859x(ISO_8859_14);
 
                 return passString<std::string, T>(_iso_8859_14);
             }
             case ISO_8859_15:
             {
                 if (!(_updatedFlags & FLAG_ISO_8859_15))
-                    m_utf8ToIso8859x(FLAG_ISO_8859_15);
+                    m_utf8ToIso8859x(ISO_8859_15);
 
                 return passString<std::string, T>(_iso_8859_15);
             }
             case ISO_8859_16:
             {
                 if (!(_updatedFlags & FLAG_ISO_8859_16))
-                    m_utf8ToIso8859x(FLAG_ISO_8859_16);
+                    m_utf8ToIso8859x(ISO_8859_16);
 
                 return passString<std::string, T>(_iso_8859_16);
             }
