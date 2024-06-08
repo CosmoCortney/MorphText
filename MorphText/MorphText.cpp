@@ -1209,7 +1209,7 @@ std::wstring MorphText::utf8ToUtf16Helper(const std::string& str, const bool byt
     else
     {
         std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-        return converter.from_bytes(str);
+        return converter.from_bytes(str.c_str());
     }
 }
 
@@ -1225,7 +1225,7 @@ std::string MorphText::utf16ToUtf8Helper(const std::wstring& str, const bool byt
         return utf16ToUtf8Helper(temp, false);
     }
     else
-        return std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>().to_bytes(str);
+        return std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>().to_bytes(str.c_str());
 }
 
 std::u32string MorphText::utf8ToUtf32Helper(const std::string& str, const bool byteSwap)
@@ -1242,7 +1242,7 @@ std::u32string MorphText::utf8ToUtf32Helper(const std::string& str, const bool b
     else
     {
         std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
-        return converter.from_bytes(str);
+        return converter.from_bytes(str.c_str());
     }
 }
 
@@ -1259,7 +1259,7 @@ std::string MorphText::utf32ToUtf8Helper(const std::u32string& str, const bool b
     }
     else
     {
-        std::u32string unchecked = str;
+        std::u32string unchecked = str.c_str();
         replaceIllegalChars(unchecked);
         return std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t>().to_bytes(unchecked);
     }
