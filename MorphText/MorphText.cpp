@@ -1,4 +1,5 @@
 ﻿#include"MorphText.h"
+#include <bit>
 
 MorphText::MorphText(const std::string& str, const int encoding)
 {
@@ -730,26 +731,6 @@ void MorphText::replaceIllegalChars(std::u32string& str, const bool isBE)
     }
 }
 
-void MorphText::swapBytes(wchar_t* ch)
-{
-    char* src = reinterpret_cast<char*>(ch);
-    *src ^= *(src + 1);
-    *(src + 1) ^= *src;
-    *src ^= *(src + 1);
-}
-
-void MorphText::swapBytes(char32_t* ch)
-{
-    char* src = reinterpret_cast<char*>(ch);
-    *src ^= *(src + 3);
-    *(src + 3) ^= *src;
-    *src ^= *(src + 3);
-
-    *(src + 1) ^= *(src + 2);
-    *(src + 2) ^= *(src + 1);
-    *(src + 1) ^= *(src + 2);
-}
-
 std::string MorphText::convertFromUtf8_singleByte(std::string& input, const int encoding)
 {
     switch (encoding)
@@ -1202,7 +1183,7 @@ std::wstring MorphText::utf8ToUtf16Helper(const std::string& str, const bool byt
         std::wstring output = utf8ToUtf16Helper(str, false);
 
         for (wchar_t& ch : output)
-            swapBytes(&ch);
+            ch = std::byteswap(ch);
 
         return output;
     }
@@ -1220,7 +1201,7 @@ std::string MorphText::utf16ToUtf8Helper(const std::wstring& str, const bool byt
         std::wstring temp = str;
 
         for (wchar_t& ch : temp)
-            swapBytes(&ch);
+            ch = std::byteswap(ch);
 
         return utf16ToUtf8Helper(temp, false);
     }
@@ -1235,7 +1216,7 @@ std::u32string MorphText::utf8ToUtf32Helper(const std::string& str, const bool b
         std::u32string output = utf8ToUtf32Helper(str, false);
 
         for (char32_t& ch : output)
-            swapBytes(&ch);
+            ch = std::byteswap(ch);
 
         return output;
     }
@@ -1253,7 +1234,7 @@ std::string MorphText::utf32ToUtf8Helper(const std::u32string& str, const bool b
         std::u32string temp = str;
 
         for (char32_t& ch : temp)
-            swapBytes(&ch);
+            ch = std::byteswap(ch);//swapBytes(&ch);
 
         return utf32ToUtf8Helper(temp, false);
     }
@@ -1326,13 +1307,13 @@ wchar_t* MorphText::ToLower(const wchar_t* input, const int encoding)
         case UTF16BE:
             for (wchar_t* i = result; i < result + length; ++i)
             {
-                swapBytes(i);
+                *i = std::byteswap(*i);
 
                 if (*i != '\0')
                     break;
 
                 *i = std::towlower(*i);
-                swapBytes(i);
+                *i = std::byteswap(*i);
             }
             break;
         default: //UTF16LE or invalid encoding
@@ -1356,13 +1337,13 @@ char32_t* MorphText::ToLower(const char32_t* input, const int encoding)
         case UTF32BE:
             for (char32_t* i = result; i < result + length; ++i)
             {
-                swapBytes(i);
+                *i = std::byteswap(*i);
 
                 if (*i != '\0')
                     break;
 
                 *i = std::towlower(*i);
-                swapBytes(i);
+                *i = std::byteswap(*i);
             }
         break;
         default: //UTF32LE, invalid encoding
@@ -1429,13 +1410,13 @@ wchar_t* MorphText::ToUpper(const wchar_t* input, const int encoding)
         case UTF16BE:
             for (wchar_t* i = result; i < result + length; ++i)
             {
-                swapBytes(i);
+                *i = std::byteswap(*i);
 
                 if (*i != '\0')
                     break;
 
                 *i = std::towupper(*i);
-                swapBytes(i);
+                *i = std::byteswap(*i);
             }
             break;
         default: //UTF16LE, invalid encoding
@@ -1457,13 +1438,13 @@ char32_t* MorphText::ToUpper(const char32_t* input, const int encoding)
         case UTF32BE:
             for (char32_t* i = result; i < result + length; ++i)
             {
-                swapBytes(i);
+                *i = std::byteswap(*i);
 
                 if (*i != '\0')
                     break;
 
                 *i = std::towupper(*i);
-                swapBytes(i);
+                *i = std::byteswap(*i);
             }
         break;
         default: //UTF32LE, invalid encoding
@@ -1992,7 +1973,7 @@ void MorphText::Test()
 
         utf16L = Convert<const char*, std::wstring>("ABCabc ÄÖÜẞäöüß Ññ オオヤマネコ　おおやまねこ　大山猫　스라소니", UTF8, UTF16BE);
         for (wchar_t& ch : utf16R)
-            swapBytes(&ch);
+            ch = std::byteswap(ch);
         assert(Compare(utf16L, utf16R, true, true));
         utf8 = Convert<std::wstring, std::string>(utf16L, UTF16BE, UTF8);
         assert(Compare(utf8Comp, utf8));
@@ -2005,7 +1986,7 @@ void MorphText::Test()
 
         utf32L = Convert<std::string, std::u32string>("ABCabc ÄÖÜẞäöüß Ññ オオヤマネコ　おおやまねこ　大山猫　스라소니", UTF8, UTF32BE);
         for (char32_t& ch : utf32R)
-            swapBytes(&ch);
+            ch = std::byteswap(ch);
         assert(Compare(utf32L, utf32R, true, true));
         utf8 = Convert<std::u32string, std::string>(utf32L, UTF32BE, UTF8);
         assert(Compare(utf8Comp, utf8));

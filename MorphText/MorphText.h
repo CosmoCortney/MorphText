@@ -973,8 +973,6 @@ private:
     static bool compareRaw(const wchar_t* lhs, const wchar_t* rhs);
     static bool compareRaw(const char32_t* lhs, const char32_t* rhs);
     static void replaceIllegalChars(std::u32string& str, const bool isBE = false);
-    static void swapBytes(wchar_t* src);
-    static void swapBytes(char32_t* src);
     static bool isLittleEndian();
     static std::string utf16ToUtf8Helper(const std::wstring& str, const bool byteSwap);
     static std::wstring utf8ToUtf16Helper(const std::string& str, const bool byteSwap);
