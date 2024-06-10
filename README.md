@@ -29,11 +29,12 @@ These are used to tell function how to process input and output strings.
 * `JIS_X_0201_FULLWIDTH`: [JIS X 0201](https://en.wikipedia.org/wiki/JIS_X_0201) in [Full Width](https://en.wikipedia.org/wiki/Katakana#Computer_encoding) Katakana
 * `JIS_X_0201_HALFWIDTH`: JIS X 0201 in [Half Width](https://en.wikipedia.org/wiki/Half-width_kana) Katakana
 * `KS_X_1001`: [KS X 1001](https://en.wikipedia.org/wiki/KS_X_1001). Available aliases: `EUC_KR`, `KS_C_5601`
+* `POKEMON_GEN1_ENGLISH`: [Pokémon Gen I English](https://bulbapedia.bulbagarden.net/wiki/Character_encoding_(Generation_I))
 
 ## Supported String Types
-UTF16LE, UTF16BE relate to std::wstring, const wchar_t*, and wchar_t* types.
+UTF16LE, UTF16BE relate to `std::wstring`, `const wchar_t*`, and `wchar_t*` types.
 
-UTF32LE, UTF32BE relate to std::u32string, const char32_t*, and char32_t* types.
+UTF32LE, UTF32BE relate to `std::u32string`, `const char32_t*`, and `char32_t*` types.
 
 All others relate to std::string, const char*, and char* types.
 
@@ -245,7 +246,7 @@ A test function that runs all functions. Only available in debug mode.
 * check if double-byte characters of KS X 1001 are stored in BE on BE machines and in LE on LE machines
 * public static C-String type conversion specialization (convertToUTF8, convertFromUTF8)
 * fix convertToUTF8(), convertFromUTF8(), Convert() to be able to use references of std::string, std::wstring, and std::u32string
-* Pokémon encoding support
+* Pokémon character encodings
 * add Shift-Jis CP10001/2000, Shift-Jis CP10001/2016
 * improve ToLower, ToUpper, ToSarcasm functions by specializing them and considering characters like umlauts, full-width letters, etc
 * improve comparisons by specializing them for each encoding
@@ -255,3 +256,4 @@ A test function that runs all functions. Only available in debug mode.
 ## Credits
 * Lawn Meower: Idea, Code
 * [sozysozbot](https://github.com/sozysozbot): original KS X 1001 table
+* [Bulbapedia](https://bulbapedia.bulbagarden.net/wiki/Main_Page) at [Bulbagarden](https://bulbagarden.net/home/): Documenting the Pokémon character encodings
