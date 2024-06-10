@@ -100,7 +100,8 @@ public:
         SJIS932 = SHIFTJIS_CP932,
         MS932 = SHIFTJIS_CP932,
         EUC_KR = KS_X_1001,
-        KS_C_5601 = KS_X_1001
+        KS_C_5601 = KS_X_1001,
+        POKEMON_GEN1_ENGLISH
     };
 
     MorphText() = default;
@@ -833,6 +834,7 @@ private:
     std::string _jis_x_0201_halfwidth;
     std::string _jis_x_0201_fullwidth;
     std::string _ks_x_1001;
+    std::string _pokemon_gen1_english;
     int _updatedFlags = 0;
     int _primaryEncoding = UTF8;
 
@@ -863,7 +865,8 @@ private:
         FLAG_JIS_X_0201_FULLWIDTH = 1 << Encodings::JIS_X_0201_FULLWIDTH,
         FLAG_JIS_X_0201_HALFWIDTH = 1 << Encodings::JIS_X_0201_HALFWIDTH,
         FLAG_KS_X_1001 = 1 << Encodings::KS_X_1001,
-        FLAG_Reserved = 1 << Encodings::Reserved
+        FLAG_Reserved = 1 << Encodings::Reserved,
+        FLAG_POKEMON_GEN1_ENGLISH = 1 << Encodings::POKEMON_GEN1_ENGLISH
     };
 
     //Convertion functions
@@ -887,6 +890,8 @@ private:
     static std::string jisx0201halfwidthToUtf8(const std::string& input);
     static std::string utf8ToKsx1001(const std::string& input);
     static std::string ksx1001ToUtf8(const std::string& input);
+    static std::string utf8ToPokemonGen1English(const std::string& input);
+    static std::string pokemonGen1EnglishToUtf8(const std::string& input);
     static std::string convertFromUtf8_singleByte(std::string& input, const int encoding = PRIMARY);
     static std::wstring convertFromUtf8_doubleByte(std::string& input, const int encoding = PRIMARY);
     static std::u32string convertFromUtf8_quatrupleByte(std::string& input, const int encoding = PRIMARY);
@@ -928,6 +933,8 @@ private:
                 return jisx0201halfwidthToUtf8(reinterpret_cast<const char*>(input.c_str()));
             case KS_X_1001:
                 return ksx1001ToUtf8(reinterpret_cast<const char*>(input.c_str()));
+            case POKEMON_GEN1_ENGLISH:
+                return pokemonGen1EnglishToUtf8(reinterpret_cast<const char*>(input.c_str()));
             default: //UTF8 or invalid format value
             {
                 return std::string(reinterpret_cast<const char*>(input.c_str()));
@@ -967,6 +974,7 @@ private:
     void m_shiftJis_cp932ToUtf8();
     void m_utf8ToKsX1001();
     void m_ksX1001ToUtf8();
+    void m_pokemonGen1EnglishToUtf8();
 
     //helper functions
     static bool compareRaw(const char* lhs, const char* rhs);
