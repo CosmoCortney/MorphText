@@ -74,6 +74,8 @@ public:
         JIS_X_0201_HALFWIDTH,
         KS_X_1001,
         Reserved,
+        POKEMON_GEN1_ENGLISH,
+        POKEMON_GEN1_FRENCH_GERMAN,
         LATIN1 = ISO_8859_1,
         LATIN2 = ISO_8859_2,
         LATIN3 = ISO_8859_3,
@@ -100,8 +102,7 @@ public:
         SJIS932 = SHIFTJIS_CP932,
         MS932 = SHIFTJIS_CP932,
         EUC_KR = KS_X_1001,
-        KS_C_5601 = KS_X_1001,
-        POKEMON_GEN1_ENGLISH
+        KS_C_5601 = KS_X_1001
     };
 
     MorphText() = default;
@@ -835,6 +836,7 @@ private:
     std::string _jis_x_0201_fullwidth;
     std::string _ks_x_1001;
     std::string _pokemon_gen1_english;
+    std::string _pokemon_gen1_french_german;
     int _updatedFlags = 0;
     int _primaryEncoding = UTF8;
 
@@ -866,7 +868,8 @@ private:
         FLAG_JIS_X_0201_HALFWIDTH = 1 << Encodings::JIS_X_0201_HALFWIDTH,
         FLAG_KS_X_1001 = 1 << Encodings::KS_X_1001,
         FLAG_Reserved = 1 << Encodings::Reserved,
-        FLAG_POKEMON_GEN1_ENGLISH = 1 << Encodings::POKEMON_GEN1_ENGLISH
+        FLAG_POKEMON_GEN1_ENGLISH = 1 << Encodings::POKEMON_GEN1_ENGLISH,
+        FLAG_POKEMON_GEN1_FRENCH_GERMAN = 1 << Encodings::POKEMON_GEN1_FRENCH_GERMAN
     };
 
     //Convertion functions
@@ -892,6 +895,10 @@ private:
     static std::string ksx1001ToUtf8(const std::string& input);
     static std::string utf8ToPokemonGen1English(const std::string& input);
     static std::string pokemonGen1EnglishToUtf8(const std::string& input);
+    public:
+        static std::string utf8ToPokemonGen1FrenchGerman(const std::string& input);
+        static std::string pokemonGen1FrenchGermanToUtf8(const std::string& input);
+        private:
     static std::string convertFromUtf8_singleByte(std::string& input, const int encoding = PRIMARY);
     static std::wstring convertFromUtf8_doubleByte(std::string& input, const int encoding = PRIMARY);
     static std::u32string convertFromUtf8_quatrupleByte(std::string& input, const int encoding = PRIMARY);
@@ -935,6 +942,8 @@ private:
                 return ksx1001ToUtf8(reinterpret_cast<const char*>(input.c_str()));
             case POKEMON_GEN1_ENGLISH:
                 return pokemonGen1EnglishToUtf8(reinterpret_cast<const char*>(input.c_str()));
+            case POKEMON_GEN1_FRENCH_GERMAN:
+                return pokemonGen1FrenchGermanToUtf8(reinterpret_cast<const char*>(input.c_str()));
             default: //UTF8 or invalid format value
             {
                 return std::string(reinterpret_cast<const char*>(input.c_str()));
@@ -975,6 +984,7 @@ private:
     void m_utf8ToKsX1001();
     void m_ksX1001ToUtf8();
     void m_pokemonGen1EnglishToUtf8();
+    void m_pokemonGen1FrenchGermanToUtf8();
 
     //helper functions
     static bool compareRaw(const char* lhs, const char* rhs);

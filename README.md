@@ -2,8 +2,8 @@
 A class to process and convert different kinds of texts/character encodings appearing in video games and elsewhere.
 
 ## Encoding Identifiers
-These are used to tell function how to process input and output strings.
-* `PRIMARY`: Processes operation with previously set primary encoding
+These are used to tell certain functions how to process input and output strings.
+* `PRIMARY`: Processes operation according to the previously set primary encoding
 * `UTF8`: [UTF-8](https://en.wikipedia.org/wiki/UTF-8)
 * `UTF16LE`: [UTF-16](https://en.wikipedia.org/wiki/UTF-16) in [Little Endian](https://en.wikipedia.org/wiki/Endianness)
 * `UTF16BE`: UTF-16 in Big Endian
@@ -30,13 +30,14 @@ These are used to tell function how to process input and output strings.
 * `JIS_X_0201_HALFWIDTH`: JIS X 0201 in [Half Width](https://en.wikipedia.org/wiki/Half-width_kana) Katakana
 * `KS_X_1001`: [KS X 1001](https://en.wikipedia.org/wiki/KS_X_1001). Available aliases: `EUC_KR`, `KS_C_5601`
 * `POKEMON_GEN1_ENGLISH`: [Pokémon Gen I English](https://bulbapedia.bulbagarden.net/wiki/Character_encoding_(Generation_I))
+* `POKEMON_GEN1_FRENCH_GERMAN`: [Pokémon Gen I French & German](https://bulbapedia.bulbagarden.net/wiki/Character_encoding_(Generation_I)#French_&_German)
 
 ## Supported String Types
 UTF16LE, UTF16BE relate to `std::wstring`, `const wchar_t*`, and `wchar_t*` types.
 
 UTF32LE, UTF32BE relate to `std::u32string`, `const char32_t*`, and `char32_t*` types.
 
-All others relate to std::string, const char*, and char* types.
+All others relate to `std::string`, `const char*`, and `char*` types.
 
 ## Constructors
 ### `MorphText()`
@@ -236,7 +237,7 @@ Sets the instance's string in the desired encoding identifier.
   * `encoding`: Encoding identifier of the input strings
 
 ### `Print()`
-A test function that prints all instances. Only available in debug mode.
+A test function that prints all class members. Only available in debug mode.
 
 ### `Test()`
 A test function that runs all functions. Only available in debug mode.
@@ -256,4 +257,4 @@ A test function that runs all functions. Only available in debug mode.
 ## Credits
 * Lawn Meower: Idea, Code
 * [sozysozbot](https://github.com/sozysozbot): original KS X 1001 table
-* [Bulbapedia](https://bulbapedia.bulbagarden.net/wiki/Main_Page) at [Bulbagarden](https://bulbagarden.net/home/): Documenting the Pokémon character encodings
+* [Bulbapedia](https://bulbapedia.bulbagarden.net/wiki/Main_Page) wiki at [Bulbagarden](https://bulbagarden.net/home/): Documenting the Pokémon character encodings
