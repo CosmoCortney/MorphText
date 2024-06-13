@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <algorithm>
 #include <assert.h>
 #include <codecvt>
@@ -776,6 +776,16 @@ public:
             {
                 _ks_x_1001 = reinterpret_cast<const char*>(input);
                 _updatedFlags = FLAG_KS_X_1001;
+            } break;
+            case POKEMON_GEN1_ENGLISH:
+            {
+                _pokemon_gen1_english = reinterpret_cast<const char*>(input);
+                _updatedFlags = FLAG_POKEMON_GEN1_ENGLISH;
+            } break;
+            case POKEMON_GEN1_FRENCH_GERMAN:
+            {
+                _pokemon_gen1_french_german = reinterpret_cast<const char*>(input);
+                _updatedFlags = FLAG_POKEMON_GEN1_FRENCH_GERMAN;
             } break;
             default: //PRIMARY
             {
