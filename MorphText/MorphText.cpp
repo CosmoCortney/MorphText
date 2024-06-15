@@ -1,4 +1,4 @@
-#include "MorphText.h"
+﻿#include "MorphText.h"
 #include <bit>
 #include <unordered_map>
 
@@ -93,6 +93,10 @@ MorphText::MorphText(const std::string& str, const int encoding)
         case POKEMON_GEN1_FRENCH_GERMAN: {
             _pokemon_gen1_french_german = str;
             _updatedFlags |= FLAG_POKEMON_GEN1_FRENCH_GERMAN;
+        } break;
+        case POKEMON_GEN1_ITALIAN_SPANISH: {
+            _pokemon_gen1_italian_spanish = str;
+            _updatedFlags |= FLAG_POKEMON_GEN1_ITALIAN_SPANISH;
         } break;
         default: // UTF8
         {
@@ -697,17 +701,11 @@ std::string MorphText::utf8ToPokemonGen1English(const std::string& input)
 
     for (int i = 0; i < output.size(); ++i)
     {
-        if (utf16[i] >= L'A' && utf16[i] <= L'Z')
+        output[i - stepBack] = utf16charToPokemonGen1and2AlphaNumeric(utf16[i]);
+
+        if (output[i - stepBack])
         {
-            output[i-stepBack] = utf16[i] + 0x80 - L'A';
-        }
-        else if (utf16[i] >= L'a' && utf16[i] <= L'z')
-        {
-            output[i-stepBack] = utf16[i] + 0xA0 - L'a';
-        }
-        else if (utf16[i] >= L'0' && utf16[i] <= L'9')
-        {
-            output[i-stepBack] = utf16[i] + 0xF6 - L'0';
+            continue;
         }
         else if (utf16[i] == L'‥')
         {
@@ -851,10 +849,6 @@ std::string MorphText::utf8ToPokemonGen1FrenchGerman(const std::string& input)
                 output[i - stepBack] = normalChar;
             }
         }
-        else if (utf16[i] >= L'A' && utf16[i] <= L'Z')
-        {
-            output[i - stepBack] = utf16[i] + 0x80 - L'A';
-        }
         else if (utf16[i] == L'\'')
         {
             if (utf16[i + 1] == L's')
@@ -866,13 +860,9 @@ std::string MorphText::utf8ToPokemonGen1FrenchGerman(const std::string& input)
             else
                 output[i - stepBack] = 0xE0;
         }
-        else if (utf16[i] >= L'a' && utf16[i] <= L'z')
-        {
-            output[i - stepBack] = utf16[i] + 0xA0 - L'a';
-        }
-        else if (utf16[i] >= L'0' && utf16[i] <= L'9')
-        {
-            output[i - stepBack] = utf16[i] + 0xF6 - L'0';
+        else if (output[i - stepBack] = output[i - stepBack] = utf16charToPokemonGen1and2AlphaNumeric(utf16[i]))
+        {                           //^this is meant to be an assignment
+            continue;
         }
         else if (utf16[i] == L'‥')
         {
@@ -963,6 +953,125 @@ std::string MorphText::pokemonGen1FrenchGermanToUtf8(const std::string& input)
     return utf16leToUtf8(utf16.c_str());
 }
 
+
+std::string MorphText::utf8ToPokemonGen1ItalianSpanish(const std::string& input)
+{
+    std::wstring utf16 = utf8ToUtf16le(input);
+    std::string output(utf16.size(), '\0');
+    int stepBack = 0; //needed if '-esc found
+
+    for (int i = 0; i < output.size(); ++i)
+    {
+        output[i - stepBack] = utf16charToPokemonGen1and2AlphaNumeric(utf16[i]);
+
+        if (output[i - stepBack])
+        {
+            continue;
+        }
+        else if (utf16[i] == L'‥')
+        {
+            output[i - stepBack] = 0x75;
+        }
+        else if (utf16[i] == L'\'')
+        {
+            switch (utf16[i + 1])
+            {
+            case L'd':
+                output[i - stepBack] = 0xD8;
+                break;
+            case L'l':
+                output[i - stepBack] = 0xD9;
+                break;
+            case L'm':
+                output[i - stepBack] = 0xDA;
+                break;
+            case L'r':
+                output[i - stepBack] = 0xDB;
+                break;
+            case L's':
+                output[i - stepBack] = 0xDC;
+                break;
+            case L't':
+                output[i - stepBack] = 0xDD;
+                break;
+            case L'v':
+                output[i - stepBack] = 0xDE;
+                break;
+            default:
+                output[i - stepBack] = 0xE0;
+                --i;
+                --stepBack;
+            }
+            ++i;
+            ++stepBack;
+        }
+        else
+        {
+            for (int j = 0; j < 0x100 - 0x60; ++j)
+            {
+                if (_pokemon_gen1_italian_spanish_map[j] == utf16[i])
+                {
+                    output[i - stepBack] = j + 0x60;
+                    break;
+                }
+
+                if (j == 0x100 - 0x60 - 1)
+                    output[i - stepBack] = 0xE6;
+            }
+        }
+    }
+
+    return output.c_str();
+}
+
+std::string MorphText::pokemonGen1ItalianSpanishToUtf8(const std::string& input)
+{
+    std::wstring utf16(input.size() * 2, '\0'); //mind double-chars like 's
+    int stepForward = 0; //needed if '-esc found
+
+    for (int i = 0; i < input.size(); ++i)
+    {
+        uint8_t ch = input[i];
+
+        if (ch >= 0xD8 && ch <= 0xDE)
+        {
+            utf16[i + stepForward] = L'\'';
+            ++stepForward;
+
+            switch (ch)
+            {
+            case 0xD8:
+                utf16[i + stepForward] = L'd';
+                break;
+            case 0xD9:
+                utf16[i + stepForward] = L'l';
+                break;
+            case 0xDA:
+                utf16[i + stepForward] = L'm';
+                break;
+            case 0xDB:
+                utf16[i + stepForward] = L'r';
+                break;
+            case 0xDC:
+                utf16[i + stepForward] = L's';
+                break;
+            case 0xDD:
+                utf16[i + stepForward] = L't';
+                break;
+            case 0xDE:
+                utf16[i + stepForward] = L'v';
+                break;
+            }
+        }
+        else if (ch >= 0x60 && ch <= 0xFF)
+            utf16[i + stepForward] = _pokemon_gen1_italian_spanish_map[ch - 0x60];
+        else
+            utf16[i + stepForward] = L'?';
+    }
+
+    return utf16leToUtf8(utf16.c_str());
+}
+
 bool MorphText::compareRaw(const char* lhs, const char* rhs)
 {
     const int len = strlen(lhs);
@@ -1039,6 +1148,8 @@ std::string MorphText::convertFromUtf8_singleByte(std::string& input, const int 
             return utf8ToPokemonGen1English(input);
         case POKEMON_GEN1_FRENCH_GERMAN:
             return utf8ToPokemonGen1FrenchGerman(input);
+        case POKEMON_GEN1_ITALIAN_SPANISH:
+            return utf8ToPokemonGen1ItalianSpanish(input);
         default: //invalid format value
         {
             return input;
@@ -1129,6 +1240,8 @@ void MorphText::m_convertToUtf8()
         m_pokemonGen1EnglishToUtf8();
     else if (_updatedFlags & FLAG_POKEMON_GEN1_FRENCH_GERMAN)
         m_pokemonGen1FrenchGermanToUtf8();
+    else if (_updatedFlags & FLAG_POKEMON_GEN1_ITALIAN_SPANISH)
+        m_pokemonGen1ItalianSpanishToUtf8();
     else
         m_asciiToUtf8();
 }
@@ -1357,10 +1470,34 @@ void MorphText::m_pokemonGen1EnglishToUtf8()
     _updatedFlags |= FLAG_POKEMON_GEN1_ENGLISH;
 }
 
+void MorphText::m_utf8ToPokemonGen1English()
+{
+    _pokemon_gen1_english = utf8ToPokemonGen1English(_utf8);
+    _updatedFlags |= FLAG_UTF8;
+}
+
 void MorphText::m_pokemonGen1FrenchGermanToUtf8()
 {
-    _utf8 = pokemonGen1EnglishToUtf8(_pokemon_gen1_french_german);
+    _utf8 = pokemonGen1FrenchGermanToUtf8(_pokemon_gen1_french_german);
     _updatedFlags |= FLAG_POKEMON_GEN1_FRENCH_GERMAN;
+}
+
+void MorphText::m_utf8ToPokemonGen1FrenchGerman()
+{
+    _pokemon_gen1_french_german = utf8ToPokemonGen1FrenchGerman(_utf8);
+    _updatedFlags |= FLAG_UTF8;
+}
+
+void MorphText::m_pokemonGen1ItalianSpanishToUtf8()
+{
+    _utf8 = pokemonGen1ItalianSpanishToUtf8(_pokemon_gen1_italian_spanish);
+    _updatedFlags |= FLAG_POKEMON_GEN1_ITALIAN_SPANISH;
+}
+
+void MorphText::m_utf8ToPokemonGen1ItalianSpanish()
+{
+    _pokemon_gen1_italian_spanish = utf8ToPokemonGen1ItalianSpanish(_utf8);
+    _updatedFlags |= FLAG_UTF8;
 }
 
 bool MorphText::isLittleEndian()
@@ -1551,6 +1688,70 @@ std::string MorphText::utf32ToUtf8Helper(const std::u32string& str, const bool b
     }
 }
 
+uint8_t MorphText::utf16charToPokemonGen1and2AlphaNumeric(const wchar_t ch)
+{
+    if (ch >= L'A' && ch <= L'Z')
+        return ch + 0x80 - L'A';
+    else if (ch >= L'a' && ch <= L'z')
+        return ch + 0xA0 - L'a';
+    else if (ch >= L'0' && ch <= L'9')
+        return ch + 0xF6 - L'0';
+    
+    return 0;
+}
+
+uint8_t MorphText::pokemonGen1and2EsItSwapCaseSpecial(const uint8_t key, const bool upperToLower)
+{
+    static const std::unordered_map<uint8_t, uint8_t> charMapUpperToLower =
+    {
+        {0xBE, 0xBA},
+        {0xBF, 0xCF},
+        {0xC0, 0xC3},
+        {0xC1, 0xC4},
+        {0xC2, 0xC5},
+        {0xC6, 0xBB},
+        {0xC7, 0xBC},
+        {0xC8, 0xD0},
+        {0xC9, 0xD1},
+        {0xCA, 0xD2},
+        {0xCB, 0xD3},
+        {0xCC, 0xD4},
+        {0xCD, 0xBD},
+        {0xCE, 0xD5}
+    };
+
+    static const std::unordered_map<uint8_t, uint8_t> charMapLowerToUpper =
+    {
+        {0xBA, 0xBE},
+        {0xCF, 0xBF},
+        {0xC3, 0xC0},
+        {0xC4, 0xC1},
+        {0xC5, 0xC2},
+        {0xBB, 0xC6},
+        {0xBC, 0xC7},
+        {0xD0, 0xC8},
+        {0xD1, 0xC9},
+        {0xD2, 0xCA},
+        {0xD3, 0xCB},
+        {0xD4, 0xCC},
+        {0xBD, 0xCD},
+        {0xD5, 0xCE}
+    };
+
+    if (upperToLower)
+    {
+        if (charMapUpperToLower.find(key) != charMapUpperToLower.end())
+            return charMapUpperToLower.at(key);
+    }
+    else
+    {
+        if (charMapLowerToUpper.find(key) != charMapLowerToUpper.end())
+            return charMapLowerToUpper.at(key);
+    }
+
+    return key;
+}
+
 int MorphText::GetPrimaryFormat() const
 {
     return _primaryEncoding;
@@ -1601,6 +1802,21 @@ std::string MorphText::ToLower(const std::string& input, const int encoding)
                     result[i] = ch + 0x20;
                 else if(ch >= 0xC0 && ch <= 0xC2)
                     result[i] = ch + 3;
+            }
+            return result;
+        }
+        case POKEMON_GEN1_ITALIAN_SPANISH: {
+
+
+            uint8_t ch;
+            for (int i = 0; i < result.size(); ++i)
+            {
+                ch = result[i];
+
+                if (ch >= 0x80 && ch <= 0x99)
+                    result[i] = ch + 0x20;
+                else
+                    result[i] = pokemonGen1and2EsItSwapCaseSpecial(ch, true);
             }
             return result;
         }
@@ -1728,6 +1944,20 @@ std::string MorphText::ToUpper(const std::string& input, const int encoding)
                     result[i] = ch - 0x20;
                 else if (ch >= 0xC3 && ch <= 0xC5)
                     result[i] = ch - 3;
+            }
+            return result;
+        }
+        case POKEMON_GEN1_ITALIAN_SPANISH:
+        {
+            uint8_t ch;
+            for (int i = 0; i < result.size(); ++i)
+            {
+                ch = result[i];
+
+                if (ch >= 0xA0 && ch <= 0xB9)
+                    result[i] = ch - 0x20;
+                else
+                    result[i] = pokemonGen1and2EsItSwapCaseSpecial(ch, false);
             }
             return result;
         }
@@ -1867,6 +2097,23 @@ std::string MorphText::ToSarcasm(const std::string& input, const int encoding)
             }
             return result;
         }
+        case POKEMON_GEN1_ITALIAN_SPANISH:
+        {
+            uint8_t ch;
+
+            for (int i = 0; i < result.size(); ++i)
+            {
+                ch = result[i];
+
+                if (ch >= 0x80 && ch <= 0x99)
+                    result[i] = (i & 1) == 0 ? ch + 0x20 : ch;
+                else if (ch >= 0xA0 && ch <= 0xB9)
+                    result[i] = i & 1 ? ch - 0x20 : ch;
+                else
+                    result[i] = pokemonGen1and2EsItSwapCaseSpecial(ch, i & 1);
+            }
+            return result;
+        }
         default: //UTF8, ASCII
         {
             for (int i = 0; i < result.size(); ++i)
@@ -1965,7 +2212,7 @@ bool MorphText::Compare(const char* lhs, const char* rhs, const bool caseSensiti
         case ISO_8859_5: case ISO_8859_6: case ISO_8859_7: case ISO_8859_8:
         case ISO_8859_9: case ISO_8859_10: case ISO_8859_11: case ISO_8859_13:
         case ISO_8859_14: case ISO_8859_15: case ISO_8859_16: case POKEMON_GEN1_ENGLISH:
-        case POKEMON_GEN1_FRENCH_GERMAN:
+        case POKEMON_GEN1_FRENCH_GERMAN: case POKEMON_GEN1_ITALIAN_SPANISH:
         {
             if (!caseSensitive)
             {
@@ -2227,9 +2474,11 @@ int MorphText::Find(const char* subset, const bool caseSensitive, const int enco
     case JIS_X_0201_HALFWIDTH:
         return Find(jisx0201halfwidthToUtf8(_jis_x_0201_halfwidth), jisx0201halfwidthToUtf8(subset), caseSensitive);
     case POKEMON_GEN1_ENGLISH:
-        return Find(pokemonGen1EnglishToUtf8(_jis_x_0201_halfwidth), pokemonGen1EnglishToUtf8(subset), caseSensitive);
+        return Find(pokemonGen1EnglishToUtf8(_pokemon_gen1_english), pokemonGen1EnglishToUtf8(subset), caseSensitive);
     case POKEMON_GEN1_FRENCH_GERMAN:
-        return Find(pokemonGen1EnglishToUtf8(_jis_x_0201_halfwidth), pokemonGen1FrenchGermanToUtf8(subset), caseSensitive);
+        return Find(pokemonGen1FrenchGermanToUtf8(_pokemon_gen1_french_german), pokemonGen1FrenchGermanToUtf8(subset), caseSensitive);
+    case POKEMON_GEN1_ITALIAN_SPANISH:
+        return Find(pokemonGen1ItalianSpanishToUtf8(_pokemon_gen1_italian_spanish), pokemonGen1ItalianSpanishToUtf8(subset), caseSensitive);
     default: //ASCII
         return Find(asciiToUtf8(_ascii), asciiToUtf8(subset), caseSensitive);
     }
@@ -2265,6 +2514,9 @@ void MorphText::SetPrimaryEncoding(const int encoding)
         case POKEMON_GEN1_FRENCH_GERMAN:
             m_pokemonGen1FrenchGermanToUtf8();
             break;
+        case POKEMON_GEN1_ITALIAN_SPANISH:
+            m_pokemonGen1ItalianSpanishToUtf8();
+            break;
         case UTF16LE:
             m_utf8ToUtf16le();
             break;
@@ -2296,6 +2548,7 @@ void MorphText::operator = (const MorphText& other)
     _ks_x_1001 = other._ks_x_1001;
     _pokemon_gen1_english = other._pokemon_gen1_english;
     _pokemon_gen1_french_german = other._pokemon_gen1_french_german;
+    _pokemon_gen1_italian_spanish = other._pokemon_gen1_italian_spanish;
     _iso_8859_1 = other._iso_8859_1;
     _iso_8859_2 = other._iso_8859_2;
     _iso_8859_3 = other._iso_8859_3;
@@ -2347,6 +2600,7 @@ void MorphText::Print()
     std::cout << "KS X 1001: " << _ks_x_1001 << " --- updated: " << (bool)(_updatedFlags & FLAG_KS_X_1001) << "\n";
     std::cout << "KPokemon Gen1 English: " << _pokemon_gen1_english << " --- updated: " << (bool)(_updatedFlags & FLAG_POKEMON_GEN1_ENGLISH) << "\n";
     std::cout << "KPokemon Gen1 French, German: " << _pokemon_gen1_french_german << " --- updated: " << (bool)(_updatedFlags & FLAG_POKEMON_GEN1_FRENCH_GERMAN) << "\n";
+    std::cout << "KPokemon Gen1 Italian, Spanish: " << _pokemon_gen1_italian_spanish << " --- updated: " << (bool)(_updatedFlags & FLAG_POKEMON_GEN1_ITALIAN_SPANISH) << "\n";
     std::cout << "Primary Format: " << _primaryEncoding << "\n";
     std::cout << "Endianness: " << (isLittleEndian() ? "little" : "big") << "\n";
     std::cout << "\n";
@@ -2550,6 +2804,14 @@ void MorphText::Test()
         assert(Compare(pkmGen1FrDe.c_str(), (char*)hexBin.data(), true, POKEMON_GEN1_FRENCH_GERMAN));
         utf8Comp = "azAZ09‘’Ⓟ.♀ 'rdfd'grw'$äöüd'ßgn'ÄÖÜ.";
         utf8 = Convert<std::string, std::string>(pkmGen1FrDe, POKEMON_GEN1_FRENCH_GERMAN, UTF8);
+        assert(Compare(utf8Comp, utf8));
+
+        std::string pkmGen1EsIt = Convert<const char*, std::string>("azAZ09‘’Ⓟ.♀ 'rdfd'grw'$äöüd'Ñgn'ÄÖÜ.", UTF8, POKEMON_GEN1_ITALIAN_SPANISH);
+        hexBin = { 0xA0, 0xB9, 0x80, 0x99, 0xF6, 0xFF, 0x70, 0x71, 0xE1, 0xE8, 0xF5, 0x7F, 0xDB, 0xA3, 0xA5, 0xA3, 
+        0xE0, 0xA6, 0xB1, 0xB6, 0xE0, 0xF0, 0xC3, 0xC4, 0xC5, 0xA3, 0xE0, 0xCA, 0xA6, 0xAD, 0xE0, 0xC0, 0xC1, 0xC2, 0xE8, 0x00 };
+        assert(Compare(pkmGen1EsIt.c_str(), (char*)hexBin.data(), true, POKEMON_GEN1_ITALIAN_SPANISH));
+        utf8Comp = "azAZ09‘’Ⓟ.♀ 'rdfd'grw'$äöüd'Ñgn'ÄÖÜ.";
+        utf8 = Convert<std::string, std::string>(pkmGen1EsIt, POKEMON_GEN1_ITALIAN_SPANISH, UTF8);
         assert(Compare(utf8Comp, utf8));
 
         std::cout << "PASS\n";

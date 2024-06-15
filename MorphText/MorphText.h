@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <algorithm>
 #include <assert.h>
 #include <codecvt>
@@ -76,6 +76,7 @@ public:
         Reserved,
         POKEMON_GEN1_ENGLISH,
         POKEMON_GEN1_FRENCH_GERMAN,
+        POKEMON_GEN1_ITALIAN_SPANISH,
         LATIN1 = ISO_8859_1,
         LATIN2 = ISO_8859_2,
         LATIN3 = ISO_8859_3,
@@ -212,6 +213,15 @@ public:
                 case KS_X_1001:
                     m_utf8ToKsX1001();
                     return ToLower(_ks_x_1001, false, KS_X_1001);
+                case POKEMON_GEN1_ENGLISH:
+                    m_utf8ToPokemonGen1English();
+                    return ToLower(_pokemon_gen1_english, false, POKEMON_GEN1_ENGLISH);
+                case POKEMON_GEN1_FRENCH_GERMAN:
+                    m_utf8ToPokemonGen1FrenchGerman();
+                    return ToLower(_pokemon_gen1_french_german, false, POKEMON_GEN1_FRENCH_GERMAN);
+                case POKEMON_GEN1_ITALIAN_SPANISH:
+                    m_utf8ToPokemonGen1ItalianSpanish();
+                    return ToLower(_pokemon_gen1_italian_spanish, false, POKEMON_GEN1_ITALIAN_SPANISH);
                 default: { //ISO 8859-X
                     m_utf8ToIso8859x();
                     return ToLower(_ascii, ASCII);
@@ -292,6 +302,15 @@ public:
                 case KS_X_1001:
                     m_utf8ToKsX1001();
                     return ToUpper(_ks_x_1001, false, KS_X_1001);
+                case POKEMON_GEN1_ENGLISH:
+                    m_utf8ToPokemonGen1English();
+                    return ToUpper(_pokemon_gen1_english, false, POKEMON_GEN1_ENGLISH);
+                case POKEMON_GEN1_FRENCH_GERMAN:
+                    m_utf8ToPokemonGen1FrenchGerman();
+                    return ToUpper(_pokemon_gen1_french_german, false, POKEMON_GEN1_FRENCH_GERMAN);
+                case POKEMON_GEN1_ITALIAN_SPANISH:
+                    m_utf8ToPokemonGen1ItalianSpanish();
+                    return ToUpper(_pokemon_gen1_italian_spanish, false, POKEMON_GEN1_ITALIAN_SPANISH);
                 default: { //ISO 8859-X
                     m_utf8ToIso8859x();
                     return ToUpper(_ascii, ASCII);
@@ -368,6 +387,15 @@ public:
                     m_utf8ToJisX0201HW();
                     return ToSarcasm(_jis_x_0201_halfwidth, JIS_X_0201_HALFWIDTH);
                 }
+                case POKEMON_GEN1_ENGLISH:
+                    m_utf8ToPokemonGen1English();
+                    return ToSarcasm(_pokemon_gen1_english, false, POKEMON_GEN1_ENGLISH);
+                case POKEMON_GEN1_FRENCH_GERMAN:
+                    m_utf8ToPokemonGen1FrenchGerman();
+                    return ToSarcasm(_pokemon_gen1_french_german, false, POKEMON_GEN1_FRENCH_GERMAN);
+                case POKEMON_GEN1_ITALIAN_SPANISH:
+                    m_utf8ToPokemonGen1ItalianSpanish();
+                    return ToSarcasm(_pokemon_gen1_italian_spanish, false, POKEMON_GEN1_ITALIAN_SPANISH);
                 default: { //ASCII
                     utf8ToAscii();
                     return ToSarcasm(_ascii, ASCII);
@@ -615,6 +643,27 @@ public:
 
                 return passString<std::string, T>(_ks_x_1001);
             }
+            case POKEMON_GEN1_ENGLISH:
+            {
+                if (!(_updatedFlags & FLAG_POKEMON_GEN1_ENGLISH))
+                    m_utf8ToPokemonGen1English();
+
+                return passString<std::string, T>(_pokemon_gen1_english);
+            }
+            case POKEMON_GEN1_FRENCH_GERMAN:
+            {
+                if (!(_updatedFlags & FLAG_POKEMON_GEN1_FRENCH_GERMAN))
+                    m_utf8ToPokemonGen1FrenchGerman();
+
+                return passString<std::string, T>(_pokemon_gen1_french_german);
+            }
+            case POKEMON_GEN1_ITALIAN_SPANISH:
+            {
+                if (!(_updatedFlags & FLAG_POKEMON_GEN1_ITALIAN_SPANISH))
+                    m_utf8ToPokemonGen1FrenchGerman();
+
+                return passString<std::string, T>(_pokemon_gen1_italian_spanish);
+            }
             default: //PRIMARY
             {
                 if (_primaryEncoding)
@@ -787,6 +836,11 @@ public:
                 _pokemon_gen1_french_german = reinterpret_cast<const char*>(input);
                 _updatedFlags = FLAG_POKEMON_GEN1_FRENCH_GERMAN;
             } break;
+            case POKEMON_GEN1_ITALIAN_SPANISH:
+            {
+                _pokemon_gen1_italian_spanish = reinterpret_cast<const char*>(input);
+                _updatedFlags = FLAG_POKEMON_GEN1_ITALIAN_SPANISH;
+            } break;
             default: //PRIMARY
             {
                 if (_primaryEncoding)
@@ -847,6 +901,7 @@ private:
     std::string _ks_x_1001;
     std::string _pokemon_gen1_english;
     std::string _pokemon_gen1_french_german;
+    std::string _pokemon_gen1_italian_spanish;
     int _updatedFlags = 0;
     int _primaryEncoding = UTF8;
 
@@ -879,7 +934,8 @@ private:
         FLAG_KS_X_1001 = 1 << Encodings::KS_X_1001,
         FLAG_Reserved = 1 << Encodings::Reserved,
         FLAG_POKEMON_GEN1_ENGLISH = 1 << Encodings::POKEMON_GEN1_ENGLISH,
-        FLAG_POKEMON_GEN1_FRENCH_GERMAN = 1 << Encodings::POKEMON_GEN1_FRENCH_GERMAN
+        FLAG_POKEMON_GEN1_FRENCH_GERMAN = 1 << Encodings::POKEMON_GEN1_FRENCH_GERMAN,
+        FLAG_POKEMON_GEN1_ITALIAN_SPANISH = 1 << Encodings::POKEMON_GEN1_ITALIAN_SPANISH
     };
 
     //Convertion functions
@@ -905,10 +961,10 @@ private:
     static std::string ksx1001ToUtf8(const std::string& input);
     static std::string utf8ToPokemonGen1English(const std::string& input);
     static std::string pokemonGen1EnglishToUtf8(const std::string& input);
-    public:
-        static std::string utf8ToPokemonGen1FrenchGerman(const std::string& input);
-        static std::string pokemonGen1FrenchGermanToUtf8(const std::string& input);
-        private:
+    static std::string utf8ToPokemonGen1FrenchGerman(const std::string& input);
+    static std::string pokemonGen1FrenchGermanToUtf8(const std::string& input);
+    static std::string utf8ToPokemonGen1ItalianSpanish(const std::string& input);
+    static std::string pokemonGen1ItalianSpanishToUtf8(const std::string& input);
     static std::string convertFromUtf8_singleByte(std::string& input, const int encoding = PRIMARY);
     static std::wstring convertFromUtf8_doubleByte(std::string& input, const int encoding = PRIMARY);
     static std::u32string convertFromUtf8_quatrupleByte(std::string& input, const int encoding = PRIMARY);
@@ -954,6 +1010,8 @@ private:
                 return pokemonGen1EnglishToUtf8(reinterpret_cast<const char*>(input.c_str()));
             case POKEMON_GEN1_FRENCH_GERMAN:
                 return pokemonGen1FrenchGermanToUtf8(reinterpret_cast<const char*>(input.c_str()));
+            case POKEMON_GEN1_ITALIAN_SPANISH:
+                return pokemonGen1ItalianSpanishToUtf8(reinterpret_cast<const char*>(input.c_str()));
             default: //UTF8 or invalid format value
             {
                 return std::string(reinterpret_cast<const char*>(input.c_str()));
@@ -994,7 +1052,11 @@ private:
     void m_utf8ToKsX1001();
     void m_ksX1001ToUtf8();
     void m_pokemonGen1EnglishToUtf8();
+    void m_utf8ToPokemonGen1English();
     void m_pokemonGen1FrenchGermanToUtf8();
+    void m_utf8ToPokemonGen1FrenchGerman();
+    void m_pokemonGen1ItalianSpanishToUtf8();
+    void m_utf8ToPokemonGen1ItalianSpanish();
 
     //helper functions
     static bool compareRaw(const char* lhs, const char* rhs);
@@ -1006,6 +1068,8 @@ private:
     static std::wstring utf8ToUtf16Helper(const std::string& str, const bool byteSwap);
     static std::string utf32ToUtf8Helper(const std::u32string& str, const bool byteSwap);
     static std::u32string utf8ToUtf32Helper(const std::string& str, const bool byteSwap);
+    static uint8_t utf16charToPokemonGen1and2AlphaNumeric(const wchar_t ch);
+    static uint8_t pokemonGen1and2EsItSwapCaseSpecial(const uint8_t key, const bool upperToLower = true);
 
     //This is needed because standard C and C++ substring functions are incapable of processing non-UTF strings
     template<AllowedCStringType T> static int findRaw(T superset, T subset, const bool caseSensitive)
