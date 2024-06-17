@@ -256,6 +256,8 @@ A test function that runs all functions. Only available in debug mode.
 * make member comparison overloads for c-style input string work
 * specialize findRaw() function for any other encoding than ASCII or any other UTF type to consider umlauts, fullwidth letters, etc for case insensitivity
 * refactor and complete test functions
+* test on a big-endian system
+* add necessary endianness checks to UTF-16 and UTF32-operations
 	
 ## Credits
 * Lawn Meower: Idea, Code
