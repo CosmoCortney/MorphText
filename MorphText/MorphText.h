@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <algorithm>
 #include <assert.h>
 #include <codecvt>
@@ -174,10 +174,10 @@ public:
             {
             case UTF16BE:
                 m_utf8ToUtf16Be();
-                return ToLower(_utf16BE, true);
+                return ToLower(_utf16BE, encoding);
             default:
                 m_utf8ToUtf16le();
-                return ToLower(_utf16LE, false);
+                return ToLower(_utf16LE, encoding);
             }
         }
         else if constexpr (std::is_same_v<T, std::u32string>)
@@ -185,11 +185,11 @@ public:
             if (encoding == UTF32BE)
             {
                 m_utf8ToUtf32Be();
-                return ToLower(_utf32BE, true);
+                return ToLower(_utf32BE, encoding);
             }
 
             m_utf8ToUtf32Le();
-            return ToLower(_utf32LE, false);
+            return ToLower(_utf32LE, encoding);
         }
         else
         {
@@ -266,10 +266,10 @@ public:
             {
             case UTF16BE:
                 m_utf8ToUtf16Be();
-                return ToUpper(_utf16BE, true);
+                return ToUpper(_utf16BE, encoding);
             default:// UTF16LE
                 m_utf8ToUtf16le();
-                return ToUpper(_utf16LE, false);
+                return ToUpper(_utf16LE, encoding);
             }
         }
         else if constexpr (std::is_same_v<T, std::u32string>)
@@ -277,11 +277,11 @@ public:
             if (encoding == UTF32BE)
             {
                 m_utf8ToUtf32Be();
-                return ToUpper(_utf32BE, true);
+                return ToUpper(_utf32BE, encoding);
             }
 
             m_utf8ToUtf32Le();
-            return ToUpper(_utf32LE, false);
+            return ToUpper(_utf32LE, encoding);
         }
         else // ASCII, ANSI, Shift Jist, ...
         {
@@ -358,10 +358,10 @@ public:
             {
                 case UTF16BE:
                     m_utf8ToUtf16Be();
-                    return ToSarcasm(_utf16BE, true);
+                    return ToSarcasm(_utf16BE, encoding);
                 default:// UTF16LE
                     m_utf8ToUtf16le();
-                    return ToSarcasm(_utf16LE, false);
+                    return ToSarcasm(_utf16LE, encoding);
             }
         }
         else if constexpr (std::is_same_v<T, std::u32string>)
@@ -369,11 +369,11 @@ public:
             if (encoding == UTF32BE)
             {
                 m_utf8ToUtf32Be();
-                return ToSarcasm(_utf32BE, true);
+                return ToSarcasm(_utf32BE, encoding);
             }
 
             m_utf8ToUtf32Le();
-            return ToSarcasm(_utf32LE, false);
+            return ToSarcasm(_utf32LE, encoding);
         }
         else // ASCII, ANSI, Shift Jist, ...
         {
