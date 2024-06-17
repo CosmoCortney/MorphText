@@ -1160,6 +1160,18 @@ private:
                     if (currentSubset >= 'A' && currentSubset <= 'Z')
                         currentSubset |= 0x20;
 
+                    if ((currentSuperset >= 'A' << 8) && (currentSuperset <= 'Z' << 8))
+                        currentSuperset |= 0x2000;
+
+                    if ((currentSubset >= 'A' << 8) && (currentSubset <= 'Z' << 8))
+                        currentSubset |= 0x2000;
+
+                    if ((currentSuperset >= 'A' << 24) && (currentSuperset <= 'Z' << 24))
+                        currentSuperset |= 0x20000000;
+
+                    if ((currentSubset >= 'A' << 24) && (currentSubset <= 'Z' << 24))
+                        currentSubset |= 0x20000000;
+
                     if (currentSuperset == currentSubset)
                         ++charMatchCount;
                 }
