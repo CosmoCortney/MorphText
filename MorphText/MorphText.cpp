@@ -1,4 +1,4 @@
-﻿#include "MorphText.h"
+#include "MorphText.h"
 #include <bit>
 #include <unordered_map>
 
@@ -2616,12 +2616,12 @@ int MorphText::Find(const std::string& subset, const bool caseSensitive, const i
 
 int MorphText::Find(const std::wstring& subset, const bool caseSensitive, const int encoding)
 {
-    return Find(GetString<std::wstring>(encoding), subset, encoding, caseSensitive);
+    return Find(GetString<std::wstring>(encoding), subset, caseSensitive, encoding);
 }
 
 int MorphText::Find(const std::u32string& subset, const bool caseSensitive, const int encoding)
 {
-    return Find(GetString<std::u32string>(encoding), subset, encoding, caseSensitive);
+    return Find(GetString<std::u32string>(encoding), subset, caseSensitive, encoding);
 }
 
 int MorphText::Find(const char* subset, const bool caseSensitive, const int encoding) const
