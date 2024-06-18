@@ -1366,35 +1366,35 @@ void MorphText::m_convertToUtf8()
         return;
 
     if (_updatedFlags & FLAG_ISO_8859_1)
-        m_iso8859xToUtf8(FLAG_ISO_8859_1);
+        m_iso8859xToUtf8(ISO_8859_1);
     else if (_updatedFlags & FLAG_ISO_8859_2)
-        m_iso8859xToUtf8(FLAG_ISO_8859_2);
+        m_iso8859xToUtf8(ISO_8859_2);
     else if (_updatedFlags & FLAG_ISO_8859_3)
-        m_iso8859xToUtf8(FLAG_ISO_8859_3);
+        m_iso8859xToUtf8(ISO_8859_3);
     else if (_updatedFlags & FLAG_ISO_8859_4)
-        m_iso8859xToUtf8(FLAG_ISO_8859_4);
+        m_iso8859xToUtf8(ISO_8859_4);
     else if (_updatedFlags & FLAG_ISO_8859_5)
-        m_iso8859xToUtf8(FLAG_ISO_8859_5);
+        m_iso8859xToUtf8(ISO_8859_5);
     else if (_updatedFlags & FLAG_ISO_8859_6)
-        m_iso8859xToUtf8(FLAG_ISO_8859_6);
+        m_iso8859xToUtf8(ISO_8859_6);
     else if (_updatedFlags & FLAG_ISO_8859_7)
-        m_iso8859xToUtf8(FLAG_ISO_8859_7);
+        m_iso8859xToUtf8(ISO_8859_7);
     else if (_updatedFlags & FLAG_ISO_8859_8)
-        m_iso8859xToUtf8(FLAG_ISO_8859_8);
+        m_iso8859xToUtf8(ISO_8859_8);
     else if (_updatedFlags & FLAG_ISO_8859_9)
-        m_iso8859xToUtf8(FLAG_ISO_8859_9);
+        m_iso8859xToUtf8(ISO_8859_9);
     else if (_updatedFlags & FLAG_ISO_8859_10)
-        m_iso8859xToUtf8(FLAG_ISO_8859_10);
+        m_iso8859xToUtf8(ISO_8859_10);
     else if (_updatedFlags & FLAG_ISO_8859_11)
-        m_iso8859xToUtf8(FLAG_ISO_8859_11);
+        m_iso8859xToUtf8(ISO_8859_11);
     else if (_updatedFlags & FLAG_ISO_8859_13)
-        m_iso8859xToUtf8(FLAG_ISO_8859_13);
+        m_iso8859xToUtf8(ISO_8859_13);
     else if (_updatedFlags & FLAG_ISO_8859_14)
-        m_iso8859xToUtf8(FLAG_ISO_8859_14);
+        m_iso8859xToUtf8(ISO_8859_14);
     else if (_updatedFlags & FLAG_ISO_8859_15)
-        m_iso8859xToUtf8(FLAG_ISO_8859_15);
+        m_iso8859xToUtf8(ISO_8859_15);
     else if (_updatedFlags & FLAG_ISO_8859_16)
-        m_iso8859xToUtf8(FLAG_ISO_8859_16);
+        m_iso8859xToUtf8(ISO_8859_16);
     else if (_updatedFlags & FLAG_UTF16LE)
         m_utf16LeToUtf8();
     else if (_updatedFlags & FLAG_UTF16BE)
@@ -2243,7 +2243,7 @@ std::string MorphText::ToSarcasm(const std::string& input, const int encoding)
         case SHIFTJIS_CP932: case KS_X_1001:
         {
             result = convertToUTF8<std::string>(input, encoding);
-            result = ToUpper(result, UTF8);
+            result = ToSarcasm(result, UTF8);
             return convertFromUTF8<std::string>(result, encoding);
         }
         case JIS_X_0201_FULLWIDTH: case JIS_X_0201_HALFWIDTH:
