@@ -1409,6 +1409,8 @@ void MorphText::m_convertToUtf8()
         m_jisX0201HWToUtf8();
     else if (_updatedFlags & FLAG_KS_X_1001)
         m_ksX1001ToUtf8();
+    else if (_updatedFlags & FLAG_SHIFTJIS_CP932)
+        m_shiftJis_cp932ToUtf8();
     else if (_updatedFlags & FLAG_POKEMON_GEN1_ENGLISH)
         m_pokemonGen1EnglishToUtf8();
     else if (_updatedFlags & FLAG_POKEMON_GEN1_FRENCH_GERMAN)
