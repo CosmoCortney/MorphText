@@ -164,73 +164,17 @@ public:
     {
         m_convertToUtf8();
 
-        if constexpr (std::is_same_v<T, std::string>)
+        if constexpr (std::is_same_v<T, std::wstring>)
         {
-            return ToLower(_utf8);
-        }
-        else if constexpr (std::is_same_v<T, std::wstring>)
-        {
-            switch (encoding)
-            {
-            case UTF16BE:
-                m_utf8ToUtf16Be();
-                return ToLower(_utf16BE, encoding);
-            default:
-                m_utf8ToUtf16le();
-                return ToLower(_utf16LE, encoding);
-            }
+            return ToLower(GetString<std::wstring>(encoding), encoding);
         }
         else if constexpr (std::is_same_v<T, std::u32string>)
         {
-            if (encoding == UTF32BE)
-            {
-                m_utf8ToUtf32Be();
-                return ToLower(_utf32BE, encoding);
-            }
-
-            m_utf8ToUtf32Le();
-            return ToLower(_utf32LE, encoding);
+            return ToLower(GetString<std::u32string>(encoding), encoding);
         }
         else
         {
-            switch (encoding)
-            {
-                case ASCII: {
-                    m_utf8ToAscii();
-                    return ToLower(_ascii, ASCII);
-                }
-                case JIS_X_0201_FULLWIDTH: {
-                    m_utf8ToJisX0201FW();
-                    return ToLower(_jis_x_0201_fullwidth, JIS_X_0201_FULLWIDTH);
-                }
-                case JIS_X_0201_HALFWIDTH: {
-                    m_utf8ToJisX0201HW();
-                    return ToLower(_jis_x_0201_halfwidth, JIS_X_0201_HALFWIDTH);
-                }
-                case SHIFTJIS_CP932: {
-                    m_utf8ToShiftJis();
-                    return ToLower(_shiftJis_cp932, SHIFTJIS_CP932);
-                }
-                case KS_X_1001:
-                    m_utf8ToKsX1001();
-                    return ToLower(_ks_x_1001, false, KS_X_1001);
-                case POKEMON_GEN1_ENGLISH:
-                    m_utf8ToPokemonGen1English();
-                    return ToLower(_pokemon_gen1_english, false, POKEMON_GEN1_ENGLISH);
-                case POKEMON_GEN1_FRENCH_GERMAN:
-                    m_utf8ToPokemonGen1FrenchGerman();
-                    return ToLower(_pokemon_gen1_french_german, false, POKEMON_GEN1_FRENCH_GERMAN);
-                case POKEMON_GEN1_ITALIAN_SPANISH:
-                    m_utf8ToPokemonGen1ItalianSpanish();
-                    return ToLower(_pokemon_gen1_italian_spanish, false, POKEMON_GEN1_ITALIAN_SPANISH);
-                case POKEMON_GEN1_JAPANESE:
-                    m_utf8ToPokemonGen1Japanese();
-                    return ToLower(_pokemon_gen1_japanese, false, POKEMON_GEN1_JAPANESE);
-                default: { //ISO 8859-X
-                    m_utf8ToIso8859x();
-                    return ToLower(_ascii, ASCII);
-                }
-            }
+            return ToLower(GetString<std::string>(encoding), encoding);
         }
     }
 
@@ -256,73 +200,17 @@ public:
     {
         m_convertToUtf8();
 
-        if constexpr (std::is_same_v<T, std::string>)
+        if constexpr (std::is_same_v<T, std::wstring>)
         {
-            return ToUpper(_utf8);
-        }
-        else if constexpr (std::is_same_v<T, std::wstring>)
-        {
-            switch (encoding)
-            {
-            case UTF16BE:
-                m_utf8ToUtf16Be();
-                return ToUpper(_utf16BE, encoding);
-            default:// UTF16LE
-                m_utf8ToUtf16le();
-                return ToUpper(_utf16LE, encoding);
-            }
+            return ToUpper(GetString<std::wstring>(encoding), encoding);
         }
         else if constexpr (std::is_same_v<T, std::u32string>)
         {
-            if (encoding == UTF32BE)
-            {
-                m_utf8ToUtf32Be();
-                return ToUpper(_utf32BE, encoding);
-            }
-
-            m_utf8ToUtf32Le();
-            return ToUpper(_utf32LE, encoding);
+            return ToUpper(GetString<std::u32string>(encoding), encoding);
         }
-        else // ASCII, ANSI, Shift Jist, ...
+        else
         {
-            switch (encoding)
-            {
-                case ASCII: {
-                    m_utf8ToAscii();
-                    return ToUpper(_ascii, ASCII);
-                } break;
-                case JIS_X_0201_FULLWIDTH: {
-                    m_utf8ToJisX0201FW();
-                    return ToUpper(_jis_x_0201_fullwidth, JIS_X_0201_FULLWIDTH);
-                }
-                case JIS_X_0201_HALFWIDTH: {
-                    m_utf8ToJisX0201HW();
-                    return ToUpper(_jis_x_0201_halfwidth, JIS_X_0201_HALFWIDTH);
-                }
-                case SHIFTJIS_CP932: {
-                    m_utf8ToShiftJis();
-                    return ToUpper(_shiftJis_cp932, SHIFTJIS_CP932);
-                }
-                case KS_X_1001:
-                    m_utf8ToKsX1001();
-                    return ToUpper(_ks_x_1001, false, KS_X_1001);
-                case POKEMON_GEN1_ENGLISH:
-                    m_utf8ToPokemonGen1English();
-                    return ToUpper(_pokemon_gen1_english, false, POKEMON_GEN1_ENGLISH);
-                case POKEMON_GEN1_FRENCH_GERMAN:
-                    m_utf8ToPokemonGen1FrenchGerman();
-                    return ToUpper(_pokemon_gen1_french_german, false, POKEMON_GEN1_FRENCH_GERMAN);
-                case POKEMON_GEN1_ITALIAN_SPANISH:
-                    m_utf8ToPokemonGen1ItalianSpanish();
-                    return ToUpper(_pokemon_gen1_italian_spanish, false, POKEMON_GEN1_ITALIAN_SPANISH);
-                case POKEMON_GEN1_JAPANESE:
-                    m_utf8ToPokemonGen1Japanese();
-                    return ToUpper(_pokemon_gen1_japanese, false, POKEMON_GEN1_JAPANESE);
-                default: { //ISO 8859-X
-                    m_utf8ToIso8859x();
-                    return ToUpper(_ascii, ASCII);
-                }
-            }
+            return ToUpper(GetString<std::string>(encoding), encoding);
         }
     }
 
@@ -348,69 +236,17 @@ public:
     {
         m_convertToUtf8();
 
-        if constexpr (std::is_same_v<T, std::string>)
+        if constexpr (std::is_same_v<T, std::wstring>)
         {
-            return ToSarcasm(_utf8);
-        }
-        else if constexpr (std::is_same_v<T, std::wstring>)
-        {
-            switch (encoding)
-            {
-                case UTF16BE:
-                    m_utf8ToUtf16Be();
-                    return ToSarcasm(_utf16BE, encoding);
-                default:// UTF16LE
-                    m_utf8ToUtf16le();
-                    return ToSarcasm(_utf16LE, encoding);
-            }
+            return ToSarcasm(GetString<std::wstring>(encoding), encoding);
         }
         else if constexpr (std::is_same_v<T, std::u32string>)
         {
-            if (encoding == UTF32BE)
-            {
-                m_utf8ToUtf32Be();
-                return ToSarcasm(_utf32BE, encoding);
-            }
-
-            m_utf8ToUtf32Le();
-            return ToSarcasm(_utf32LE, encoding);
+            return ToSarcasm(GetString<std::u32string>(encoding), encoding);
         }
-        else // ASCII, ANSI, Shift Jist, ...
+        else
         {
-            switch (encoding)
-            {
-                case SHIFTJIS_CP932: {
-                    m_utf8ToShiftJis();
-                    return ToSarcasm(_shiftJis_cp932, SHIFTJIS_CP932);
-                }
-                case KS_X_1001:
-                    m_utf8ToKsX1001();
-                    return ToSarcasm(_ks_x_1001, false, KS_X_1001);
-                case JIS_X_0201_FULLWIDTH: {
-                    m_utf8ToJisX0201FW();
-                    return ToSarcasm(_jis_x_0201_fullwidth, JIS_X_0201_FULLWIDTH);
-                }
-                case JIS_X_0201_HALFWIDTH: {
-                    m_utf8ToJisX0201HW();
-                    return ToSarcasm(_jis_x_0201_halfwidth, JIS_X_0201_HALFWIDTH);
-                }
-                case POKEMON_GEN1_ENGLISH:
-                    m_utf8ToPokemonGen1English();
-                    return ToSarcasm(_pokemon_gen1_english, false, POKEMON_GEN1_ENGLISH);
-                case POKEMON_GEN1_FRENCH_GERMAN:
-                    m_utf8ToPokemonGen1FrenchGerman();
-                    return ToSarcasm(_pokemon_gen1_french_german, false, POKEMON_GEN1_FRENCH_GERMAN);
-                case POKEMON_GEN1_ITALIAN_SPANISH:
-                    m_utf8ToPokemonGen1ItalianSpanish();
-                    return ToSarcasm(_pokemon_gen1_italian_spanish, false, POKEMON_GEN1_ITALIAN_SPANISH);
-                case POKEMON_GEN1_JAPANESE:
-                    m_utf8ToPokemonGen1Japanese();
-                    return ToSarcasm(_pokemon_gen1_japanese, false, POKEMON_GEN1_JAPANESE);
-                default: { //ASCII
-                    utf8ToAscii();
-                    return ToSarcasm(_ascii, ASCII);
-                }
-            }
+            return ToSarcasm(GetString<std::string>(encoding), encoding);
         }
     }
 
