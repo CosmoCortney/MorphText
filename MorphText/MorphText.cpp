@@ -2265,9 +2265,9 @@ std::string MorphText::ToSarcasm(const std::string& input, const int encoding)
                 ch = result[i];
 
                 if (ch >= 0x80 && ch <= 0x99)
-                    result[i] = (i & 1) == 0 ? ch + 0x20 : ch;
+                    result[i] = (i & 1) ? ch + 0x20 : ch;
                 else if (ch >= 0xA0 && ch <= 0xB9)
-                    result[i] = i & 1 ? ch - 0x20 : ch;
+                    result[i] = (i & 1) == 0 ? ch - 0x20 : ch;
             }
             return result;
         }
