@@ -26,7 +26,7 @@ These are used to tell certain functions how to process input and output strings
 * `ISO_8859_15`: [ISO-8859-15](https://en.wikipedia.org/wiki/ISO/IEC_8859-15). Available aliases: `WEST_EUROPEAN`, `LATIN9`
 * `ISO_8859_16`: [ISO-8859-16](https://en.wikipedia.org/wiki/ISO/IEC_8859-16). Available aliases: `SOUTHEAST_EUROPEAN`, `LATIN10`
 * `SHIFTJIS_CP932`: [Shift Jis](https://en.wikipedia.org/wiki/Shift_JIS) Code Page 932. Available aliases: `CP932`, `SHIFT_JIS_CP932`, `SJIS932`, `MS932`
-* `JIS_X_0201_FULLWIDTH`: [JIS X 0201](https://en.wikipedia.org/wiki/JIS_X_0201) in [Full Width](https://en.wikipedia.org/wiki/Katakana#Computer_encoding) Katakana
+* `JIS_X_0201_FULLWIDTH`: [JIS X 0201](https://en.wikipedia.org/wiki/JIS_X_0201) in [Full Width](https://en.wikipedia.org/wiki/Katakana#Computer_encoding) [Katakana](https://en.wikipedia.org/wiki/Katakana)
 * `JIS_X_0201_HALFWIDTH`: JIS X 0201 in [Half Width](https://en.wikipedia.org/wiki/Half-width_kana) Katakana
 * `KS_X_1001`: [KS X 1001](https://en.wikipedia.org/wiki/KS_X_1001). Available aliases: `EUC_KR`, `KS_C_5601`
 * `POKEMON_GEN1_ENGLISH`: [Pokémon Gen I English](https://bulbapedia.bulbagarden.net/wiki/Character_encoding_(Generation_I))

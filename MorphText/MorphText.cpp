@@ -3191,31 +3191,29 @@ void MorphText::Print()
     std::cout << "Jis x 0201 Half Width: " << _jis_x_0201_halfwidth << " --- updated: " << (bool)(_updatedFlags & FLAG_JIS_X_0201_HALFWIDTH) << "\n";
     std::cout << "Shift Jis CP932: " << _shiftJis_cp932 << " --- updated: " << (bool)(_updatedFlags & FLAG_SHIFTJIS_CP932) << "\n";
     std::cout << "KS X 1001: " << _ks_x_1001 << " --- updated: " << (bool)(_updatedFlags & FLAG_KS_X_1001) << "\n";
-    std::cout << "KPokemon Gen1 English: " << _pokemon_gen1_english << " --- updated: " << (bool)(_updatedFlags & FLAG_POKEMON_GEN1_ENGLISH) << "\n";
-    std::cout << "KPokemon Gen1 French, German: " << _pokemon_gen1_french_german << " --- updated: " << (bool)(_updatedFlags & FLAG_POKEMON_GEN1_FRENCH_GERMAN) << "\n";
-    std::cout << "KPokemon Gen1 Italian, Spanish: " << _pokemon_gen1_italian_spanish << " --- updated: " << (bool)(_updatedFlags & FLAG_POKEMON_GEN1_ITALIAN_SPANISH) << "\n";
-    std::cout << "KPokemon Gen1 Japanese: " << _pokemon_gen1_japanese << " --- updated: " << (bool)(_updatedFlags & FLAG_POKEMON_GEN1_JAPANESE) << "\n";
+    std::cout << "Pokemon Gen1 English: " << _pokemon_gen1_english << " --- updated: " << (bool)(_updatedFlags & FLAG_POKEMON_GEN1_ENGLISH) << "\n";
+    std::cout << "Pokemon Gen1 French, German: " << _pokemon_gen1_french_german << " --- updated: " << (bool)(_updatedFlags & FLAG_POKEMON_GEN1_FRENCH_GERMAN) << "\n";
+    std::cout << "Pokemon Gen1 Italian, Spanish: " << _pokemon_gen1_italian_spanish << " --- updated: " << (bool)(_updatedFlags & FLAG_POKEMON_GEN1_ITALIAN_SPANISH) << "\n";
+    std::cout << "Pokemon Gen1 Japanese: " << _pokemon_gen1_japanese << " --- updated: " << (bool)(_updatedFlags & FLAG_POKEMON_GEN1_JAPANESE) << "\n";
     std::cout << "Primary Format: " << _primaryEncoding << "\n";
     std::cout << "Endianness: " << (isLittleEndian() ? "little" : "big") << "\n";
     std::cout << "\n";
 }
 void MorphText::Test()
 {
-    {
-        std::cout << "Running Tests... ";
-        testUTF8();
-        testASCII();
-        testUTF16LE();
-        testUTF16BE();
-        testUTF32LE();
-        testUTF32BE();
-        testISO_8859_X();
-        testShiftJis931();
-        testKSX1001();
-        testJis0201FW();
-        testJis0201HW();
-        testPokemonGen1();
-        std::cout << "PASS\n";
-    }
+    std::cout << "Running Tests... ";
+    testUTF8();
+    testASCII();
+    testUTF16LE();
+    testUTF16BE();
+    testUTF32LE();
+    testUTF32BE();
+    testISO_8859_X();
+    testShiftJis931();
+    testKSX1001();
+    testJis0201FW();
+    testJis0201HW();
+    testPokemonGen1();
+    std::cout << "PASS\n";
 }
 #endif
