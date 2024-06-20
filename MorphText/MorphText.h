@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <algorithm>
 #include <assert.h>
 #include <codecvt>
@@ -105,6 +105,12 @@ public:
         MS932 = SHIFTJIS_CP932,
         EUC_KR = KS_X_1001,
         KS_C_5601 = KS_X_1001
+    };
+
+    enum CASES : bool
+    {
+        CASE_SENSITIVE = true,
+        CASE_INSENSITIVE = false
     };
 
     MorphText() = default;
@@ -1017,7 +1023,6 @@ private:
             }
         }
 
-
         return -1;
     }
 
@@ -1046,4 +1051,20 @@ private:
         else if constexpr (std::is_same_v<outT, char32_t*>)
             return reinterpret_cast<char32_t*>(str.data());
     }
+
+#ifndef NDEBUG
+    static void testUTF8();
+    static void testASCII();
+    static void testUTF16LE();
+    static void testUTF16BE();
+    static void testUTF32LE();
+    static void testUTF32BE();
+    static void testISO_8859_X();
+    static void testShiftJis931();
+    static void testKSX1001();
+    static void testJis0201FW();
+    static void testJis0201HW();
+    static void testPokemonGen1();
+    static void testSubRoutine(const std::string& testStr, const std::string& utf8, const char* hex, const int encoding);
+#endif
 };

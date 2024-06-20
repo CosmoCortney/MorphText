@@ -249,15 +249,14 @@ A test function that runs all functions. Only available in debug mode.
 * check if double-byte characters of KS X 1001 are stored in BE on BE machines and in LE on LE machines
 * public static C-String type conversion specialization (convertToUTF8, convertFromUTF8)
 * fix convertToUTF8(), convertFromUTF8(), Convert() to be able to use references of std::string, std::wstring, and std::u32string
-* Pokémon character encodings
+* Pokémon character encodings (Gen II and later + spin-offs)
 * add Shift-Jis CP10001/2000, Shift-Jis CP10001/2016
 * improve ToLower, ToUpper, ToSarcasm functions by specializing them and considering characters like umlauts, full-width letters, etc
 * improve comparisons by specializing them for each encoding
 * make member comparison overloads for c-style input string work
 * specialize findRaw() function for any other encoding than ASCII or any other UTF type to consider umlauts, fullwidth letters, etc for case insensitivity
-* refactor and complete test functions
 * test on a big-endian system
-* add necessary endianness checks to UTF-16 and UTF32-operations
+  * add necessary endianness checks to UTF-16 and UTF32-operations
 	
 ## Credits
 * Lawn Meower: Idea, Code

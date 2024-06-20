@@ -1,4 +1,4 @@
-#include "MorphText.h"
+﻿#include "MorphText.h"
 #include <bit>
 #include <unordered_map>
 
@@ -2810,6 +2810,358 @@ void MorphText::operator = (const MorphText& other)
 }
 
 #ifndef NDEBUG
+
+void MorphText::testSubRoutine(const std::string& str, const std::string& utf8, const char* hex, const int encoding)
+{
+    if (encoding != ISO_8859_3) //consider that ISO-8859-3 has undefined characters
+        assert(Compare(str.c_str(), hex, CASE_SENSITIVE, encoding));
+
+    std::string utf8c = Convert<std::string, std::string>(str, encoding, UTF8);
+    assert(Compare(utf8c, utf8, CASE_SENSITIVE, UTF8));
+
+    std::string testStr = Convert<const char*, std::string>("Abcd123", UTF8, encoding);
+    std::string hexBin = { 0x41, 0x62, 0x63, 0x64, 0x31, 0x32, 0x33, 0x00 };
+
+    assert(Compare(testStr.c_str(), (char*)hexBin.data(), CASE_SENSITIVE, encoding));
+    assert(Compare(testStr.c_str(), "aBcD123", CASE_INSENSITIVE, encoding));
+    assert(Compare(ToLower(testStr, encoding), "abcd123", CASE_SENSITIVE, encoding));
+    assert(Compare(ToUpper(testStr, encoding), "ABCD123", CASE_SENSITIVE, encoding));
+    assert(Compare(ToSarcasm(testStr, encoding), "AbCd123", CASE_SENSITIVE, encoding));
+    assert(Find(testStr, "d1", CASE_SENSITIVE, encoding) == 3);
+    assert(Find(testStr, "D1", CASE_INSENSITIVE, encoding) == 3);
+
+    MorphText test(testStr, encoding);
+    assert(test.Compare("Abcd123", CASE_SENSITIVE, encoding));
+    assert(Compare(test.ToLower<std::string>(encoding), "abcd123", CASE_SENSITIVE, encoding));
+    assert(Compare(test.ToUpper<std::string>(encoding), "ABCD123", CASE_SENSITIVE, encoding));
+    assert(Compare(test.ToSarcasm<std::string>(encoding), "AbCd123", CASE_SENSITIVE, encoding));
+    assert(test.Find(std::string("d1"), CASE_SENSITIVE, encoding) == 3);
+    assert(test.Find(std::string("D1"), CASE_INSENSITIVE, encoding) == 3);
+}
+
+void MorphText::testUTF8()
+{
+    std::vector<uint8_t> hexBin = { 0x41, 0x62, 0x63, 0x64, 0x31, 0x32, 0x33, 0x00 };
+    testSubRoutine("Abcd123", "Abcd123", (char*)hexBin.data(), UTF8);
+}
+
+void MorphText::testASCII()
+{
+    std::vector<uint8_t> hexBin = { 0x41, 0x62, 0x63, 0x64, 0x31, 0x32, 0x33, 0x00 };
+    testSubRoutine("Abcd123", "Abcd123", (char*)hexBin.data(), ASCII);
+}
+
+void MorphText::testUTF16LE()
+{
+    std::string testStr = "ABCabc ÄÖÜẞäöüß Ññ オオヤマネコ　おおやまねこ　大山猫　스라소니"; 
+    std::wstring utf16L = Convert<std::string, std::wstring>(testStr, UTF8, UTF16LE);
+    std::wstring utf16R = L"ABCabc ÄÖÜẞäöüß Ññ オオヤマネコ　おおやまねこ　大山猫　스라소니";
+    assert(Compare(utf16L, utf16R, CASE_SENSITIVE, UTF16LE));
+    
+    std::string utf8 = Convert<std::wstring, std::string>(utf16L, UTF16LE, UTF8);
+    assert(Compare(utf8, testStr, CASE_SENSITIVE, UTF8));
+
+    utf16L = L"Abcd123";
+    assert(Compare(utf16L, L"abCd123", CASE_INSENSITIVE, UTF16LE));
+    assert(Compare(ToLower(utf16L, UTF16LE), L"abcd123", CASE_SENSITIVE, UTF16LE));
+    assert(Compare(ToUpper(utf16L, UTF16LE), L"ABCD123", CASE_SENSITIVE, UTF16LE));
+    assert(Compare(ToSarcasm(utf16L, UTF16LE), L"AbCd123", CASE_SENSITIVE, UTF16LE));
+    assert(Find(utf16L, L"d1", CASE_SENSITIVE, UTF16LE) == 3);
+    assert(Find(utf16L, L"D1", CASE_INSENSITIVE, UTF16LE) == 3);
+
+    MorphText test(utf16L, UTF16LE);
+    assert(test.Compare(L"Abcd123", CASE_SENSITIVE, UTF16LE));
+    assert(Compare(test.ToLower<std::wstring>(UTF16LE), L"abcd123", CASE_SENSITIVE, UTF16LE));
+    assert(Compare(test.ToUpper<std::wstring>(UTF16LE), L"ABCD123", CASE_SENSITIVE, UTF16LE));
+    assert(Compare(test.ToSarcasm<std::wstring>(UTF16LE), L"AbCd123", CASE_SENSITIVE, UTF16LE));
+    assert(test.Find(L"d1", CASE_SENSITIVE, UTF16LE) == 3);
+    assert(test.Find(L"D1", CASE_INSENSITIVE, UTF16LE) == 3);
+}
+
+void MorphText::testUTF16BE()
+{
+    std::string testStr = "ABCabc ÄÖÜẞäöüß Ññ オオヤマネコ　おおやまねこ　大山猫　스라소니";
+    std::wstring utf16L = Convert<std::string, std::wstring>(testStr, UTF8, UTF16BE);
+    std::wstring utf16R = L"ABCabc ÄÖÜẞäöüß Ññ オオヤマネコ　おおやまねこ　大山猫　스라소니";
+    for (wchar_t& ch : utf16R)
+        ch = std::byteswap(ch);
+
+    assert(Compare(utf16L, utf16R, CASE_SENSITIVE, UTF16BE));
+
+    std::string utf8 = Convert<std::wstring, std::string>(utf16L, UTF16BE, UTF8);
+    assert(Compare(utf8, testStr, CASE_SENSITIVE, UTF8));
+
+    utf16L = L"Abc";
+    for (wchar_t& ch : utf16L)
+        ch = std::byteswap(ch);
+
+    MorphText test(utf16L, UTF16BE);
+
+    std::vector<wchar_t> bin = { 0x4100, 0x6200, 0x6300, 0x0000 };
+    assert(Compare(utf16L, bin.data(), CASE_INSENSITIVE, UTF16BE)); 
+    assert(test.Compare(bin.data(), CASE_SENSITIVE, UTF16BE));
+    bin[0] = 0x6100;
+    assert(Compare(ToLower(utf16L, UTF16BE), bin.data(), CASE_SENSITIVE, UTF16BE));
+    assert(Compare(test.ToLower<std::wstring>(UTF16BE), bin.data(), CASE_SENSITIVE, UTF16BE));
+    bin = { 0x4100, 0x4200, 0x4300, 0x0000  };
+    assert(Compare(ToUpper(utf16L, UTF16BE), bin.data(), CASE_SENSITIVE, UTF16BE));
+    assert(Compare(test.ToUpper<std::wstring>(UTF16BE), bin.data(), CASE_SENSITIVE, UTF16BE));
+    bin = { 0x4100, 0x6200, 0x4300, 0x0000 };
+    assert(Compare(ToSarcasm(utf16L, UTF16BE), bin.data(), CASE_SENSITIVE, UTF16BE));
+    assert(Compare(test.ToSarcasm<std::wstring>(UTF16BE), bin.data(), CASE_SENSITIVE, UTF16BE));
+    bin = { 0x6300, 0x0000 };
+    assert(Find(utf16L, bin.data(), CASE_SENSITIVE, UTF16BE) == 2);
+    assert(test.Find(bin.data(), CASE_SENSITIVE, UTF16BE) == 2);
+    bin = { 0x4300, 0x0000 };
+    assert(Find(utf16L, bin.data(), CASE_INSENSITIVE, UTF16BE) == 2);
+    assert(test.Find(bin.data(), CASE_INSENSITIVE, UTF16BE) == 2);
+}
+
+void MorphText::testUTF32LE()
+{
+    std::string testStr = "ABCabc ÄÖÜẞäöüß Ññ オオヤマネコ　おおやまねこ　大山猫　스라소니";
+    std::u32string UTF32L = Convert<std::string, std::u32string>(testStr, UTF8, UTF32LE);
+    std::u32string UTF32R = U"ABCabc ÄÖÜẞäöüß Ññ オオヤマネコ　おおやまねこ　大山猫　스라소니";
+    assert(Compare(UTF32L, UTF32R, CASE_SENSITIVE, UTF32LE));
+
+    std::string utf8 = Convert<std::u32string, std::string>(UTF32L, UTF32LE, UTF8);
+    assert(Compare(utf8, testStr, CASE_SENSITIVE, UTF8));
+
+    UTF32L = U"Abcd123";
+    assert(Compare(UTF32L, U"abCd123", CASE_INSENSITIVE, UTF32LE));
+    assert(Compare(ToLower(UTF32L, UTF32LE), U"abcd123", CASE_SENSITIVE, UTF32LE));
+    assert(Compare(ToUpper(UTF32L, UTF32LE), U"ABCD123", CASE_SENSITIVE, UTF32LE));
+    assert(Compare(ToSarcasm(UTF32L, UTF32LE), U"AbCd123", CASE_SENSITIVE, UTF32LE));
+    assert(Find(UTF32L, U"d1", CASE_SENSITIVE, UTF32LE) == 3);
+    assert(Find(UTF32L, U"D1", CASE_INSENSITIVE, UTF32LE) == 3);
+
+    MorphText test(UTF32L, UTF32LE);
+    assert(test.Compare(U"Abcd123", CASE_SENSITIVE, UTF32LE));
+    assert(Compare(test.ToLower<std::u32string>(UTF32LE), U"abcd123", CASE_SENSITIVE, UTF32LE));
+    assert(Compare(test.ToUpper<std::u32string>(UTF32LE), U"ABCD123", CASE_SENSITIVE, UTF32LE));
+    assert(Compare(test.ToSarcasm<std::u32string>(UTF32LE), U"AbCd123", CASE_SENSITIVE, UTF32LE));
+    assert(test.Find(U"d1", CASE_SENSITIVE, UTF32LE) == 3);
+    assert(test.Find(U"D1", CASE_INSENSITIVE, UTF32LE) == 3);
+}
+
+void MorphText::testUTF32BE()
+{
+    std::string testStr = "ABCabc ÄÖÜẞäöüß Ññ オオヤマネコ　おおやまねこ　大山猫　스라소니";
+    std::u32string UTF32L = Convert<std::string, std::u32string>(testStr, UTF8, UTF32BE);
+    std::u32string UTF32R = U"ABCabc ÄÖÜẞäöüß Ññ オオヤマネコ　おおやまねこ　大山猫　스라소니";
+    for (char32_t& ch : UTF32R)
+        ch = std::byteswap(ch);
+
+    assert(Compare(UTF32L, UTF32R, CASE_SENSITIVE, UTF32BE));
+
+    std::string utf8 = Convert<std::u32string, std::string>(UTF32L, UTF32BE, UTF8);
+    assert(Compare(utf8, testStr, CASE_SENSITIVE, UTF8));
+
+    UTF32L = U"Abc";
+    for (char32_t& ch : UTF32L)
+        ch = std::byteswap(ch);
+
+    MorphText test(UTF32L, UTF32BE);
+
+    std::vector<char32_t> bin = { 0x41000000, 0x62000000, 0x63000000, 0x00000000 };
+    assert(Compare(UTF32L, bin.data(), CASE_INSENSITIVE, UTF32BE));
+    assert(test.Compare(bin.data(), CASE_SENSITIVE, UTF32BE));
+    bin[0] = 0x61000000;
+    assert(Compare(ToLower(UTF32L, UTF32BE), bin.data(), CASE_SENSITIVE, UTF32BE));
+    assert(Compare(test.ToLower<std::u32string>(UTF32BE), bin.data(), CASE_SENSITIVE, UTF32BE));
+    bin = { 0x41000000, 0x42000000, 0x43000000, 0x00000000 };
+    assert(Compare(ToUpper(UTF32L, UTF32BE), bin.data(), CASE_SENSITIVE, UTF32BE));
+    assert(Compare(test.ToUpper<std::u32string>(UTF32BE), bin.data(), CASE_SENSITIVE, UTF32BE));
+    bin = { 0x41000000, 0x62000000, 0x43000000, 0x00000000 };
+    assert(Compare(ToSarcasm(UTF32L, UTF32BE), bin.data(), CASE_SENSITIVE, UTF32BE));
+    assert(Compare(test.ToSarcasm<std::u32string>(UTF32BE), bin.data(), CASE_SENSITIVE, UTF32BE));
+    bin = { 0x63000000, 0x00000000 };
+    assert(Find(UTF32L, bin.data(), CASE_SENSITIVE, UTF32BE) == 2);
+    assert(test.Find(bin.data(), CASE_SENSITIVE, UTF32BE) == 2);
+    bin = { 0x43000000, 0x00000000 };
+    assert(Find(UTF32L, bin.data(), CASE_INSENSITIVE, UTF32BE) == 2);
+    assert(test.Find(bin.data(), CASE_INSENSITIVE, UTF32BE) == 2);
+}
+
+void MorphText::testISO_8859_X()
+{
+    std::vector<std::string> utf8Strings
+    {
+        " ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ",
+        " Ą˘Ł¤ĽŚ§¨ŠŞŤŹ­ŽŻ°ą˛ł´ľśˇ¸šşťź˝žżŔÁÂĂÄĹĆÇČÉĘËĚÍÎĎĐŃŇÓÔŐÖ×ŘŮÚŰÜÝŢßŕáâăäĺćçčéęëěíîďđńňóôőö÷řůúűüýţ˙",
+        " Ħ˘£¤?Ĥ§¨İŞĞĴ­?Ż°ħ²³´µĥ·¸ışğĵ½?żÀÁÂ?ÄĊĈÇÈÉÊËÌÍÎÏ?ÑÒÓÔĠÖ×ĜÙÚÛÜŬŜßàáâ?äċĉçèéêëìíîï?ñòóôġö÷ĝùúûüŭŝ˙",
+        " ĄĸŖ¤ĨĻ§¨ŠĒĢŦ­Ž¯°ą˛ŗ´ĩļˇ¸šēģŧŊžŋĀÁÂÃÄÅÆĮČÉĘËĖÍÎĪĐŅŌĶÔÕÖ×ØŲÚÛÜŨŪßāáâãäåæįčéęëėíîīđņōķôõö÷øųúûüũū˙",
+        " ЁЂЃЄЅІЇЈЉЊЋЌ­ЎЏАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдежзийклмнопрстуфхцчшщъыьэюя№ёђѓєѕіїјљњћќ§ўџ",
+        "",
+        "",
+        "",
+        " ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖ×ØÙÚÛÜİŞßàáâãäåæçèéêëìíîïğñòóôõö÷øùúûüışÿ",
+        " ĄĒĢĪĨĶ§ĻĐŠŦŽ­ŪŊ°ąēģīĩķ·ļđšŧž―ūŋĀÁÂÃÄÅÆĮČÉĘËĖÍÎÏÐŅŌÓÔÕÖŨØŲÚÛÜÝÞßāáâãäåæįčéęëėíîïðņōóôõöũøųúûüýþĸ",
+        "",
+        " ”¢£¤„¦§Ø©Ŗ«¬­®Æ°±²³“µ¶·ø¹ŗ»¼½¾æĄĮĀĆÄÅĘĒČÉŹĖĢĶĪĻŠŃŅÓŌÕÖ×ŲŁŚŪÜŻŽßąįāćäåęēčéźėģķīļšńņóōõö÷ųłśūüżž’",
+        " Ḃḃ£ĊċḊ§Ẁ©ẂḋỲ­®ŸḞḟĠġṀṁ¶ṖẁṗẃṠỳẄẅṡÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏŴÑÒÓÔÕÖṪØÙÚÛÜÝŶßàáâãäåæçèéêëìíîïŵñòóôõöṫøùúûüýŷÿ",
+        " ¡¢£€¥Š§š©ª«¬­®¯°±²³Žµ¶·ž¹º»ŒœŸ¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ",
+        " ĄąŁ€„Š§š©Ș«Ź­źŻ°±ČłŽ”¶·žčș»ŒœŸżÀÁÂĂÄĆÆÇÈÉÊËÌÍÎÏĐŃÒÓÔŐÖŚŰÙÚÛÜĘȚßàáâăäćæçèéêëìíîïđńòóôőöśűùúûüęțÿ"
+    };
+    
+    for (int i = 0; i < utf8Strings.size(); ++i)
+    {
+        std::vector<uint8_t> hexBin(0x61);
+        for (int hi = 0; hi < hexBin.size() - 1; ++hi)
+            hexBin[hi] = hi + 0xA0;
+        hexBin.back() = 0;
+
+        int encoding = ISO_8859_1 + i;
+        std::string testStr = Convert<std::string, std::string>(utf8Strings[i], UTF8, encoding);
+
+        if (i == 5)
+        {
+            testStr = Convert<const char*, std::string>("test سشصض", UTF8, ISO_8859_6);
+            hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xD3, 0xD4, 0xD5, 0xD6, 0xD7, 0x00 };
+            assert(Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_6));
+            std::string utf8Comp = "test سشصض";
+            std::string utf8 = Convert<std::string, std::string>(testStr, ISO_8859_6, UTF8);
+            assert(Compare(utf8Comp, utf8));
+            continue;
+        }
+        else if (i == 6)
+        {
+            testStr = Convert<const char*, std::string>("test ΦΧΨΩΪ", UTF8, ISO_8859_7);
+            hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xD6, 0xD7, 0xD8, 0xD9, 0xDA, 0x00 };
+            assert(Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_7));
+            std::string utf8Comp = "test ΦΧΨΩΪ";
+            std::string utf8 = Convert<std::string, std::string>(testStr, ISO_8859_7, UTF8);
+            assert(Compare(utf8Comp, utf8));
+            continue;
+        }
+        else if (i == 7)
+        {
+            testStr = Convert<const char*, std::string>("test דהוזחטי", UTF8, ISO_8859_8);
+            hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xE3, 0xE4, 0xE5, 0xE6, 0xE7, 0xE8, 0xE9, 0x00 };
+            assert(Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_8));
+            std::string utf8Comp = "test דהוזחטי";
+            std::string utf8 = Convert<std::string, std::string>(testStr, ISO_8859_8, UTF8);
+            assert(Compare(utf8Comp, utf8));
+            continue;
+        }
+        else if (i == 10)
+        {
+            testStr = Convert<const char*, std::string>("test ฃคฅฆ", UTF8, ISO_8859_11);
+            hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xA3, 0xA4, 0xA5, 0xA6, 0x00 };
+            assert(Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_11));
+            std::string utf8Comp = "test ฃคฅฆ";
+            std::string utf8 = Convert<std::string, std::string>(testStr, ISO_8859_11, UTF8);
+            assert(Compare(utf8Comp, utf8));
+            continue;
+        }
+
+        testSubRoutine(testStr, utf8Strings[i], (char*)hexBin.data(), encoding);
+    }
+}
+
+void MorphText::testShiftJis931()
+{
+    std::string utf8String = "ooyamaneko ｵｵﾔﾏﾈｺ　オオヤマネコ　おおやまねこ　大山猫";
+    std::string testStr = Convert<std::string, std::string>(utf8String, UTF8, SHIFTJIS_CP932);
+    std::vector<uint8_t> hexBin = { 0x6F, 0x6F, 0x79, 0x61, 0x6D, 0x61, 0x6E, 0x65, 0x6B, 0x6F, 0x20, 0xB5, 0xB5, 0xD4, 0xCF, 0xC8, 0xBA, 0x81, 0x40, 0x83,
+               0x49, 0x83, 0x49, 0x83, 0x84, 0x83, 0x7D, 0x83, 0x6C, 0x83, 0x52, 0x81, 0x40, 0x82, 0xA8, 0x82, 0xA8, 0x82, 0xE2, 0x82,
+               0xDC, 0x82, 0xCB, 0x82, 0xB1, 0x81, 0x40, 0x91, 0xE5, 0x8E, 0x52, 0x94, 0x4C, 0x00 };
+    testSubRoutine(testStr, utf8String, (char*)hexBin.data(), SHIFTJIS_CP932);
+}
+
+void MorphText::testKSX1001()
+{
+    std::string utf8String = "스라소니";
+    std::string testStr = Convert<std::string, std::string>(utf8String, UTF8, KS_X_1001);
+    std::vector<uint8_t> hexBin = { 0xBD, 0xBA, 0xB6, 0xF3, 0xBC, 0xD2, 0xB4, 0xCF, 0x00 };
+    testSubRoutine(testStr, utf8String, (char*)hexBin.data(), KS_X_1001);
+}
+
+void MorphText::testJis0201FW()
+{
+    std::string utf8String = "オオヤマネコ ABCD abcd";
+    std::string testStr = Convert<std::string, std::string>(utf8String, UTF8, JIS_X_0201_FULLWIDTH);
+    std::vector<uint8_t> hexBin = { 0xB5, 0xB5, 0xD4, 0xCF, 0xC8, 0xBA, 0x20, 0x41, 0x42, 0x43, 0x44, 0x20, 0x61, 0x62, 0x63, 0x64 };
+    testSubRoutine(testStr, utf8String, (char*)hexBin.data(), JIS_X_0201_FULLWIDTH);
+}
+
+void MorphText::testJis0201HW()
+{
+    std::string utf8String = "ｵｵﾔﾏﾈｺ ABCD abcd";
+    std::string testStr = Convert<std::string, std::string>(utf8String, UTF8, JIS_X_0201_HALFWIDTH);
+    std::vector<uint8_t> hexBin = { 0xB5, 0xB5, 0xD4, 0xCF, 0xC8, 0xBA, 0x20, 0x41, 0x42, 0x43, 0x44, 0x20, 0x61, 0x62, 0x63, 0x64 };
+    testSubRoutine(testStr, utf8String, (char*)hexBin.data(), JIS_X_0201_HALFWIDTH);
+}
+
+void MorphText::testPokemonGen1()
+{
+    std::string utf8 = "";
+    std::string utf8Comp = "";
+    std::string testStr;
+    std::vector<std::vector<uint8_t>> hexBin
+    {
+        { 0xA0, 0xB9, 0x80, 0x99, 0xF6, 0xFF, 0x70, 0x71, 0xE1, 0xE8, 0xF5, 0x7F, 0xE4, 0xA3, 0xA5, 0xBB, 0xA6, 0xB1, 0xE0, 0xB6, 0xF0, 0x00 },
+        { 0xA0, 0xB9, 0x80, 0x99, 0xF6, 0xFF, 0x70, 0x71, 0xE1, 0xE8, 0xF5, 0x7F, 0xE0, 0xB1, 0xA3, 0xA5, 0xD5, 0xA6, 0xB1,0xB6, 0xE0, 0xF0, 0xC3, 0xC4, 0xC5, 0xD5, 0xBE, 0xA6, 0xD9, 0xC0, 0xC1, 0xC2, 0xE8, 0x00 },
+        { 0xA0, 0xB9, 0x80, 0x99, 0xF6, 0xFF, 0x70, 0x71, 0xE1, 0xE8, 0xF5, 0x7F, 0xDB, 0xA3, 0xA5, 0xA3, 0xE0, 0xA6, 0xB1, 0xB6, 0xE0, 0xF0, 0xC3, 0xC4, 0xC5, 0xA3, 0xE0, 0xCA, 0xA6, 0xAD, 0xE0, 0xC0, 0xC1, 0xC2, 0xE8, 0x00 },
+        { 0x83, 0xE3, 0x8C, 0x19, 0xE3, 0xAB, 0x7F, 0x21, 0x61, 0x60, 0x00 }
+    };
+
+    std::vector<std::string> utf8Strings
+    {
+        "azAZ09‘’Ⓟ.♀ 'rdf'dgr'w$",
+        "azAZ09‘’Ⓟ.♀ 'rdfd'grw'$äöüd'ßgn'ÄÖÜ.",
+        "azAZ09‘’Ⓟ.♀ 'rdfd'grw'$äöüd'Ñgn'ÄÖÜ.",
+        "エースバーン　あ゙"
+    };
+
+    for (int i = 0; i < utf8Strings.size(); ++i)
+    {
+        int encoding = POKEMON_GEN1_ENGLISH + i;
+        std::string testStr = Convert<std::string, std::string>(utf8Strings[i], UTF8, encoding);
+        assert(Compare(testStr.c_str(), (char*)hexBin[i].data(), CASE_SENSITIVE, encoding));
+        std::string utf8C = Convert<std::string, std::string>(testStr, encoding, UTF8);
+        assert(Compare(utf8C, utf8Strings[i]));
+
+        if (encoding == POKEMON_GEN1_JAPANESE)
+        {
+            std::vector<uint8_t> subHex = { 0x19, 0xE3, 0xAB, 0x00 };
+            assert(Find(testStr, (char*)subHex.data(), CASE_SENSITIVE, encoding) == 3);
+
+            MorphText test(testStr, encoding);
+            assert(test.Compare((char*)hexBin[i].data(), CASE_SENSITIVE, encoding));
+            assert(test.Find(std::string((char*)subHex.data()), CASE_SENSITIVE, encoding) == 3);
+            continue;
+        }
+
+        testStr = Convert<const char*, std::string>("AbcD123", UTF8, encoding);
+        std::vector<uint8_t> hex = { 0x80, 0xA1, 0xA2, 0x83, 0xF7, 0xF8, 0xF9, 0x00 };
+
+        assert(Compare(testStr.c_str(), (char*)hex.data(), CASE_SENSITIVE, encoding));
+        hex[0] = 0xA0;
+        assert(Compare(testStr.c_str(), (char*)hex.data(), CASE_INSENSITIVE, encoding));
+        std::vector<uint8_t> hexLower = { 0xA0, 0xA1, 0xA2, 0xA3, 0xF7, 0xF8, 0xF9, 0x00 };
+        assert(Compare(ToLower(testStr, encoding), (char*)hexLower.data(), CASE_SENSITIVE, encoding));
+        std::vector<uint8_t> hexUpper = { 0x80, 0x81, 0x82, 0x83, 0xF7, 0xF8, 0xF9, 0x00 };
+        assert(Compare(ToUpper(testStr, encoding), (char*)hexUpper.data(), CASE_SENSITIVE, encoding));
+        std::vector<uint8_t> hexSarcasm = { 0x80, 0xA1, 0x82, 0xA3, 0xF7, 0xF8, 0xF9, 0x00 };
+        assert(Compare(ToSarcasm(testStr, encoding), (char*)hexSarcasm.data(), CASE_SENSITIVE, encoding));
+
+        std::vector<uint8_t> subHexSensitive = { 0x83, 0xF7, 0x00 };
+        assert(Find(testStr, (char*)subHexSensitive.data(), CASE_SENSITIVE, encoding) == 3);
+        std::vector<uint8_t> subHexInsensitive = { 0xA3, 0xF7, 0x00 };
+        assert(Find(testStr, (char*)subHexInsensitive.data(), CASE_INSENSITIVE, encoding) == 3);
+
+        MorphText test(testStr, encoding);
+        hex = { 0x80, 0xA1, 0xA2, 0x83, 0xF7, 0xF8, 0xF9, 0x00 };
+        assert(test.Compare((char*)hex.data(), CASE_SENSITIVE, encoding));
+        assert(Compare(test.ToLower<std::string>(encoding), (char*)hexLower.data(), CASE_SENSITIVE, encoding));
+        assert(Compare(test.ToUpper<std::string>(encoding), (char*)hexUpper.data(), CASE_SENSITIVE, encoding));
+        assert(Compare(test.ToSarcasm<std::string>(encoding), (char*)hexSarcasm.data(), CASE_SENSITIVE, encoding));
+        assert(test.Find(std::string((char*)subHexSensitive.data()), CASE_SENSITIVE, encoding) == 3);
+        assert(test.Find(std::string((char*)subHexInsensitive.data()), CASE_INSENSITIVE, encoding) == 3);
+    }
+}
+
 void MorphText::Print()
 {
     std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
@@ -2847,222 +3199,22 @@ void MorphText::Print()
     std::cout << "Endianness: " << (isLittleEndian() ? "little" : "big") << "\n";
     std::cout << "\n";
 }
-
 void MorphText::Test()
 {
     {
         std::cout << "Running Tests... ";
-
-        std::string testStr = "Abcd123";
-        MorphText test(testStr, UTF8);
-        assert(Compare(test.ToLower<std::string>(UTF8).c_str(), "abcd123", false, UTF8));
-        assert(Compare(test.ToUpper<std::string>(UTF8).c_str(), "ABCD123", false, UTF8));
-        assert(Compare(test.ToSarcasm<std::string>(UTF8).c_str(), "AbCd123", false, UTF8));
-        test.SetString("This is a UTF-8 Sample Text.", UTF8);
-        assert(test.Find(std::string("Sample"), true, UTF8) > -1);  //case sensitive
-        assert(test.Find(std::string("sAMPLE"), false, UTF8) > -1); //case insensitive
-        assert(test.Compare(std::string("This is a UTF-8 Sample Text."), true, UTF8));  //case sensitive
-        assert(test.Compare(std::string("This Is A UTF-8 Sample Text."), false, UTF8)); //case insensitive
-
-        std::wstring utf16L = Convert<const char*, std::wstring>("ABCabc ÄÖÜẞäöüß Ññ オオヤマネコ　おおやまねこ　大山猫　스라소니", UTF8, UTF16LE);
-        std::wstring utf16R = L"ABCabc ÄÖÜẞäöüß Ññ オオヤマネコ　おおやまねこ　大山猫　스라소니";
-        assert(Compare(utf16L, utf16R, true, false));
-        std::string utf8Comp = "ABCabc ÄÖÜẞäöüß Ññ オオヤマネコ　おおやまねこ　大山猫　스라소니";
-        std::string utf8 = Convert<std::wstring, std::string>(utf16L, UTF16LE, UTF8);
-        assert(Compare(utf8Comp, utf8));
-
-        utf16L = Convert<const char*, std::wstring>("ABCabc ÄÖÜẞäöüß Ññ オオヤマネコ　おおやまねこ　大山猫　스라소니", UTF8, UTF16BE);
-        for (wchar_t& ch : utf16R)
-            ch = std::byteswap(ch);
-        assert(Compare(utf16L, utf16R, true, true));
-        utf8 = Convert<std::wstring, std::string>(utf16L, UTF16BE, UTF8);
-        assert(Compare(utf8Comp, utf8));
-
-        std::u32string utf32L = Convert<const char*, std::u32string>("ABCabc ÄÖÜẞäöüß Ññ オオヤマネコ　おおやまねこ　大山猫　스라소니", UTF8, UTF32LE);
-        std::u32string utf32R = U"ABCabc ÄÖÜẞäöüß Ññ オオヤマネコ　おおやまねこ　大山猫　스라소니";
-        assert(Compare(utf32L, utf32R, true, false));
-        utf8 = Convert<std::u32string, std::string>(utf32L, UTF32LE, UTF8);
-        assert(Compare(utf8Comp, utf8));
-
-        utf32L = Convert<std::string, std::u32string>("ABCabc ÄÖÜẞäöüß Ññ オオヤマネコ　おおやまねこ　大山猫　스라소니", UTF8, UTF32BE);
-        for (char32_t& ch : utf32R)
-            ch = std::byteswap(ch);
-        assert(Compare(utf32L, utf32R, true, true));
-        utf8 = Convert<std::u32string, std::string>(utf32L, UTF32BE, UTF8);
-        assert(Compare(utf8Comp, utf8));
-
-        //------------------------------------------------------------
-        testStr = Convert<const char*, std::string>("some ascii lol,.--+!0123", UTF8, ASCII);
-        std::vector<uint8_t> hexBin = { 0x73, 0x6F, 0x6D, 0x65, 0x20, 0x61, 0x73, 0x63, 0x69, 0x69, 0x20, 0x6C, 0x6F, 0x6C, 0x2C, 0x2E, 0x2D, 0x2D, 0x2B, 0x21, 0x30, 0x31, 0x32, 0x33, 0x00 };
-        assert(Compare(testStr.c_str(), (char*)hexBin.data(), true, ASCII));
-        utf8Comp = "some ascii lol,.--+!0123";
-        utf8 = Convert<std::string, std::string>(testStr, ASCII, UTF8);
-        assert(Compare(utf8Comp, utf8));
-
-        testStr = Convert<const char*, std::string>("test äöüÄÖü", UTF8, ISO_8859_1);
-        hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xE4, 0xF6, 0xFC, 0xC4, 0xD6, 0xFC, 0x00 };
-        assert(Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_1));
-        utf8Comp = "test äöüÄÖü";
-        utf8 = Convert<std::string, std::string>(testStr, ISO_8859_1, UTF8);
-        assert(Compare(utf8Comp, utf8));
-
-        testStr = Convert<const char*, std::string>("test ŔÂĂÄĹĆÇ", UTF8, ISO_8859_2);
-        hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xC0, 0xC2, 0xC3, 0xC4, 0xC5, 0xC6, 0xC7, 0x00 };
-        assert(Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_2));
-        utf8Comp = "test ŔÂĂÄĹĆÇ";
-        utf8 = Convert<std::string, std::string>(testStr, ISO_8859_2, UTF8);
-        assert(Compare(utf8Comp, utf8));
-
-        testStr = Convert<const char*, std::string>("test çèéêëìíîï", UTF8, ISO_8859_3);
-        hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xE7, 0xE8, 0xE9, 0xEA, 0xEB, 0xEC, 0xED, 0xEE, 0xEF, 0x00 };
-        assert(Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_3));
-        utf8Comp = "test çèéêëìíîï";
-        utf8 = Convert<std::string, std::string>(testStr, ISO_8859_3, UTF8);
-        assert(Compare(utf8Comp, utf8));
-
-        testStr = Convert<const char*, std::string>("test ŠĒĢŦ", UTF8, ISO_8859_4);
-        hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xA9, 0xAA, 0xAB, 0xAC, 0x00 };
-        assert(Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_4));
-        utf8Comp = "test ŠĒĢŦ";
-        utf8 = Convert<std::string, std::string>(testStr, ISO_8859_4, UTF8);
-        assert(Compare(utf8Comp, utf8));
-
-        testStr = Convert<const char*, std::string>("test ежз", UTF8, ISO_8859_5);
-        hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xD5, 0xD6, 0xD7, 0x00 };
-        assert(Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_5));
-        utf8Comp = "test ежз";
-        utf8 = Convert<std::string, std::string>(testStr, ISO_8859_5, UTF8);
-        assert(Compare(utf8Comp, utf8));
-
-        testStr = Convert<const char*, std::string>("test سشصض", UTF8, ISO_8859_6);
-        hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xD3, 0xD4, 0xD5, 0xD6, 0xD7, 0x00 };
-        assert(Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_6));
-        utf8Comp = "test سشصض";
-        utf8 = Convert<std::string, std::string>(testStr, ISO_8859_6, UTF8);
-        assert(Compare(utf8Comp, utf8));
-
-        testStr = Convert<const char*, std::string>("test ΦΧΨΩΪ", UTF8, ISO_8859_7);
-        hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xD6, 0xD7, 0xD8, 0xD9, 0xDA, 0x00 };
-        assert(Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_7));
-        utf8Comp = "test ΦΧΨΩΪ";
-        utf8 = Convert<std::string, std::string>(testStr, ISO_8859_7, UTF8);
-        assert(Compare(utf8Comp, utf8));
-
-        testStr = Convert<const char*, std::string>("test דהוזחטי", UTF8, ISO_8859_8);
-        hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xE3, 0xE4, 0xE5, 0xE6, 0xE7, 0xE8, 0xE9, 0x00 };
-        assert(Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_8));
-        utf8Comp = "test דהוזחטי";
-        utf8 = Convert<std::string, std::string>(testStr, ISO_8859_8, UTF8);
-        assert(Compare(utf8Comp, utf8));
-
-        testStr = Convert<const char*, std::string>("test åæçèéê", UTF8, ISO_8859_9);
-        hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xE5, 0xE6, 0xE7, 0xE8, 0xE9, 0xEA, 0x00 };
-        assert(Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_9));
-        utf8Comp = "test åæçèéê";
-        utf8 = Convert<std::string, std::string>(testStr, ISO_8859_9, UTF8);
-        assert(Compare(utf8Comp, utf8));
-
-        testStr = Convert<const char*, std::string>("test åæįčé", UTF8, ISO_8859_10);
-        hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xE5, 0xE6, 0xE7, 0xE8, 0xE9, 0x00 };
-        assert(Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_10));
-        utf8Comp = "test åæįčé";
-        utf8 = Convert<std::string, std::string>(testStr, ISO_8859_10, UTF8);
-        assert(Compare(utf8Comp, utf8));
-
-        testStr = Convert<const char*, std::string>("test ฃคฅฆ", UTF8, ISO_8859_11);
-        hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xA3, 0xA4, 0xA5, 0xA6, 0x00 };
-        assert(Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_11));
-        utf8Comp = "test ฃคฅฆ";
-        utf8 = Convert<std::string, std::string>(testStr, ISO_8859_11, UTF8);
-        assert(Compare(utf8Comp, utf8));
-
-        testStr = Convert<const char*, std::string>("test ÕÖ×ŲŁŚ", UTF8, ISO_8859_13);
-        hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xD5, 0xD6, 0xD7, 0xD8, 0xD9, 0xDA, 0x00 };
-        assert(Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_13));
-        utf8Comp = "test ÕÖ×ŲŁŚ";
-        utf8 = Convert<std::string, std::string>(testStr, ISO_8859_13, UTF8);
-        assert(Compare(utf8Comp, utf8));
-
-        testStr = Convert<const char*, std::string>("test ÔÕÖṪØÙ", UTF8, ISO_8859_14);
-        hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xD4, 0xD5, 0xD6, 0xD7, 0xD8, 0xD9, 0x00 };
-        assert(Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_14));
-        utf8Comp = "test ÔÕÖṪØÙ";
-        utf8 = Convert<std::string, std::string>(testStr, ISO_8859_14, UTF8);
-        assert(Compare(utf8Comp, utf8));
-
-        testStr = Convert<const char*, std::string>("test ÅÆÇÈÉÊËÌ", UTF8, ISO_8859_15);
-        hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xC5, 0xC6, 0xC7, 0xC8, 0xC9, 0xCA, 0xCB, 0xCC, 0x00 };
-        assert(Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_15));
-        utf8Comp = "test ÅÆÇÈÉÊËÌ";
-        utf8 = Convert<std::string, std::string>(testStr, ISO_8859_15, UTF8);
-        assert(Compare(utf8Comp, utf8));
-
-        testStr = Convert<const char*, std::string>("test ÄĆ6ÆÇÈÉ", UTF8, ISO_8859_16);
-        hexBin = { 0x74, 0x65, 0x73, 0x74, 0x20, 0xC4, 0xC5, 0x36, 0xC6, 0xC7, 0xC8, 0xC9, 0x00 };
-        assert(Compare(testStr.c_str(), (char*)hexBin.data(), true, ISO_8859_16));
-        utf8Comp = "test ÄĆ6ÆÇÈÉ";
-        utf8 = Convert<std::string, std::string>(testStr, ISO_8859_16, UTF8);
-        assert(Compare(utf8Comp, utf8));
-
-        testStr = Convert<const char*, std::string>("ooyamaneko ｵｵﾔﾏﾈｺ　オオヤマネコ　おおやまねこ　大山猫", UTF8, SHIFTJIS_CP932);
-        hexBin = { 0x6F, 0x6F, 0x79, 0x61, 0x6D, 0x61, 0x6E, 0x65, 0x6B, 0x6F, 0x20, 0xB5, 0xB5, 0xD4, 0xCF, 0xC8, 0xBA, 0x81, 0x40, 0x83,
-                   0x49, 0x83, 0x49, 0x83, 0x84, 0x83, 0x7D, 0x83, 0x6C, 0x83, 0x52, 0x81, 0x40, 0x82, 0xA8, 0x82, 0xA8, 0x82, 0xE2, 0x82,
-                   0xDC, 0x82, 0xCB, 0x82, 0xB1, 0x81, 0x40, 0x91, 0xE5, 0x8E, 0x52, 0x94, 0x4C, 0x00 };
-        assert(Compare(testStr.c_str(), (char*)hexBin.data(), true, SHIFTJIS_CP932));
-        utf8Comp = "ooyamaneko ｵｵﾔﾏﾈｺ　オオヤマネコ　おおやまねこ　大山猫";
-        utf8 = Convert<std::string, std::string>(testStr, SHIFTJIS_CP932, UTF8);
-        assert(Compare(utf8Comp, utf8));
-
-        testStr = Convert<const char*, std::string>("オオヤマネコ　ABCD abcd", UTF8, JIS_X_0201_FULLWIDTH);
-        hexBin = { 0xB5, 0xB5, 0xD4, 0xCF, 0xC8, 0xBA, 0x20, 0x41, 0x42, 0x43, 0x44, 0x20, 0x61, 0x62, 0x63, 0x64 };
-        assert(Compare(testStr.c_str(), (char*)hexBin.data(), true, JIS_X_0201_FULLWIDTH));
-        utf8Comp = "オオヤマネコ ABCD abcd";
-        utf8 = Convert<std::string, std::string>(testStr, JIS_X_0201_FULLWIDTH, UTF8);
-        assert(Compare(utf8Comp, utf8));
-
-        testStr = Convert<const char*, std::string>("ｵｵﾔﾏﾈｺ　ABCD abcd", UTF8, JIS_X_0201_HALFWIDTH);
-        assert(Compare(testStr.c_str(), (char*)hexBin.data(), true, JIS_X_0201_HALFWIDTH));
-        utf8Comp = "ｵｵﾔﾏﾈｺ ABCD abcd";
-        utf8 = Convert<std::string, std::string>(testStr, JIS_X_0201_HALFWIDTH, UTF8);
-        assert(Compare(utf8Comp, utf8));
-
-        std::string ksx = Convert<const char*, std::string>("스라소니", UTF8, KS_X_1001);
-        hexBin = { 0xBD, 0xBA, 0xB6, 0xF3, 0xBC, 0xD2, 0xB4, 0xCF, 0x00 };
-        assert(Compare(ksx.c_str(), (char*)hexBin.data(), true, KS_X_1001));
-        utf8Comp = "스라소니";
-        utf8 = Convert<std::string, std::string>(ksx, KS_X_1001, UTF8);
-        assert(Compare(utf8Comp, utf8));
-
-        std::string pkmGen1Eng = Convert<const char*, std::string>("azAZ09‘’Ⓟ.♀ 'rdf'dgr'w$", UTF8, POKEMON_GEN1_ENGLISH);
-        hexBin = { 0xA0, 0xB9, 0x80, 0x99, 0xF6, 0xFF, 0x70, 0x71, 0xE1, 0xE8, 0xF5, 0x7F, 0xE4, 0xA3, 0xA5, 0xBB, 0xA6, 0xB1, 0xE0, 0xB6, 0xF0, 0x00 };
-        assert(Compare(pkmGen1Eng.c_str(), (char*)hexBin.data(), true, POKEMON_GEN1_ENGLISH));
-        utf8Comp = "azAZ09‘’Ⓟ.♀ 'rdf'dgr'w$";
-        utf8 = Convert<std::string, std::string>(pkmGen1Eng, POKEMON_GEN1_ENGLISH, UTF8);
-        assert(Compare(utf8Comp, utf8));
-
-        std::string pkmGen1FrDe = Convert<const char*, std::string>("azAZ09‘’Ⓟ.♀ 'rdfd'grw'$äöüd'ßgn'ÄÖÜ.", UTF8, POKEMON_GEN1_FRENCH_GERMAN);
-        hexBin = { 0xA0, 0xB9, 0x80, 0x99, 0xF6, 0xFF, 0x70, 0x71, 0xE1, 0xE8, 0xF5, 0x7F, 0xE0, 0xB1, 0xA3, 0xA5, 
-        0xD5, 0xA6, 0xB1,0xB6, 0xE0, 0xF0, 0xC3, 0xC4, 0xC5, 0xD5, 0xBE, 0xA6, 0xD9, 0xC0, 0xC1, 0xC2, 0xE8, 0x00};
-        assert(Compare(pkmGen1FrDe.c_str(), (char*)hexBin.data(), true, POKEMON_GEN1_FRENCH_GERMAN));
-        utf8Comp = "azAZ09‘’Ⓟ.♀ 'rdfd'grw'$äöüd'ßgn'ÄÖÜ.";
-        utf8 = Convert<std::string, std::string>(pkmGen1FrDe, POKEMON_GEN1_FRENCH_GERMAN, UTF8);
-        assert(Compare(utf8Comp, utf8));
-
-        std::string pkmGen1EsIt = Convert<const char*, std::string>("azAZ09‘’Ⓟ.♀ 'rdfd'grw'$äöüd'Ñgn'ÄÖÜ.", UTF8, POKEMON_GEN1_ITALIAN_SPANISH);
-        hexBin = { 0xA0, 0xB9, 0x80, 0x99, 0xF6, 0xFF, 0x70, 0x71, 0xE1, 0xE8, 0xF5, 0x7F, 0xDB, 0xA3, 0xA5, 0xA3, 
-        0xE0, 0xA6, 0xB1, 0xB6, 0xE0, 0xF0, 0xC3, 0xC4, 0xC5, 0xA3, 0xE0, 0xCA, 0xA6, 0xAD, 0xE0, 0xC0, 0xC1, 0xC2, 0xE8, 0x00 };
-        assert(Compare(pkmGen1EsIt.c_str(), (char*)hexBin.data(), true, POKEMON_GEN1_ITALIAN_SPANISH));
-        utf8Comp = "azAZ09‘’Ⓟ.♀ 'rdfd'grw'$äöüd'Ñgn'ÄÖÜ.";
-        utf8 = Convert<std::string, std::string>(pkmGen1EsIt, POKEMON_GEN1_ITALIAN_SPANISH, UTF8);
-        assert(Compare(utf8Comp, utf8));
-
-        std::string pkmGen1Jpn = Convert<const char*, std::string>("エースバーン　あ゙BA", UTF8, POKEMON_GEN1_JAPANESE);
-        hexBin = { 0x83, 0xE3, 0x8C, 0x19, 0xE3, 0xAB, 0x7F, 0x21, 0x61, 0x60, 0x00 };
-        assert(Compare(pkmGen1Jpn.c_str(), (char*)hexBin.data(), true, POKEMON_GEN1_JAPANESE));
-        utf8Comp = "エースバーン　あ゙BA";
-        utf8 = Convert<std::string, std::string>(pkmGen1Jpn, POKEMON_GEN1_JAPANESE, UTF8);
-        assert(Compare(utf8Comp, utf8));
-
+        testUTF8();
+        testASCII();
+        testUTF16LE();
+        testUTF16BE();
+        testUTF32LE();
+        testUTF32BE();
+        testISO_8859_X();
+        testShiftJis931();
+        testKSX1001();
+        testJis0201FW();
+        testJis0201HW();
+        testPokemonGen1();
         std::cout << "PASS\n";
     }
 }
