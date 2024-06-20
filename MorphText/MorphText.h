@@ -1185,6 +1185,8 @@ private:
         return -1;
     }
 
+    static int findPokemonGen1(const char* superset, const char* subset, const bool caseSensitive);
+
     template<typename inT, typename outT> static outT passString(inT& str)
     {
         if constexpr (std::is_same_v<outT, std::string>)

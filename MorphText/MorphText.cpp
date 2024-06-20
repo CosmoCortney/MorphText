@@ -2575,6 +2575,9 @@ int MorphText::Find(const std::string& superset, const std::string& subset, cons
         const std::string subs = caseSensitive ? subset : ToLower(subset, encoding);
         return sups.find(subs);
     }
+    case POKEMON_GEN1_ENGLISH: case POKEMON_GEN1_FRENCH_GERMAN:
+    case POKEMON_GEN1_ITALIAN_SPANISH: case POKEMON_GEN1_JAPANESE:
+        return findPokemonGen1(superset.c_str(), subset.c_str(), caseSensitive);
     default: //invalid format
         return findRaw<const char*>(superset.c_str(), subset.c_str(), caseSensitive);
     }
@@ -2678,6 +2681,43 @@ int MorphText::Find(const char* subset, const bool caseSensitive, const int enco
         return Find(pokemonGen1JapaneseToUtf8(_pokemon_gen1_japanese), pokemonGen1JapaneseToUtf8(subset), caseSensitive);
     default: //ASCII
         return Find(asciiToUtf8(_ascii), asciiToUtf8(subset), caseSensitive);
+    }
+}
+
+int MorphText::findPokemonGen1(const char* superset, const char* subset, const bool caseSensitive)
+{
+    if (caseSensitive)
+        return findRaw(superset, subset, caseSensitive);
+
+    int supersetLength = strlen(superset);
+    int subsetLength = strlen(subset);
+
+    if (supersetLength < subsetLength)
+        return -1;
+
+    uint8_t currentSuperset;
+    uint8_t currentSubset;
+
+    for (int i = 0; i < supersetLength - subsetLength + 1; ++i)
+    {
+        int charMatchCount = 0;
+        for (int j = 0; j < subsetLength; ++j)
+        {
+            currentSuperset = superset[i + j];
+            currentSubset = subset[j];
+
+            if (currentSuperset >= 0x80 && currentSuperset <= 0x99)
+                currentSuperset += 0x20;
+
+            if (currentSubset >= 0x80 && currentSubset <= 0x99)
+                currentSubset += 0x20;
+
+            if (currentSuperset == currentSubset)
+                ++charMatchCount;
+        }
+
+        if (charMatchCount == subsetLength)
+            return i;
     }
 }
 
