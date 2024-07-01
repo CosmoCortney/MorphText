@@ -33,6 +33,7 @@ These are used to tell certain functions how to process input and output strings
 * `POKEMON_GEN1_FRENCH_GERMAN`: [Pokémon Gen I French & German](https://bulbapedia.bulbagarden.net/wiki/Character_encoding_(Generation_I)#French_&_German)
 * `POKEMON_GEN1_ITALIAN_SPANISH`: [Pokémon Gen I Italian & Spanish](https://bulbapedia.bulbagarden.net/wiki/Character_encoding_(Generation_I)#Italian_&_Spanish)
 * `POKEMON_GEN1_JAPANESE`: [Pokémon Gen I Japanese](https://bulbapedia.bulbagarden.net/wiki/Character_encoding_(Generation_I)#Japanese)
+* `POKEMON_GEN2_ENGLISH`: [Pokémon Gen II English](https://bulbapedia.bulbagarden.net/wiki/Character_encoding_(Generation_II))
 
 ## Supported String Types
 UTF16LE, UTF16BE relate to `std::wstring`, `const wchar_t*`, and `wchar_t*` types.

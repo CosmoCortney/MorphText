@@ -78,6 +78,7 @@ public:
         POKEMON_GEN1_FRENCH_GERMAN,
         POKEMON_GEN1_ITALIAN_SPANISH,
         POKEMON_GEN1_JAPANESE,
+        POKEMON_GEN2_ENGLISH,
         LATIN1 = ISO_8859_1,
         LATIN2 = ISO_8859_2,
         LATIN3 = ISO_8859_3,
@@ -523,6 +524,13 @@ public:
 
                 return passString<std::string, T>(_pokemon_gen1_japanese);
             }
+            case POKEMON_GEN2_ENGLISH:
+            {
+                if (!(_updatedFlags & FLAG_POKEMON_GEN2_ENGLISH))
+                    m_utf8ToPokemonGen2English();
+
+                return passString<std::string, T>(_pokemon_gen2_english);
+            }
             default: //PRIMARY
             {
                 if (_primaryEncoding)
@@ -705,6 +713,11 @@ public:
                 _pokemon_gen1_japanese = reinterpret_cast<const char*>(input);
                 _updatedFlags = FLAG_POKEMON_GEN1_JAPANESE;
             } break;
+            case POKEMON_GEN2_ENGLISH:
+            {
+                _pokemon_gen2_english = reinterpret_cast<const char*>(input);
+                _updatedFlags = FLAG_POKEMON_GEN2_ENGLISH;
+            } break;
             default: //PRIMARY
             {
                 if (_primaryEncoding)
@@ -767,41 +780,43 @@ private:
     std::string _pokemon_gen1_french_german;
     std::string _pokemon_gen1_italian_spanish;
     std::string _pokemon_gen1_japanese;
+    std::string _pokemon_gen2_english;
     uint64_t _updatedFlags = 0;
     int _primaryEncoding = UTF8;
 
     enum Flags : uint64_t
     {
-        FLAG_UTF8 = 1 << Encodings::UTF8,
-        FLAG_UTF16LE = 1 << Encodings::UTF16LE,
-        FLAG_UTF16BE = 1 << Encodings::UTF16BE,
-        FLAG_UTF32LE = 1 << Encodings::UTF32LE,
-        FLAG_UTF32BE = 1 << Encodings::UTF32BE,
-        FLAG_ASCII = 1 << Encodings::ASCII,
-        FLAG_ISO_8859_1 = 1 << Encodings::ISO_8859_1,
-        FLAG_ISO_8859_2 = 1 << Encodings::ISO_8859_2,
-        FLAG_ISO_8859_3 = 1 << Encodings::ISO_8859_3,
-        FLAG_ISO_8859_4 = 1 << Encodings::ISO_8859_4,
-        FLAG_ISO_8859_5 = 1 << Encodings::ISO_8859_5,
-        FLAG_ISO_8859_6 = 1 << Encodings::ISO_8859_6,
-        FLAG_ISO_8859_7 = 1 << Encodings::ISO_8859_7,
-        FLAG_ISO_8859_8 = 1 << Encodings::ISO_8859_8,
-        FLAG_ISO_8859_9 = 1 << Encodings::ISO_8859_9,
-        FLAG_ISO_8859_10 = 1 << Encodings::ISO_8859_10,
-        FLAG_ISO_8859_11 = 1 << Encodings::ISO_8859_11,
-        FLAG_ISO_8859_13 = 1 << Encodings::ISO_8859_13,
-        FLAG_ISO_8859_14 = 1 << Encodings::ISO_8859_14,
-        FLAG_ISO_8859_15 = 1 << Encodings::ISO_8859_15,
-        FLAG_ISO_8859_16 = 1 << Encodings::ISO_8859_16,
-        FLAG_SHIFTJIS_CP932 = 1 << Encodings::SHIFTJIS_CP932,
-        FLAG_JIS_X_0201_FULLWIDTH = 1 << Encodings::JIS_X_0201_FULLWIDTH,
-        FLAG_JIS_X_0201_HALFWIDTH = 1 << Encodings::JIS_X_0201_HALFWIDTH,
-        FLAG_KS_X_1001 = 1 << Encodings::KS_X_1001,
-        FLAG_Reserved = 1 << Encodings::Reserved,
-        FLAG_POKEMON_GEN1_ENGLISH = 1 << Encodings::POKEMON_GEN1_ENGLISH,
-        FLAG_POKEMON_GEN1_FRENCH_GERMAN = 1 << Encodings::POKEMON_GEN1_FRENCH_GERMAN,
-        FLAG_POKEMON_GEN1_ITALIAN_SPANISH = 1 << Encodings::POKEMON_GEN1_ITALIAN_SPANISH,
-        FLAG_POKEMON_GEN1_JAPANESE = 1 << Encodings::POKEMON_GEN1_JAPANESE
+        FLAG_UTF8 = 1 << UTF8,
+        FLAG_UTF16LE = 1 << UTF16LE,
+        FLAG_UTF16BE = 1 << UTF16BE,
+        FLAG_UTF32LE = 1 << UTF32LE,
+        FLAG_UTF32BE = 1 << UTF32BE,
+        FLAG_ASCII = 1 << ASCII,
+        FLAG_ISO_8859_1 = 1 << ISO_8859_1,
+        FLAG_ISO_8859_2 = 1 << ISO_8859_2,
+        FLAG_ISO_8859_3 = 1 << ISO_8859_3,
+        FLAG_ISO_8859_4 = 1 << ISO_8859_4,
+        FLAG_ISO_8859_5 = 1 << ISO_8859_5,
+        FLAG_ISO_8859_6 = 1 << ISO_8859_6,
+        FLAG_ISO_8859_7 = 1 << ISO_8859_7,
+        FLAG_ISO_8859_8 = 1 << ISO_8859_8,
+        FLAG_ISO_8859_9 = 1 << ISO_8859_9,
+        FLAG_ISO_8859_10 = 1 << ISO_8859_10,
+        FLAG_ISO_8859_11 = 1 << ISO_8859_11,
+        FLAG_ISO_8859_13 = 1 << ISO_8859_13,
+        FLAG_ISO_8859_14 = 1 << ISO_8859_14,
+        FLAG_ISO_8859_15 = 1 << ISO_8859_15,
+        FLAG_ISO_8859_16 = 1 << ISO_8859_16,
+        FLAG_SHIFTJIS_CP932 = 1 << SHIFTJIS_CP932,
+        FLAG_JIS_X_0201_FULLWIDTH = 1 << JIS_X_0201_FULLWIDTH,
+        FLAG_JIS_X_0201_HALFWIDTH = 1 << JIS_X_0201_HALFWIDTH,
+        FLAG_KS_X_1001 = 1 << KS_X_1001,
+        FLAG_Reserved = 1 << Reserved,
+        FLAG_POKEMON_GEN1_ENGLISH = 1 << POKEMON_GEN1_ENGLISH,
+        FLAG_POKEMON_GEN1_FRENCH_GERMAN = 1 << POKEMON_GEN1_FRENCH_GERMAN,
+        FLAG_POKEMON_GEN1_ITALIAN_SPANISH = 1 << POKEMON_GEN1_ITALIAN_SPANISH,
+        FLAG_POKEMON_GEN1_JAPANESE = 1 << POKEMON_GEN1_JAPANESE,
+        FLAG_POKEMON_GEN2_ENGLISH = 1 << POKEMON_GEN2_ENGLISH
     };
 
     //Convertion functions
@@ -833,6 +848,8 @@ private:
     static std::string pokemonGen1ItalianSpanishToUtf8(const std::string& input);
     static std::string utf8ToPokemonGen1Japanese(const std::string& input);
     static std::string pokemonGen1JapaneseToUtf8(const std::string& input);
+    static std::string utf8ToPokemonGen2English(const std::string& input);
+    static std::string pokemonGen2EnglishToUtf8(const std::string& input);
     static std::string convertFromUtf8_singleByte(std::string& input, const int encoding = PRIMARY);
     static std::wstring convertFromUtf8_doubleByte(std::string& input, const int encoding = PRIMARY);
     static std::u32string convertFromUtf8_quatrupleByte(std::string& input, const int encoding = PRIMARY);
@@ -882,6 +899,8 @@ private:
                 return pokemonGen1ItalianSpanishToUtf8(reinterpret_cast<const char*>(input.c_str()));
             case POKEMON_GEN1_JAPANESE:
                 return pokemonGen1JapaneseToUtf8(reinterpret_cast<const char*>(input.c_str()));
+            case POKEMON_GEN2_ENGLISH:
+                return pokemonGen2EnglishToUtf8(reinterpret_cast<const char*>(input.c_str()));
             default: //UTF8 or invalid format value
             {
                 return std::string(reinterpret_cast<const char*>(input.c_str()));
@@ -929,6 +948,8 @@ private:
     void m_utf8ToPokemonGen1ItalianSpanish();
     void m_pokemonGen1JapaneseToUtf8();
     void m_utf8ToPokemonGen1Japanese();
+    void m_pokemonGen2EnglishToUtf8();
+    void m_utf8ToPokemonGen2English();
 
     //helper functions
     static bool compareRaw(const char* lhs, const char* rhs);
@@ -1065,6 +1086,7 @@ private:
     static void testJis0201FW();
     static void testJis0201HW();
     static void testPokemonGen1();
+    static void testPokemonGen2();
     static void testSubRoutine(const std::string& testStr, const std::string& utf8, const char* hex, const int encoding);
 #endif
 };
