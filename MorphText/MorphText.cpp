@@ -2747,7 +2747,6 @@ int MorphText::Find(const std::wstring& superset, const std::wstring& subset, co
     }
 }
 
-
 int MorphText::Find(const std::u32string& superset, const std::u32string& subset, const bool caseSensitive, const int encoding)
 {
     switch (encoding)
@@ -2760,6 +2759,79 @@ int MorphText::Find(const std::u32string& superset, const std::u32string& subset
         }
         default: //UTF32LE, invalid encoding
             return findRaw<const char32_t*>(superset.c_str(), subset.c_str(), caseSensitive);
+    }
+}
+
+int MorphText::Find(const char* superset, const char* subset, const bool caseSensitive, const int encoding)
+{
+    switch (encoding)
+    {
+        case UTF8: case ASCII:
+        {
+            if (caseSensitive)
+            {
+                const char* position = strstr(superset, subset);
+
+                if (position != nullptr)
+                    return position - superset;
+
+                return -1;
+            }
+            
+            const std::string sups = caseSensitive ? superset : ToLower(superset, encoding);
+            const std::string subs = caseSensitive ? subset : ToLower(subset, encoding);
+            return sups.find(subs);
+        }
+        case POKEMON_GEN1_ENGLISH: case POKEMON_GEN1_FRENCH_GERMAN:
+        case POKEMON_GEN1_ITALIAN_SPANISH: case POKEMON_GEN1_JAPANESE:
+        case POKEMON_GEN2_ENGLISH:
+            return findPokemonGen1(superset, subset, caseSensitive);
+        default: //invalid format
+            return findRaw<const char*>(superset, subset, caseSensitive);
+    }
+}
+
+
+int MorphText::Find(const wchar_t* superset, const wchar_t* subset, const bool caseSensitive, const int encoding)
+{
+    switch (encoding)
+    {
+        case UTF16LE:
+        {
+            if (caseSensitive)
+            {
+                const wchar_t* position = wcsstr(superset, subset);
+
+                if (position != nullptr)
+                    return position - superset;
+
+                return -1;
+            }
+
+            const std::wstring sups = caseSensitive ? superset : ToLower(superset, encoding);
+            const std::wstring subs = caseSensitive ? subset : ToLower(subset, encoding);
+            return sups.find(subs);
+        }
+        default: //UTF16LE, invalid encoding
+            return findRaw<const wchar_t*>(superset, subset, caseSensitive);
+    }
+}
+
+int MorphText::Find(const char32_t* superset, const char32_t* subset, const bool caseSensitive, const int encoding)
+{
+    switch (encoding)
+    {
+    case UTF32LE:
+    {
+        if (caseSensitive)
+            return findRaw(superset, subset, true);
+
+        const std::u32string sups = caseSensitive ? superset : ToLower(superset, encoding);
+        const std::u32string subs = caseSensitive ? subset : ToLower(subset, encoding);
+        return sups.find(subs);
+    }
+    default: //UTF32LE, invalid encoding
+        return findRaw<const char32_t*>(superset, subset, caseSensitive);
     }
 }
 

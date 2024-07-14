@@ -297,6 +297,9 @@ public:
     static int Find(const std::string& superset, const std::string& subset, const bool caseSensitive = true, const int encoding = UTF8);
     static int Find(const std::wstring& superset, const std::wstring& subset, const bool caseSensitive = true, const int encoding = UTF16LE);
     static int Find(const std::u32string& superset, const std::u32string& subset, const bool caseSensitive = true, const int encoding = UTF32LE);
+    static int Find(const char* superset, const char* subset, const bool caseSensitive = true, const int encoding = UTF8);
+    static int Find(const wchar_t* superset, const wchar_t* subset, const bool caseSensitive = true, const int encoding = UTF16LE);
+    static int Find(const char32_t* superset, const char32_t* subset, const bool caseSensitive = true, const int encoding = UTF32LE);
     
     /// <summary>
     /// Searches for the first occurence of a subset string within the instance.
