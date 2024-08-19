@@ -6,7 +6,7 @@
 #include <cwctype>
 #include <iostream>
 #include <locale>
-#include "Lookup.h"
+#include "Lookup.hpp"
 #include <stdexcept>
 #include <string>
 #include <type_traits>

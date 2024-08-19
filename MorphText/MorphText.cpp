@@ -1,4 +1,4 @@
-﻿#include "MorphText.h"
+﻿#include "MorphText.hpp"
 #include <bit>
 #include <unordered_map>
 
