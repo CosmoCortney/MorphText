@@ -3115,7 +3115,7 @@ extern "C" __declspec(dllexport) const wchar_t* ConvertWcharStringToWcharStringU
     return MorphText::ConvertUnsafe<const wchar_t*, wchar_t*>(input, inputEncoding, outputEncoding);
 }
 
-extern "C" __declspec(dllexport) const wchar_t* ConvertU32harStringToWcharStringUnsafe(const char32_t* input, int inputEncoding, int outputEncoding)
+extern "C" __declspec(dllexport) const wchar_t* ConvertU32charStringToWcharStringUnsafe(const char32_t* input, int inputEncoding, int outputEncoding)
 {
     return MorphText::ConvertUnsafe<const char32_t*, wchar_t*>(input, inputEncoding, outputEncoding);
 }
