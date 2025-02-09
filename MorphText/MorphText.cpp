@@ -1,4 +1,4 @@
-#include "MorphText.hpp"
+﻿#include "MorphText.hpp"
 #include <bit>
 #include <unordered_map>
 
@@ -3088,7 +3088,83 @@ void MorphText::operator = (const MorphText& other)
     _primaryEncoding = other._primaryEncoding;
 }
 
+extern "C" __declspec(dllexport) const char* ConvertCharStringToCharStringUnsafe(const char* input, int inputEncoding, int outputEncoding)
+{
+    return MorphText::ConvertUnsafe<const char*, char*>(input, inputEncoding, outputEncoding);
+}
+
+extern "C" __declspec(dllexport) const char* ConvertWcharStringToCharStringUnsafe(const wchar_t* input, int inputEncoding, int outputEncoding)
+{
+    return MorphText::ConvertUnsafe<const wchar_t*, char*>(input, inputEncoding, outputEncoding);
+}
+
+extern "C" __declspec(dllexport) const char* ConvertU32charStringToCharStringUnsafe(const char32_t* input, int inputEncoding, int outputEncoding)
+{
+    return MorphText::ConvertUnsafe<const char32_t*, char*>(input, inputEncoding, outputEncoding);
+}
+
+extern "C" __declspec(dllexport) const wchar_t* ConvertCharStringToWcharStringUnsafe(const char* input, int inputEncoding, int outputEncoding)
+{
+    return MorphText::ConvertUnsafe<const char*, wchar_t*>(input, inputEncoding, outputEncoding);
+}
+
+extern "C" __declspec(dllexport) const wchar_t* ConvertWcharStringToWcharStringUnsafe(const wchar_t* input, int inputEncoding, int outputEncoding)
+{
+    return MorphText::ConvertUnsafe<const wchar_t*, wchar_t*>(input, inputEncoding, outputEncoding);
+}
+
+extern "C" __declspec(dllexport) const wchar_t* ConvertU32harStringToWcharStringUnsafe(const char32_t* input, int inputEncoding, int outputEncoding)
+{
+    return MorphText::ConvertUnsafe<const char32_t*, wchar_t*>(input, inputEncoding, outputEncoding);
+}
+
+extern "C" __declspec(dllexport) const char32_t* ConvertCharStringToU32charStringUnsafe(const char* input, int inputEncoding, int outputEncoding)
+{
+    return MorphText::ConvertUnsafe<const char*, char32_t*>(input, inputEncoding, outputEncoding);
+}
+
+extern "C" __declspec(dllexport) const char32_t* ConvertWcharStringToU32charStringUnsafe(const wchar_t* input, int inputEncoding, int outputEncoding)
+{
+    return MorphText::ConvertUnsafe<const wchar_t*, char32_t*>(input, inputEncoding, outputEncoding);
+}
+
+extern "C" __declspec(dllexport) const char32_t* ConvertU32charStringToU32charStringUnsafe(const char32_t* input, int inputEncoding, int outputEncoding)
+{
+    return MorphText::ConvertUnsafe<const char32_t*, char32_t*>(input, inputEncoding, outputEncoding);
+}
+
+extern "C" __declspec(dllexport) void FreeMemoryCharPtr(const char* ptr)
+{
+    delete[] ptr;
+}
+
+extern "C" __declspec(dllexport) void FreeMemoryWcharPtr(const wchar_t* ptr)
+{
+    delete[] ptr;
+}
+
+extern "C" __declspec(dllexport) void FreeMemoryU32charPtr(const char32_t* ptr)
+{
+    delete[] ptr;
+}
+
 #ifndef NDEBUG
+
+void MorphText::TestUnsafe()
+{
+    char* unsafeShiftJis = nullptr;
+    char* unsafeUtf8 = nullptr;
+    std::string utf8String = "ooyamaneko ｵｵﾔﾏﾈｺ　オオヤマネコ　おおやまねこ　大山猫";
+    unsafeShiftJis = ConvertUnsafe<const char*, char*>(utf8String.c_str(), UTF8, SHIFTJIS_CP932);
+    std::vector<uint8_t> hexBin = { 0x6F, 0x6F, 0x79, 0x61, 0x6D, 0x61, 0x6E, 0x65, 0x6B, 0x6F, 0x20, 0xB5, 0xB5, 0xD4, 0xCF, 0xC8, 0xBA, 0x81, 0x40, 0x83,
+               0x49, 0x83, 0x49, 0x83, 0x84, 0x83, 0x7D, 0x83, 0x6C, 0x83, 0x52, 0x81, 0x40, 0x82, 0xA8, 0x82, 0xA8, 0x82, 0xE2, 0x82,
+               0xDC, 0x82, 0xCB, 0x82, 0xB1, 0x81, 0x40, 0x91, 0xE5, 0x8E, 0x52, 0x94, 0x4C, 0x00 };
+    
+    unsafeUtf8 = ConvertUnsafe<char*, char*>(reinterpret_cast<char*>(hexBin.data()), SHIFTJIS_CP932, UTF8);
+    std::cout << unsafeUtf8 << std::endl;
+    free(unsafeShiftJis);
+    free(unsafeUtf8);
+}
 
 void MorphText::testSubRoutine(const std::string& str, const std::string& utf8, const char* hex, const int encoding)
 {

@@ -150,6 +150,51 @@ public:
     }
 
     /// <summary>
+    /// Converts the input string of a certain encoding to a string of another encoding. The allocated string must be freed by the implementation!
+    /// </summary>
+    /// <typeparam name="inT">Input C-string type</typeparam>
+    /// <typeparam name="outT">Output C-string type</typeparam>
+    /// <param name="input">Input C-string to be converted</param>
+    /// <param name="inputEncoding">Encoding identifier of the input string</param>
+    /// <param name="outputEncoding">Encoding identifier of the output string</param>
+    /// <returns>String of type outT encoded as outputEncoding</returns>
+    template<AllowedCStringType inT, AllowedCStringType outT> static outT ConvertUnsafe(inT input, const int inputEncoding = UTF8, const int outputEncoding = UTF8)
+    {
+        std::string utf8 = convertToUTF8<inT>(input, inputEncoding);
+        void* res = nullptr;
+
+        if constexpr (std::is_same_v<outT, const char*> || std::is_same_v<outT, char*>)
+        {
+            std::string temp = convertFromUTF8<std::string>(utf8, outputEncoding);
+            res = calloc(temp.size() + 1, 1);
+            std::memcpy(res, temp.data(), temp.size());
+        }
+        else if constexpr (std::is_same_v<outT, const wchar_t*> || std::is_same_v<outT, wchar_t*>)
+        {
+            std::wstring temp = convertFromUTF8<std::wstring>(utf8, outputEncoding);
+            res = calloc((temp.size() + 1) * 2, 1);
+            std::memcpy(res, temp.data(), temp.size() * 2);
+        }
+        else if constexpr (std::is_same_v<outT, const char32_t*> || std::is_same_v<outT, char32_t*>)
+        {
+            std::u32string temp = convertFromUTF8<std::u32string>(utf8, outputEncoding);
+            res = calloc((temp.size() + 1) * 4, 1);
+            std::memcpy(res, temp.data(), temp.size() * 4);
+        }
+        else
+            throw "Error: improper output string type!";
+
+        return reinterpret_cast<outT>(res);
+    }
+
+    template <AllowedStringType inT, AllowedStdStringType outT> static outT ConvertUnsafe(...)
+    {
+        static_assert(AllowedCStringType<inT>, "Error: Specified type inT of Convert<inT, outT>() must be one of the following types: const char*, const wchar_t*, const char32_t*, char*, wchar_t, or char32_t*.");
+        static_assert(AllowedCStringType<outT>, "Error: Specified type outT of Convert<inT, outT>() must be one of the following types: char*, wchar_t, or char32_t*.");
+        return outT{};
+    }
+
+    /// <summary>
     /// Returns the passed string all lowercase.
     /// </summary>
     /// <param name="input">Input string</param>
@@ -751,6 +796,7 @@ public:
 #ifndef NDEBUG
     void Print();
     static void Test();
+    static void TestUnsafe();
 #endif
 
 private:
