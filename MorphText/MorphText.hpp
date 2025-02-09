@@ -906,7 +906,7 @@ private:
                 return pokemonGen2EnglishToUtf8(reinterpret_cast<const char*>(input.c_str()));
             default: //UTF8 or invalid format value
             {
-                return std::string(reinterpret_cast<const char*>(input.c_str()));
+                return sanitizeUtf8(reinterpret_cast<const char*>(input.c_str()));
             }
         }
     }
@@ -966,6 +966,7 @@ private:
     static std::u32string utf8ToUtf32Helper(const std::string& str, const bool byteSwap);
     static uint8_t utf16charToPokemonGen1and2AlphaNumeric(const wchar_t ch);
     static uint8_t pokemonGen1and2EsItSwapCaseSpecial(const uint8_t key, const bool upperToLower = true);
+    static std::string sanitizeUtf8(const std::string& input);
 
     //This is needed because standard C and C++ substring functions are incapable of processing non-UTF strings
     template<AllowedCStringType T> static int findRaw(T superset, T subset, const bool caseSensitive)

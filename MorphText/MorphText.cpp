@@ -1973,6 +1973,57 @@ std::wstring MorphText::utf8ToUtf16Helper(const std::string& str, const bool byt
     }
 }
 
+std::string MorphText::sanitizeUtf8(const std::string& input)
+{
+    std::string output;
+    for (size_t i = 0; i < input.size(); )
+    {
+        unsigned char c = input[i];
+        if (c <= 0x7F) {
+            // Valid single-byte character
+            output += c;
+            ++i;
+        }
+        else if ((c >= 0xC2 && c <= 0xDF) && (i + 1 < input.size()) &&
+            (input[i + 1] >= 0x80 && input[i + 1] <= 0xBF)) 
+        {
+            // Valid two-byte sequence
+            output += c;
+            output += input[i + 1];
+            i += 2;
+        }
+        else if ((c >= 0xE0 && c <= 0xEF) && (i + 2 < input.size()) &&
+            (input[i + 1] >= 0x80 && input[i + 1] <= 0xBF) &&
+            (input[i + 2] >= 0x80 && input[i + 2] <= 0xBF))
+        {
+            // Valid three-byte sequence
+            output += c;
+            output += input[i + 1];
+            output += input[i + 2];
+            i += 3;
+        }
+        else if ((c >= 0xF0 && c <= 0xF4) && (i + 3 < input.size()) &&
+            (input[i + 1] >= 0x80 && input[i + 1] <= 0xBF) &&
+            (input[i + 2] >= 0x80 && input[i + 2] <= 0xBF) &&
+            (input[i + 3] >= 0x80 && input[i + 3] <= 0xBF))
+        {
+            // Valid four-byte sequence
+            output += c;
+            output += input[i + 1];
+            output += input[i + 2];
+            output += input[i + 3];
+            i += 4;
+        }
+        else
+        {
+            // Invalid sequence, replace with '?'
+            output += '?';
+            ++i;
+        }
+    }
+    return output;
+}
+
 std::string MorphText::utf16ToUtf8Helper(const std::wstring& str, const bool byteSwap)
 {
     if (byteSwap)
