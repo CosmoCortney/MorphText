@@ -1976,16 +1976,17 @@ std::wstring MorphText::utf8ToUtf16Helper(const std::string& str, const bool byt
 std::string MorphText::sanitizeUtf8(const std::string& input)
 {
     std::string output;
-    for (size_t i = 0; i < input.size(); )
+
+    for (size_t i = 0; i < input.size(); ) 
     {
         unsigned char c = input[i];
         if (c <= 0x7F) {
-            // Valid single-byte character
+            // Valid single-byte character (ASCII)
             output += c;
             ++i;
         }
         else if ((c >= 0xC2 && c <= 0xDF) && (i + 1 < input.size()) &&
-            (input[i + 1] >= 0x80 && input[i + 1] <= 0xBF)) 
+            ((input[i + 1] & 0xC0) == 0x80)) 
         {
             // Valid two-byte sequence
             output += c;
@@ -1993,8 +1994,8 @@ std::string MorphText::sanitizeUtf8(const std::string& input)
             i += 2;
         }
         else if ((c >= 0xE0 && c <= 0xEF) && (i + 2 < input.size()) &&
-            (input[i + 1] >= 0x80 && input[i + 1] <= 0xBF) &&
-            (input[i + 2] >= 0x80 && input[i + 2] <= 0xBF))
+            ((input[i + 1] & 0xC0) == 0x80) &&
+            ((input[i + 2] & 0xC0) == 0x80))
         {
             // Valid three-byte sequence
             output += c;
@@ -2003,9 +2004,9 @@ std::string MorphText::sanitizeUtf8(const std::string& input)
             i += 3;
         }
         else if ((c >= 0xF0 && c <= 0xF4) && (i + 3 < input.size()) &&
-            (input[i + 1] >= 0x80 && input[i + 1] <= 0xBF) &&
-            (input[i + 2] >= 0x80 && input[i + 2] <= 0xBF) &&
-            (input[i + 3] >= 0x80 && input[i + 3] <= 0xBF))
+            ((input[i + 1] & 0xC0) == 0x80) &&
+            ((input[i + 2] & 0xC0) == 0x80) &&
+            ((input[i + 3] & 0xC0) == 0x80))
         {
             // Valid four-byte sequence
             output += c;
@@ -2014,13 +2015,14 @@ std::string MorphText::sanitizeUtf8(const std::string& input)
             output += input[i + 3];
             i += 4;
         }
-        else
+        else 
         {
-            // Invalid sequence, replace with '?'
+            // Invalid sequence
             output += '?';
             ++i;
         }
     }
+
     return output;
 }
 

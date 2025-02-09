@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <algorithm>
 #include <assert.h>
 #include <codecvt>
@@ -13,18 +13,18 @@
 #include <vector>
 
 template <typename T> concept AllowedStringType =
-    std::is_same_v<std::remove_cvref_t<T>, std::string>
-    || std::is_same_v<std::remove_cvref_t<T>, std::wstring>
-    || std::is_same_v<std::remove_cvref_t<T>, std::u32string>
-    || std::is_same_v<std::remove_cvref_t<T>, const std::string>
-    || std::is_same_v<std::remove_cvref_t<T>, const std::wstring>
-    || std::is_same_v<std::remove_cvref_t<T>, const std::u32string>
-    || std::is_same_v<std::remove_cvref_t<T>, char*>
-    || std::is_same_v<std::remove_cvref_t<T>, wchar_t*>
-    || std::is_same_v<std::remove_cvref_t<T>, char32_t*>
-    || std::is_same_v<std::remove_cvref_t<T>, const char*>
-    || std::is_same_v<std::remove_cvref_t<T>, const wchar_t*>
-    || std::is_same_v<std::remove_cvref_t<T>, const char32_t*>;
+std::is_same_v<std::remove_cvref_t<T>, std::string>
+|| std::is_same_v<std::remove_cvref_t<T>, std::wstring>
+|| std::is_same_v<std::remove_cvref_t<T>, std::u32string>
+|| std::is_same_v<std::remove_cvref_t<T>, const std::string>
+|| std::is_same_v<std::remove_cvref_t<T>, const std::wstring>
+|| std::is_same_v<std::remove_cvref_t<T>, const std::u32string>
+|| std::is_same_v<std::remove_cvref_t<T>, char*>
+|| std::is_same_v<std::remove_cvref_t<T>, wchar_t*>
+|| std::is_same_v<std::remove_cvref_t<T>, char32_t*>
+|| std::is_same_v<std::remove_cvref_t<T>, const char*>
+|| std::is_same_v<std::remove_cvref_t<T>, const wchar_t*>
+|| std::is_same_v<std::remove_cvref_t<T>, const char32_t*>;
 
 template <typename T> concept AllowedStdStringType =
        std::is_same_v<std::remove_cvref_t<T>, const std::string>
@@ -1138,5 +1138,6 @@ private:
     static void testPokemonGen1();
     static void testPokemonGen2();
     static void testSubRoutine(const std::string& testStr, const std::string& utf8, const char* hex, const int encoding);
+    static void testUnsafe();
 #endif
 };
