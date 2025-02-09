@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <algorithm>
 #include <assert.h>
 #include <codecvt>
@@ -824,7 +824,7 @@ private:
 
     //Convertion functions
     static std::string utf8ToAscii(const std::string& input);
-    static std::string asciiToUtf8(const std::string input, const int32_t maxLength = -1);
+    static std::string asciiToUtf8(const std::string input);
     static std::wstring utf8ToUtf16le(const std::string& input);
     static std::string utf16leToUtf8(const std::wstring& input);
     static std::wstring utf8ToUtf16be(const std::string& input);

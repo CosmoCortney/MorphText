@@ -1,4 +1,4 @@
-﻿#include "MorphText.hpp"
+#include "MorphText.hpp"
 #include <bit>
 #include <unordered_map>
 
@@ -198,12 +198,13 @@ std::string MorphText::utf8ToAscii(const std::string& input)
     return utf16leToUtf8(temp);
 }
 
-std::string MorphText::asciiToUtf8(const std::string input, const int32_t maxLength)
+std::string MorphText::asciiToUtf8(const std::string input)
 {
-    std::string output = maxLength == -1 ? input : std::string(input.c_str(), maxLength);
+    std::string output = input.c_str();
 
-    for (int i = 0; i < output.size() && i < maxLength; ++i)
-        output[i] = input[i] < 0 ? '?' : input[i];
+    for (char& c : output)
+        if (c < 0)
+            c = '?';
 
     return output;
 }
