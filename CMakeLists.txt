@@ -6,8 +6,9 @@ add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 set(CMAKE_CXX_STANDARD 23)
 
 #add_executable (MorphText 
+#	main.cpp
 #	MorphText/Lookup.hpp
-##	MorphText/MorphText.cpp
+#	MorphText/MorphText.cpp
 #	MorphText/MorphText.hpp
 #)
 
@@ -28,6 +29,3 @@ add_library(MorphText SHARED ${SOURCES})
 
 # Include directories (if needed)
 target_include_directories(MorphText PUBLIC include)
-
-# Link libraries (if needed)
-#target_link_libraries(MorphText PUBLIC some_other_library)

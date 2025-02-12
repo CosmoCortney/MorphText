@@ -245,6 +245,88 @@ A test function that prints all class members. Only available in debug mode.
 ### `Test()`
 A test function that runs all functions. Only available in debug mode.
 
+## Using the DLL
+### C#
+Required namespace: System.Runtime.InteropServices
+
+The Following shows how to define all conversion functions in your C# class:
+```C#
+//char* to char*
+[DllImport("MorphText.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+private static extern IntPtr ConvertCharStringToCharStringUnsafe(byte[] input, int inputEncoding, int outputEncoding);
+
+// char* to wchar_t*
+[DllImport("MorphText.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+private static extern IntPtr ConvertCharStringToWcharStringUnsafe(byte[] input, int inputEncoding, int outputEncoding);
+
+// char* to u32char_t*
+[DllImport("MorphText.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+private static extern IntPtr ConvertCharStringToWU32charStringUnsafe(byte[] input, int inputEncoding, int outputEncoding);
+
+// wchar_t* to char*
+[DllImport("MorphText.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
+private static extern IntPtr ConvertWcharStringToCharStringUnsafe(char[] input, int inputEncoding, int outputEncoding);
+
+// wchar_t* to wchar_t*
+[DllImport("MorphText.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
+private static extern IntPtr ConvertWcharStringToWcharStringUnsafe(char[] input, int inputEncoding, int outputEncoding);
+
+// wchar_t* to char32_t*
+[DllImport("MorphText.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
+private static extern IntPtr ConvertWcharStringToU32charStringUnsafe(char[] input, int inputEncoding, int outputEncoding);
+
+// char32_t* to char*
+[DllImport("MorphText.dll", CallingConvention = CallingConvention.Cdecl)]
+private static extern IntPtr ConvertU32charStringToCharStringUnsafe(UInt32[] input, int inputEncoding, int outputEncoding);
+
+// char32_t* to wchar_t*
+[DllImport("MorphText.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)]
+private static extern IntPtr ConvertU32charStringToWcharStringUnsafe(UInt32[] input, int inputEncoding, int outputEncoding);
+
+// char32_t* to char32_t*
+[DllImport("MorphText.dll", CallingConvention = CallingConvention.Cdecl)]
+private static extern IntPtr ConvertU32charStringToU32charStringUnsafe(UInt32[] input, int inputEncoding, int outputEncoding);
+```
+
+The following functions must be used to free the allocated memory of the converted strings (output strings)
+```C#
+//free C++ char*/C# byte[] string
+[DllImport("MorphText.dll", CallingConvention = CallingConvention.Cdecl)]
+private static extern void FreeMemoryCharPtr(IntPtr ptr);
+
+//free C++ wchar_t*/C# string
+[DllImport("MorphText.dll", CallingConvention = CallingConvention.Cdecl)]
+private static extern void FreeMemoryWcharPtr(IntPtr ptr);
+
+//free C++ char32_t*/C# UInt32[] string
+[DllImport("MorphText.dll", CallingConvention = CallingConvention.Cdecl)]
+private static extern void FreeMemoryU32charPtr(IntPtr ptr);
+```
+
+Usage examples:
+```C#
+//signle-byte characters to C# string
+Byte[] utf8 = new Byte[11] { 0x4d, 0x45, 0x4f, 0xc3, 0x96, 0xc3, 0x9c, 0xc3, 0x84, 0x57, 0x00 };
+IntPtr resPtr = ConvertCharStringToWcharStringUnsafe(utf8, 1 /*utf8*/, 2 /*utf16 little endian*/);
+StringBuilder txt = new StringBuilder(Marshal.PtrToStringUni(resultPtr));
+string utf16 = txt;
+FreeMemoryWcharPtr(resultPtr);
+
+//C# string to C# string
+char[] utf16BE = new char[3] { 0x4700, 0x5300, 0x3300  };
+IntPtr resPtr = ConvertWcharStringToWcharStringUnsafe(utf8, 3 /*utf16 big endian*/, 2 /*utf16 little endian*/);
+StringBuilder txt = new StringBuilder(Marshal.PtrToStringUni(resultPtr));
+string utf16 = txt;
+FreeMemoryWcharPtr(resultPtr);
+
+//quatrouple-byte characters to C# string
+UInt32[] utf8 = new UInt32[4] { 0x30d00000, 0xdf000000, 0x45f40100, 0 };
+IntPtr resPtr = ConvertU32charStringToWcharStringUnsafe(utf8, 1 /*utf8*/, 2 /*utf16 little endian*/);
+StringBuilder txt = new StringBuilder(Marshal.PtrToStringUni(resultPtr));
+string utf16 = txt;
+FreeMemoryWcharPtr(resultPtr);
+```
+
 ## ToDo
 * check if double-byte characters of Shift-Jis are stored in LE on LE machines
 * check if double-byte characters of KS X 1001 are stored in BE on BE machines and in LE on LE machines
@@ -259,6 +341,7 @@ A test function that runs all functions. Only available in debug mode.
 * test on a big-endian system
   * add necessary endianness checks to UTF-16 and UTF32-operations
 	
+
 ## Credits
 * Lawn Meower: Idea, Code
 * [sozysozbot](https://github.com/sozysozbot): original KS X 1001 table
