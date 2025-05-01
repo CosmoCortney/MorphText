@@ -1,3 +1,7 @@
 .vs/
-out/
+out/build/x64-Debug/*
+out/build/x64-Release/*
+#include build files here so they can be acquired as submodules
+!out/build/x64-Debug/MorphText.dll
+!out/build/x64-Release/MorphText.dll
 main.cpp
